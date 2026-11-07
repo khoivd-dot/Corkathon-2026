@@ -1,11 +1,14 @@
 /* Tokens: OKLCH with AA-checked pairs in light and dark. No webfonts, no CDN. */
-:root{color-scheme:light dark;
---bg:oklch(98.5% .005 85);--fg:oklch(22% .02 250);--muted:oklch(45% .02 250);--card:#fff;--line:oklch(80% .01 250);
---accent:oklch(45% .12 250);--warn-bg:oklch(95% .05 75);--warn:oklch(40% .1 60);--calm-bg:oklch(94% .03 230);--error:oklch(48% .17 25);
---focus:oklch(45% .12 250);--r:16px;--s1:4px;--s2:8px;--s3:16px;--s4:24px;--s5:32px;
---serif:Georgia,"Iowan Old Style","Times New Roman",serif;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-@media (prefers-color-scheme:dark){:root{--bg:oklch(18% .015 250);--fg:oklch(95% .01 250);--muted:oklch(78% .02 250);--card:oklch(23% .02 250);--line:oklch(45% .02 250);
---accent:oklch(80% .1 250);--warn-bg:oklch(30% .05 70);--warn:oklch(88% .1 75);--calm-bg:oklch(28% .04 240);--error:oklch(78% .14 25);--focus:oklch(85% .1 250)}}
+/* Night Harbour C2 tokens: OKLCH, AA-checked in both schemes. Self-hosted OFL fonts, no CDN. */
+@font-face{font-family:Display;src:url(fonts/display.ttf) format("truetype");font-display:swap}
+@font-face{font-family:Work;src:url(fonts/body.ttf) format("truetype");font-display:swap}
+:root{color-scheme:dark light;
+--bg:oklch(17% .035 255);--fg:oklch(96% .012 85);--muted:oklch(78% .025 240);--card:oklch(21% .04 255);--line:oklch(35% .045 250);
+--accent:oklch(83% .13 78);--on-accent:oklch(19% .025 255);--warn-bg:oklch(21% .05 253);--warn:oklch(88% .135 83);--calm-bg:oklch(21% .05 253);
+--error:oklch(78% .14 25);--focus:oklch(88% .13 83);--route:oklch(82% .095 207);--r:0;--s1:4px;--s2:8px;--s3:16px;--s4:24px;--s5:32px;
+--ease:cubic-bezier(.2,.8,.2,1);--serif:Display,Georgia,serif;--sans:Work,Arial,sans-serif}
+@media (prefers-color-scheme:light){:root{--bg:oklch(97% .012 85);--fg:oklch(22% .045 253);--muted:oklch(42% .04 250);--card:oklch(94% .018 230);--line:oklch(75% .03 230);
+--accent:oklch(40% .085 60);--on-accent:oklch(98% .01 80);--warn-bg:oklch(90% .04 225);--warn:oklch(36% .09 55);--calm-bg:oklch(94% .018 230);--error:oklch(48% .17 25);--focus:oklch(40% .09 235);--route:oklch(37% .085 230)}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.55 var(--sans)}
 main{max-width:1080px;margin:0 auto;padding:var(--s5) 20px}
@@ -43,3 +46,25 @@ button{font:inherit;font-weight:600;min-height:44px;padding:10px 20px;border-rad
 @media (max-width:599px){table,thead,tbody,tr,th,td{display:block}thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 tbody tr{border-bottom:1px solid var(--line);padding:10px 0}tbody th,tbody td{border:0;padding:2px 0}tbody th{font-weight:700}
 tbody td::before{content:attr(data-label) ": ";font-weight:600;color:var(--muted)}.tablewrap{overflow:visible}}
+
+/* C2: unboxed editorial layer */
+body{font:17px/1.55 var(--sans)}
+h1{font:400 clamp(32px,4.4vw,56px)/1.08 var(--serif);letter-spacing:-.045em;text-wrap:pretty;max-width:22ch}
+h2,.card h2{font-family:var(--serif);font-weight:400;letter-spacing:-.035em}
+.card{background:none;border:0;border-top:1px solid var(--line);border-radius:0;padding:var(--s4) 0}
+.lbl{color:var(--accent);letter-spacing:.08em}
+.tag{border-radius:0;border:0;border-bottom:1px solid var(--accent);padding:2px 0;color:var(--accent)}
+.action,.calm{background:none;border-left:3px solid var(--accent);border-radius:0;color:var(--fg);padding:4px 0 4px 16px}
+.calc{background:none;border:0;border-left:1px solid var(--route);border-radius:0}
+input,select{background:transparent;border:0;border-bottom:2px solid var(--muted);border-radius:0;padding:8px 2px}
+input:focus-visible,select:focus-visible{border-bottom-color:var(--accent)}
+option{background:var(--bg);color:var(--fg)}
+.radios input{accent-color:var(--accent)}
+button{background:var(--accent);color:var(--on-accent);border-radius:0}
+.error-summary{border-radius:0;border-width:0 0 0 4px}
+@media (prefers-reduced-motion:no-preference){
+ button,a{transition:color 150ms var(--ease),transform 150ms var(--ease)}button:hover{transform:translateY(-1px)}
+ #result:not([hidden]) .card{animation:handoff 280ms var(--ease) both}#result:not([hidden]) .card+.card{animation-delay:60ms}}
+@keyframes handoff{from{opacity:.001;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media(forced-colors:active){input,select,button{border:1px solid ButtonText}.action,.calm{border-left-color:CanvasText}}
+a{color:var(--route);text-underline-offset:4px}a:hover{color:var(--accent)}
