@@ -55,9 +55,6 @@
     $("mode").textContent = ans.example ? "Example data, not live" : (ans.mode === "fallback" || (ans.sources || []).some(function (x) { return x.mode === "fallback"; }) ? "Live sources unavailable: using saved data" : "Live public data");
     $("answer-q").textContent = "Your question: \u201c" + ans.question + "\u201d";
     $("freshness").textContent = ans.dates_line || ans.freshness || "";
-    var gl = $("gaps"); gl.replaceChildren(); var gaps = ans.coverage_gaps || ans.uncovered_ports || [];
-    gaps.forEach(function (g) { var li = el("li"); if (g.url && /^https:\/\//.test(g.url)) { var a = el("a", g.port || g.name || g.url); a.href = g.url; li.append(a); } else li.textContent = g.port || g.name || String(g); gl.append(li); });
-    if (ans.coverage_line) gl.prepend(el("li", ans.coverage_line)); gl.hidden = !gl.children.length;
     $("staleness").textContent = ans.staleness || ""; $("staleness").hidden = !(ans.mode === "fallback" && ans.staleness);
     var exp = exposureText(stock, lead);
     var headline = ans.state === "alert"

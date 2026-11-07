@@ -179,7 +179,9 @@ def decide(inp: ImporterInputs, sources: dict[str, SourceResult], gdelt_records:
                   "reading": reading, "action": action},
         "fx": _fx_block(fx),
         "sources": _source_rows(sources),
-        "coverage": coverage(confirmation_enabled()),
+        "coverage": (cov := coverage(confirmation_enabled())),
+        "coverage_line": cov["line"],  # read by the #18 UI
+        "coverage_gaps": cov["ports"],
         "checked_at": checked,
         "dates_line": dates_line(checked, sources),
     }
