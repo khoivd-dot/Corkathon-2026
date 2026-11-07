@@ -83,7 +83,7 @@
     });
     box.append(svg);
     var missing = (geo || []).filter(function (p) { return pts.indexOf(p) < 0; }).map(function (p) { return p.port; });
-    $("routemap-cap").textContent = pts.map(function (p, i) { return (i + 1) + " " + p.port + (p.event === "confirmed" ? " (confirmed event)" : p.event === "unconfirmed" ? " (unconfirmed report)" : ""); }).join(" \u00b7 ") + ". Route sketch, not for navigation." + (missing.length ? " We couldn\u2019t place " + missing.join(", ") + " on the map." : "");
+    $("routemap-cap").textContent = pts.map(function (p, i) { return (i + 1) + " " + p.port + (p.event === "confirmed" ? " (confirmed event)" : p.event === "unconfirmed" ? " (unconfirmed report)" : ""); }).join(" \u00b7 ") + ". Port positions are approximate. Route sketch, not for navigation." + (missing.length ? " We couldn\u2019t place " + missing.join(", ") + " on the map." : "");
     fig.hidden = false;
   }
   function render(ans, stock, lead) {
