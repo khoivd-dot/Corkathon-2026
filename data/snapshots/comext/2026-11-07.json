@@ -1,0 +1,166 @@
+{
+ "source_id": "comext",
+ "endpoint": "https://ec.europa.eu/eurostat/api/comext/dissemination/statistics/1.0/data/DS-045409?reporter=IE&partner=EXT_EU27_2020&product=0901&flow=1&indicators=VALUE_IN_EUROS&indicators=QUANTITY_IN_100KG&freq=M&sinceTimePeriod=2025-06",
+ "licence": {
+  "name": "Eurostat free re-use (Commission Decision 2011/833/EU; CC BY 4.0 per Eurostat copyright notice — exact Comext wording to confirm)",
+  "url": "https://ec.europa.eu/eurostat/web/main/help/copyright-notice",
+  "attribution": "Source: Eurostat (Comext DS-045409). Modifications, if any, must be stated."
+ },
+ "status": "ok",
+ "retrieved_at": "2026-11-07T10:48:03+00:00",
+ "reference_period": "2026-08",
+ "published_at": "2026-10-16T11:00:00+0200",
+ "reason": null,
+ "records": [
+  {
+   "reference_period": "2025-06",
+   "product_code": "0901",
+   "product": "Coffee, whether or not roasted or decaffeinated; coffee husks and skins; coffee substitutes containing coffee in any proportion",
+   "partner": "Extra-EU27 (from 2020)",
+   "published_at": "2026-10-16T11:00:00+0200",
+   "retrieved_at": "2026-11-07T10:48:03+00:00",
+   "quantity_100kg": 11145.45,
+   "value_eur": 10163435
+  },
+  {
+   "reference_period": "2025-07",
+   "product_code": "0901",
+   "product": "Coffee, whether or not roasted or decaffeinated; coffee husks and skins; coffee substitutes containing coffee in any proportion",
+   "partner": "Extra-EU27 (from 2020)",
+   "published_at": "2026-10-16T11:00:00+0200",
+   "retrieved_at": "2026-11-07T10:48:03+00:00",
+   "quantity_100kg": 8217.0,
+   "value_eur": 8149029
+  },
+  {
+   "reference_period": "2025-08",
+   "product_code": "0901",
+   "product": "Coffee, whether or not roasted or decaffeinated; coffee husks and skins; coffee substitutes containing coffee in any proportion",
+   "partner": "Extra-EU27 (from 2020)",
+   "published_at": "2026-10-16T11:00:00+0200",
+   "retrieved_at": "2026-11-07T10:48:03+00:00",
+   "quantity_100kg": 9643.5,
+   "value_eur": 9087258
+  },
+  {
+   "reference_period": "2025-09",
+   "product_code": "0901",
+   "product": "Coffee, whether or not roasted or decaffeinated; coffee husks and skins; coffee substitutes containing coffee in any proportion",
+   "partner": "Extra-EU27 (from 2020)",
+   "published_at": "2026-10-16T11:00:00+0200",
+   "retrieved_at": "2026-11-07T10:48:03+00:00",
+   "quantity_100kg": 8770.34,
+   "value_eur": 8121653
+  },
+  {
+   "reference_period": "2025-10",
+   "product_code": "0901",
+   "product": "Coffee, whether or not roasted or decaffeinated; coffee husks and skins; coffee substitutes containing coffee in any proportion",
+   "partner": "Extra-EU27 (from 2020)",
+   "published_at": "2026-10-16T11:00:00+0200",
+   "retrieved_at": "2026-11-07T10:48:03+00:00",
+   "quantity_100kg": 8742.01,
+   "value_eur": 8171492
+  },
+  {
+   "reference_period": "2025-11",
+   "product_code": "0901",
+   "product": "Coffee, whether or not roasted or decaffeinated; coffee husks and skins; coffee substitutes containing coffee in any proportion",
+   "partner": "Extra-EU27 (from 2020)",
+   "published_at": "2026-10-16T11:00:00+0200",
+   "retrieved_at": "2026-11-07T10:48:03+00:00",
+   "quantity_100kg": 11598.31,
+   "value_eur": 10067541
+  },
+  {
+   "reference_period": "2025-12",
+   "product_code": "0901",
+   "product": "Coffee, whether or not roasted or decaffeinated; coffee husks and skins; coffee substitutes containing coffee in any proportion",
+   "partner": "Extra-EU27 (from 2020)",
+   "published_at": "2026-10-16T11:00:00+0200",
+   "retrieved_at": "2026-11-07T10:48:03+00:00",
+   "quantity_100kg": 8898.59,
+   "value_eur": 8009998
+  },
+  {
+   "reference_period": "2026-01",
+   "product_code": "0901",
+   "product": "Coffee, whether or not roasted or decaffeinated; coffee husks and skins; coffee substitutes containing coffee in any proportion",
+   "partner": "Extra-EU27 (from 2020)",
+   "published_at": "2026-10-16T11:00:00+0200",
+   "retrieved_at": "2026-11-07T10:48:03+00:00",
+   "quantity_100kg": 7541.51,
+   "value_eur": 7276128
+  },
+  {
+   "reference_period": "2026-02",
+   "product_code": "0901",
+   "product": "Coffee, whether or not roasted or decaffeinated; coffee husks and skins; coffee substitutes containing coffee in any proportion",
+   "partner": "Extra-EU27 (from 2020)",
+   "published_at": "2026-10-16T11:00:00+0200",
+   "retrieved_at": "2026-11-07T10:48:03+00:00",
+   "quantity_100kg": 5910.07,
+   "value_eur": 6276576
+  },
+  {
+   "reference_period": "2026-03",
+   "product_code": "0901",
+   "product": "Coffee, whether or not roasted or decaffeinated; coffee husks and skins; coffee substitutes containing coffee in any proportion",
+   "partner": "Extra-EU27 (from 2020)",
+   "published_at": "2026-10-16T11:00:00+0200",
+   "retrieved_at": "2026-11-07T10:48:03+00:00",
+   "quantity_100kg": 8707.39,
+   "value_eur": 8308797
+  },
+  {
+   "reference_period": "2026-04",
+   "product_code": "0901",
+   "product": "Coffee, whether or not roasted or decaffeinated; coffee husks and skins; coffee substitutes containing coffee in any proportion",
+   "partner": "Extra-EU27 (from 2020)",
+   "published_at": "2026-10-16T11:00:00+0200",
+   "retrieved_at": "2026-11-07T10:48:03+00:00",
+   "quantity_100kg": 7982.91,
+   "value_eur": 7776953
+  },
+  {
+   "reference_period": "2026-05",
+   "product_code": "0901",
+   "product": "Coffee, whether or not roasted or decaffeinated; coffee husks and skins; coffee substitutes containing coffee in any proportion",
+   "partner": "Extra-EU27 (from 2020)",
+   "published_at": "2026-10-16T11:00:00+0200",
+   "retrieved_at": "2026-11-07T10:48:03+00:00",
+   "quantity_100kg": 11453.29,
+   "value_eur": 10265042
+  },
+  {
+   "reference_period": "2026-06",
+   "product_code": "0901",
+   "product": "Coffee, whether or not roasted or decaffeinated; coffee husks and skins; coffee substitutes containing coffee in any proportion",
+   "partner": "Extra-EU27 (from 2020)",
+   "published_at": "2026-10-16T11:00:00+0200",
+   "retrieved_at": "2026-11-07T10:48:03+00:00",
+   "quantity_100kg": 7278.21,
+   "value_eur": 6977304
+  },
+  {
+   "reference_period": "2026-07",
+   "product_code": "0901",
+   "product": "Coffee, whether or not roasted or decaffeinated; coffee husks and skins; coffee substitutes containing coffee in any proportion",
+   "partner": "Extra-EU27 (from 2020)",
+   "published_at": "2026-10-16T11:00:00+0200",
+   "retrieved_at": "2026-11-07T10:48:03+00:00",
+   "quantity_100kg": 9665.34,
+   "value_eur": 8730480
+  },
+  {
+   "reference_period": "2026-08",
+   "product_code": "0901",
+   "product": "Coffee, whether or not roasted or decaffeinated; coffee husks and skins; coffee substitutes containing coffee in any proportion",
+   "partner": "Extra-EU27 (from 2020)",
+   "published_at": "2026-10-16T11:00:00+0200",
+   "retrieved_at": "2026-11-07T10:48:03+00:00",
+   "quantity_100kg": 10324.69,
+   "value_eur": 9503374
+  }
+ ]
+}
