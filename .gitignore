@@ -14,3 +14,4 @@ data/raw/
 data/cache/
 .DS_Store
 *.log
+.cache/

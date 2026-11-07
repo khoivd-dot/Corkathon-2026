@@ -72,8 +72,9 @@ def _iso(seendate: str) -> str:
 class GdeltLoader(Loader):
     source_id = "gdelt"
     endpoint = API
+    cache_ttl_s = 1800
     licence = Licence(
-        name="GDELT open data, free for any use with citation (terms to confirm)",
+        name="GDELT dataset terms: reuse, snapshots and redistribution permitted with citation/link (checked 2026-11-07); publishers' full articles not licensed",
         url="https://www.gdeltproject.org/about.html#termsofuse",
         attribution="Source: The GDELT Project (gdeltproject.org).",
     )
@@ -82,6 +83,11 @@ class GdeltLoader(Loader):
                  max_records: int = 75, pause_s: float = 6.0):
         self.queries = queries or DEFAULT_QUERIES
         self.timespan, self.max_records, self.pause_s = timespan, max_records, pause_s
+
+    def cache_key(self) -> str:
+        import hashlib
+        h = hashlib.sha256(json.dumps(self.queries, sort_keys=True).encode()).hexdigest()[:12]
+        return f"{self.source_id}-{h}"
 
     def url(self, q: str) -> str:
         return f"{API}?" + urlencode({"query": q, "mode": "artlist", "format": "json",

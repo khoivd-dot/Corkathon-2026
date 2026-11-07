@@ -6,13 +6,14 @@ from __future__ import annotations
 
 from typing import Any
 
-from .base import Licence, Loader, http_json, now_iso
+from .base import Licence, Loader, http_json, now_iso, DAY
 
 SERIES = "EXR/D.USD.EUR.SP00.A"
 
 
 class EcbFxLoader(Loader):
     source_id = "ecb_fx"
+    cache_ttl_s = DAY
     licence = Licence(
         name="ESCB statistics free reuse policy (unmodified, source quoted)",
         url="https://www.ecb.europa.eu/stats/ecb_statistics/governance_and_quality_framework/html/usage_policy.en.html",

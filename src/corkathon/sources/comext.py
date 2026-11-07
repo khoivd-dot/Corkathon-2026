@@ -9,15 +9,16 @@ from __future__ import annotations
 from typing import Any
 from urllib.parse import urlencode
 
-from .base import Licence, Loader, http_json, now_iso
+from .base import Licence, Loader, http_json, now_iso, MONTH
 
 BASE = "https://ec.europa.eu/eurostat/api/comext/dissemination/statistics/1.0/data/DS-045409"
 
 
 class ComextLoader(Loader):
     source_id = "comext"
+    cache_ttl_s = MONTH
     licence = Licence(
-        name="Eurostat free re-use (Commission Decision 2011/833/EU; CC BY 4.0 per Eurostat copyright notice — exact Comext wording to confirm)",
+        name="Eurostat free re-use (Commission Decision 2011/833/EU; CC BY 4.0 per Eurostat copyright notice; statistical reuse incl. commercial display and snapshots permitted with acknowledgement, modifications identified, disclaimer applied — checked 2026-11-07)",
         url="https://ec.europa.eu/eurostat/web/main/help/copyright-notice",
         attribution="Source: Eurostat (Comext DS-045409). Modifications, if any, must be stated.",
     )

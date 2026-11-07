@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from .base import Licence, Loader, http_json, now_iso
+from .base import Licence, Loader, http_json, now_iso, MONTH
 
 MATRIX = "TSM06"
 STAT_IMPORTS = "TSM06C1"
@@ -21,6 +21,7 @@ DEFAULT_GROUPS = ("001008", "001")
 class CsoTradeLoader(Loader):
     source_id = "cso_trade"
     endpoint = "https://ws.cso.ie/public/api.jsonrpc (PxStat.Data.Cube_API.ReadDataset, TSM06)"
+    cache_ttl_s = MONTH
     licence = Licence(
         name="CC BY 4.0",
         url="https://www.cso.ie/en/aboutus/whoweare/copyrightpolicy/",
