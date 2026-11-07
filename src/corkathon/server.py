@@ -23,6 +23,7 @@ from .inputs import InputError, parse_inputs
 from .sources.base import REPO_ROOT
 from .sources.ais import AisPortLoader, ais_enabled
 from .sources.gdelt import PortGdeltLoader
+from .sources.open_meteo import PortWeatherLoader, port_sentence, rough_days, weather_enabled
 from .sources.registry import LOADERS
 
 WEB = Path(os.environ.get("WEB_DIR", REPO_ROOT / "web"))
@@ -53,6 +54,11 @@ def refresh_once() -> None:
         LOADERS[sid]().load()
     for port in LANE_PORTS:  # GATE in sources/gdelt.py spaces the calls >= 5 s apart
         PortGdeltLoader(port).load()
+    if weather_enabled():
+        for port in LANE_PORTS:
+            hit = lookup(port)
+            if hit:
+                PortWeatherLoader(hit[0], hit[2], hit[3]).load()
 
 
 def news_ports(typed: list[str]) -> tuple[list[str], list[str]]:
@@ -97,6 +103,15 @@ def answer(form: dict) -> dict:
         sources[sid] = LOADERS[sid]().load()
     out = decide(inp, sources, records)
     out["news_ports"] = {"checked": per_port, "unknown": unknown}
+    if weather_enabled():
+        out["weather"] = weather_block(known)
+        w = out["weather"]
+        if w["checked_at"]:
+            out["sources"].append({"name": "Open-Meteo weather forecast", "reference_period": w["reference_period"],
+                                   "published_at": "\u2014", "retrieved_at": w["checked_at"],
+                                   "checked_at": w["checked_at"], "source_updated_at": w["checked_at"],
+                                   "mode": w["mode"], "use": "Signal only: forecast wind and waves at each port",
+                                   "status": w["status"], "attribution": PortWeatherLoader.licence.attribution})
     if ais_enabled():
         out["ais"] = ais_counts(known)
         if out["ais"]["ports"]:
@@ -106,6 +121,46 @@ def answer(form: dict) -> dict:
                                    "mode": out["ais"]["mode"], "use": "Context only: counts near each port",
                                    "status": out["ais"]["status"]})
     return out
+
+
+def weather_block(ports: list[str], today=None) -> dict:
+    """Next-7-day wind and waves at each known port on the route, one call and one
+    cache entry per public port. Only rough days are put into words; a port with no
+    forecast is named as unchecked, never described as calm."""
+    from datetime import datetime, timezone
+    today = today or datetime.now(timezone.utc).date()
+    lines, rough_ports, calm, missing = [], [], [], []
+    checked, mode, status, ref = None, "live", "ok", None
+    for p in ports:
+        hit = lookup(p)
+        if not hit:
+            continue
+        r = PortWeatherLoader(hit[0], hit[2], hit[3]).load()
+        future = [x for x in r.records if x.get("date", "") >= today.isoformat()]
+        if r.status == "unavailable" or not future:
+            missing.append(hit[0])
+            continue
+        checked = max(checked or r.checked_at, r.checked_at)
+        ref = min(ref or future[0]["date"], future[0]["date"])
+        if r.mode == "fallback":
+            mode, status = "fallback", r.status
+        bad = rough_days(future, today)
+        if bad:
+            rough_ports.append(hit[0]); lines.append(port_sentence(hit[0], bad))
+        else:
+            calm.append(hit[0])
+    if calm:
+        lines.append(f"No gale-force gusts or very rough seas forecast at {_join(calm)} in the next 7 days. "
+                     "Forecasts change, and they say nothing about delays further ahead.")
+    if missing:
+        lines.append(f"We have no weather forecast for {_join(missing)} right now.")
+    return {"lines": lines, "rough_ports": rough_ports, "checked_at": checked, "mode": mode, "status": status,
+            "reference_period": f"Next 7 days from {ref}" if ref else None,
+            "attribution": PortWeatherLoader.licence.attribution, "url": "https://open-meteo.com/"}
+
+
+def _join(xs: list[str]) -> str:
+    return xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + " and " + xs[-1]
 
 
 def ais_counts(ports: list[str]) -> dict:

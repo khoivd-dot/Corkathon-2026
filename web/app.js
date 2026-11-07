@@ -153,6 +153,10 @@
     if (np.unknown && np.unknown.length) notes.push("We didn’t search news for " + np.unknown.join(", ") + ": we don’t know that port name yet.");
     var saved = (np.checked || []).filter(function (p) { return p.mode === "fallback"; }).map(function (p) { return p.port; });
     if (saved.length && !ans.example) notes.push("News for " + saved.join(", ") + " is from a saved copy.");
+    var w = ans.weather;
+    if (w && w.lines) w.lines.forEach(function (l) { notes.push(l); });
+    // No news but a gale forecast: say so in the verdict, not just in a note. Weather never confirms anything.
+    if (!finds.length && w && w.rough_ports && w.rough_ports.length) r.verdict = "Nothing reported, rough weather forecast";
     r.notes = notes;
     out.route = r;
 
@@ -177,7 +181,7 @@
 
   // ---------- Source rows ----------
   function rowKey(name) {
-    return /GDELT/i.test(name) ? "gdelt" : /ECB/i.test(name) ? "ecb" : /CSO/i.test(name) ? "cso" : /Eurostat|Comext/i.test(name) ? "comext" : /AIS|ship/i.test(name) ? "ais" : /advisor|Carrier/i.test(name) ? "adv" : "other";
+    return /GDELT/i.test(name) ? "gdelt" : /ECB/i.test(name) ? "ecb" : /CSO/i.test(name) ? "cso" : /Eurostat|Comext/i.test(name) ? "comext" : /AIS|ship/i.test(name) ? "ais" : /Meteo|weather/i.test(name) ? "weather" : /advisor|Carrier/i.test(name) ? "adv" : "other";
   }
   function openSource(key) {
     var panel = $("sources-panel"); panel.open = true;
@@ -546,6 +550,8 @@
       [fmtWhen(s.reference_period), fmtWhen(s.published_at), fetched, s.use].forEach(function (val, i) { var td = el("td", val); td.setAttribute("data-label", heads[i]); tr.append(td); });
       tb.append(tr);
     });
+    var lw = $("lic-weather");
+    if (lw && ans.weather && ans.weather.url) { lw.replaceChildren(link("Weather data by Open-Meteo.com", ans.weather.url), document.createTextNode(", CC BY 4.0, forecasts only.")); }
     $("working-summary").textContent = "Where this comes from (" + rows.length + " sources)";
   }
 
