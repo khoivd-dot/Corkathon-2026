@@ -1,4 +1,6 @@
-Copyright 2019 The Work Sans Project Authors (https://github.com/weiweihuanghuang/Work-Sans)
+Copyright 2016-2023 The Inter Project Authors (https://github.com/rsms/inter)
+
+Files: inter-*.woff2, subset to Latin-1 and common punctuation from the Debian fonts-inter package (Inter 4.0).
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:

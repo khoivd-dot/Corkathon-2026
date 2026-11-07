@@ -427,7 +427,7 @@
 
   // ---------- The three answers, each with something to try ----------
   function renderPart(v, ans, inputs) {
-    var sec = el("section", null, "part part-" + v.key); sec.id = "part-" + v.key; sec.setAttribute("aria-labelledby", "t-" + v.key);
+    var sec = el("section", null, "part part-" + v.key); sec.id = "part-" + v.key; sec.setAttribute("data-tone", v.tone); sec.setAttribute("aria-labelledby", "t-" + v.key);
     var text = el("div", null, "part-text");
     var h = el("h3", v.label); h.id = "t-" + v.key; text.append(h);
     var tone = el("p", null, "tone"); tone.setAttribute("data-tone", v.tone); tone.append(icon(v.tone), document.createTextNode(v.verdict)); text.append(tone);
@@ -522,6 +522,7 @@
       glance.append(a);
     });
     if (map) map.sail();
+    ui.fillAll(); ui.roll(res);
 
     var todo = $("todo"); todo.replaceChildren();
     var acts = [ans.delay && ans.delay.action];
@@ -617,7 +618,7 @@
     form.setAttribute("aria-busy", on ? "true" : "false");
     ["submit", "ask-btn", "recheck"].forEach(function (id) { $(id).disabled = on; });
     var st = $("status"); st.replaceChildren();
-    if (on) st.append(el("span", null, "spin"));
+    if (on) { var orbs = el("span", null, "orbs"); orbs.setAttribute("aria-hidden", "true"); orbs.append(el("i"), el("i"), el("i")); st.append(orbs); }
     if (msg) st.append(document.createTextNode(msg));
     if (on && !$("result").hidden) $("result").setAttribute("aria-busy", "true");
     if (!on) $("result").removeAttribute("aria-busy");
@@ -777,4 +778,79 @@
   ["container_no", "vessel"].forEach(function (id) {
     $(id).addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); $(id === "vessel" ? "vessel-go" : "container-go").click(); } });
   });
+  // ---------- Interaction layer (ideas from bencho.dev and libraries.dev, rebuilt in plain JS) ----------
+  var ui = (function () {
+    var fine = window.matchMedia && window.matchMedia("(pointer: fine)").matches;
+    var calm = calmMotion;
+    // Pill sliders: paint the filled part of the track.
+    function fill(r) { var lo = +r.min || 0, hi = +r.max || 100; r.style.setProperty("--fill", ((r.value - lo) / (hi - lo) * 100).toFixed(1) + "%"); }
+    function fillAll() { document.querySelectorAll("input[type=range]").forEach(fill); }
+    document.addEventListener("input", function (e) { if (e.target.type === "range") fill(e.target); });
+
+    // Rolling numbers: the first number in each verdict counts up once. The final text is set first,
+    // so screen readers and copies always see the real value.
+    function roll(root) {
+      if (calm) return;
+      root.querySelectorAll(".tone, .g-v").forEach(function (n) {
+        var t = Array.prototype.filter.call(n.childNodes, function (c) { return c.nodeType === 3; })[0];
+        if (!t) return;
+        var m = /(\d+(?:\.\d+)?)/.exec(t.nodeValue); if (!m) return;
+        var target = parseFloat(m[1]), dp = (m[1].split(".")[1] || "").length, before = t.nodeValue.slice(0, m.index), after = t.nodeValue.slice(m.index + m[1].length);
+        var span = el("span", m[1], "num"); span.setAttribute("aria-hidden", "true");
+        var real = el("span", m[1], "sr");
+        var rest = document.createTextNode(after);
+        t.nodeValue = before; n.insertBefore(real, t.nextSibling); n.insertBefore(span, real.nextSibling); n.insertBefore(rest, span.nextSibling);
+        var t0 = null, dur = 900;
+        function step(ts) { if (t0 === null) t0 = ts; var f = Math.min(1, (ts - t0) / dur), e = 1 - Math.pow(1 - f, 3); span.textContent = (target * e).toFixed(dp); if (f < 1) requestAnimationFrame(step); else { real.remove(); span.removeAttribute("aria-hidden"); span.textContent = m[1]; } }
+        span.textContent = (0).toFixed(dp); requestAnimationFrame(step);
+      });
+    }
+
+    // Magnetic headline: letters near the pointer lean in, tilt its way and take the brand colour,
+    // then spring back. The heading keeps its real text for assistive tech.
+    function magnetic(h) {
+      if (!h || calm || !fine) return;
+      var text = h.textContent; h.textContent = "";
+      h.append(el("span", text, "sr"));
+      var vis = el("span", null, "mag"); vis.setAttribute("aria-hidden", "true");
+      var letters = [];
+      text.split(" ").forEach(function (w, i, all) {
+        var ws = el("span", null, "mag-w");
+        Array.from(w).forEach(function (ch) { var l = el("span", ch, "mag-l"); ws.append(l); letters.push(l); });
+        vis.append(ws); if (i < all.length - 1) vis.append(document.createTextNode(" "));
+      });
+      h.append(vis);
+      var raf = 0, px = 0, py = 0, on = false;
+      function frame() {
+        raf = 0;
+        letters.forEach(function (l) {
+          var b = l.getBoundingClientRect(), cx = b.left + b.width / 2, cy = b.top + b.height / 2, dx = px - cx, dy = py - cy, d = Math.hypot(dx, dy), k = on ? Math.max(0, 1 - d / 140) : 0;
+          l.style.transform = k ? "translate(" + (dx * k * .12).toFixed(1) + "px," + (dy * k * .12 - k * 6).toFixed(1) + "px) rotate(" + (dx / 140 * 10 * k).toFixed(1) + "deg)" : "";
+          l.style.color = k > .45 ? "var(--brand)" : "";
+        });
+      }
+      function move(e) { px = e.clientX; py = e.clientY; on = true; if (!raf) raf = requestAnimationFrame(frame); }
+      h.parentNode.addEventListener("pointermove", move);
+      h.parentNode.addEventListener("pointerleave", function () { on = false; if (!raf) raf = requestAnimationFrame(frame); });
+    }
+
+    // Tilt card for the hero picture.
+    function tilt(card) {
+      if (!card || calm || !fine) return;
+      card.addEventListener("pointermove", function (e) { var b = card.getBoundingClientRect(), x = (e.clientX - b.left) / b.width - .5, y = (e.clientY - b.top) / b.height - .5; card.style.setProperty("--ry", (x * 6).toFixed(2) + "deg"); card.style.setProperty("--rx", (-y * 6).toFixed(2) + "deg"); });
+      card.addEventListener("pointerleave", function () { card.style.setProperty("--ry", "0deg"); card.style.setProperty("--rx", "0deg"); });
+    }
+
+    // Dock falloff: the three answer cards swell toward the pointer, nearest most.
+    function dock(row) {
+      if (!row || calm || !fine) return;
+      row.addEventListener("pointermove", function (e) {
+        row.querySelectorAll(".glance-item").forEach(function (c) { var b = c.getBoundingClientRect(), d = Math.abs(e.clientX - (b.left + b.width / 2)); c.style.setProperty("--lift", Math.max(0, 1 - d / (b.width * 1.4)).toFixed(3)); });
+      });
+      row.addEventListener("pointerleave", function () { row.querySelectorAll(".glance-item").forEach(function (c) { c.style.setProperty("--lift", "0"); }); });
+    }
+
+    magnetic($("page-title")); tilt($("shot")); dock($("glance"));
+    return { fillAll: fillAll, roll: roll };
+  })();
 })();

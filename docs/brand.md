@@ -1,6 +1,6 @@
 # Brand
 
-> Owner: Isabelle. **This records the look the app already has** (the "Night Harbour" theme in `web/styles.css`). It is not a redesign. The one change it proposes is the product name, pending Khoi's OK.
+> Owner: Isabelle. Records the look the app has. **Updated 7 Nov, 13:10:** Khoa asked to scrap Night Harbour, so the app now uses the "Soft Pill" theme in `web/styles.css` (pill shapes and soft cards after morphin-ui, Inter, warm neutrals in light, pure black in dark). The one change this file proposes is the product name, pending Khoi's OK.
 
 ## Name
 
@@ -28,35 +28,36 @@ Example headline: *"Check your forwarder's ETA today: your stock runs out 14 day
 
 ## Colour
 
-From the app's design tokens (`web/styles.css`, defined in OKLCH; hex values are close equivalents for slides and documents). Dark is the primary look; light follows the reader's system setting.
+From the app's design tokens (`web/styles.css`, defined in OKLCH; hex values are close equivalents for slides and documents). Light and dark follow the reader's system setting.
 
-| Role | Token | Dark | Light | Used for |
+| Role | Token | Light | Dark | Used for |
 |---|---|---|---|---|
-| Background | `--bg` | `#040F1D` | `#FAF6EF` | Page |
-| Surface | `--bg2` | `#081527` | — | Panels, map |
-| Text | `--fg` | `#F2EEE6` | `#0A1B2F` | Body and headings |
-| Muted text | `--muted` | `#A7B7C3` | `#3F5265` | Captions, "How sure" |
-| Accent (amber) | `--accent` | `#F6BC5D` | `#7D460B` | Main button, highlights |
-| Route | `--route` | `#72D6E3` | `#005574` | Route line, links |
-| Warning | `--warn` | `#FFB95B` | `#8C4400` | Stock shortfall, confirmed event |
-| Calm | `--calm` | `#76DFBC` | `#0E5E49` | "About the same", nothing to act on |
-| Unknown | `--unk` | `#BDC1E5` | `#51507B` | "Nothing reported", can't tell |
+| Background | `--background` | `#FBFAF7` | `#000000` | Page |
+| Card | `--card` | `#FFFFFF` | `#171717` | Cards, answer, form |
+| Soft fill | `--secondary` | `#F2F0ED` | `#262626` | Chips, charts, inner panels |
+| Text | `--foreground` | `#110F0C` | `#FAFAFA` | Body, headings, main button |
+| Muted text | `--muted-foreground` | `#58554F` | `#A4A4A4` | Captions, "How sure" |
+| Brand (blue) | `--brand` | `#245FD4` | `#73A3FC` | Links, sliders, route line, focus |
+| Data (green) | `--data` | `#0E8C41` | `#53DE73` | Stock bar, exchange-rate line |
+| Warning (amber) | `--warn` | `#C66000` | `#FCA942` | Stock shortfall, confirmed event |
+| Calm | `--calm` | `#007E46` | `#60DB89` | "About the same", nothing to act on |
+| Unknown | `--unk` | `#566286` | `#A8B6DF` | "Nothing reported", can't tell |
 
 Rules:
 - **Amber means "act", not "danger".** There is no red status colour: the product warns, it doesn't alarm.
 - **Colour never carries meaning alone.** Every status has a word and an icon ("⚠ 14 days short").
 - **Contrast:** WCAG 2.2 AA in both themes (the team rule; the page passes automated checks with 0 violations).
 
-The pitch deck uses a slightly lighter navy (`#13233A`), a warm off-white (`#F6F3EC`) and a deeper amber (`#E8913A`) so it projects well; same family, tuned for screens in bright rooms.
+The pitch deck still uses the old Night Harbour colours (navy `#13233A`, off-white `#F6F3EC`, amber `#E8913A`) and needs updating to match.
 
 ## Typography
 
 | Use | App | Deck |
 |---|---|---|
-| Display and headlines | **Gloock** (serif, self-hosted, OFL) | Libre Baskerville |
-| Body and interface | **Work Sans** (self-hosted, OFL) | Inter |
+| Display and headlines | **Inter Display** SemiBold, tight tracking (self-hosted, OFL) | Inter |
+| Body and interface | **Inter** Regular, Medium, SemiBold (self-hosted, OFL) | Inter |
 
-- Headlines in the serif, sentence case, no full stops on labels.
+- Headlines in sentence case, no full stops on labels.
 - Status words big and short: "14 days short", "Nothing reported", "About the same".
 - Numbers always with units and dates: "ECB rate as of 6 Nov".
 
@@ -64,9 +65,9 @@ The pitch deck uses a slightly lighter navy (`#13233A`), a warm off-white (`#F6F
 
 Not required for judging; a wordmark is enough.
 
-- **Wordmark:** "In Time" in Gloock, in `--fg`, with the amber arc already used in the page header placed before it, as a horizon or the edge of a clock.
+- **Wordmark:** "In Time" in Inter Display SemiBold, in `--foreground`, with the blue arc already used in the page header placed before it, as a horizon or the edge of a clock.
 - **Clear space:** the height of the capital "I" on every side.
-- **Don't:** add ships, containers, globes or clocks with hands; recolour the wordmark amber on navy at small sizes (contrast drops).
+- **Don't:** add ships, containers, globes or clocks with hands; recolour the wordmark in a status colour.
 
 ## Where the brand appears
 
