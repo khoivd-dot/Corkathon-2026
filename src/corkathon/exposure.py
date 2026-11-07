@@ -38,8 +38,8 @@ class FxExposure:
 def stock_exposure(stock_days: int, lead_time_days: int) -> StockExposure:
     b = stock_days - lead_time_days
     return StockExposure(stock_days, lead_time_days, b, b < 0,
-                         f"Stock lasts {stock_days} days and a new order takes {lead_time_days} days, "
-                         + (f"so you're {-b} days short." if b < 0 else f"so you have {b} days to spare."))
+                         f"Stock lasts {stock_days} days. Lead time is {lead_time_days} days. "
+                         + (f"You're {-b} days short." if b < 0 else f"You have {b} days spare."))
 
 
 def stock_sentence(s: StockExposure) -> str:

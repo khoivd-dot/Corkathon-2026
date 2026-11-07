@@ -97,7 +97,7 @@ class DecisionTests(unittest.TestCase):
         self.assertIn("Check their notices directly", out["coverage_line"])
         self.assertNotIn("\u2212", out["delay"]["exposure"]["arithmetic"])
         self.assertNotIn("= -", out["delay"]["exposure"]["arithmetic"])
-        self.assertIn("14 days short", out["delay"]["exposure"]["arithmetic"])
+        self.assertIn("You're 14 days short.", out["delay"]["exposure"]["arithmetic"])
 
     def test_no_last_order_claim_in_examples(self):
         for f in Path("web/examples").glob("*.json"):
