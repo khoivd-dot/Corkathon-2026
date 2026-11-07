@@ -25,8 +25,8 @@ class StockExposure:
 @dataclass(frozen=True)
 class FxExposure:
     currency: str
-    status: str  # "computed" | "not_applicable" | "unavailable"
-    unfixed_share: float
+    status: str  # "computed" | "not_applicable" | "unavailable" | "needs_share"
+    unfixed_share: float | None
     rate_from: float | None = None
     rate_to: float | None = None
     date_from: str | None = None
@@ -50,8 +50,15 @@ def stock_sentence(s: StockExposure) -> str:
     return f"Your stock covers your lead time by {s.buffer_days} days."
 
 
-def fx_exposure(currency: str, fixed_rate_share: float, ecb_records: list[dict],
+NEEDS_SHARE = "We need the share you've fixed to work out your euro cost."
+
+
+def fx_exposure(currency: str, fixed_rate_share: float | None, ecb_records: list[dict],
                 lookback_days: int = 30) -> FxExposure:
+    if currency == "EUR":
+        return FxExposure(currency, "not_applicable", None, note="Invoice is in euro, so there is no exchange-rate exposure.")
+    if fixed_rate_share is None:  # "some" without a share: no amount, no default
+        return FxExposure(currency, "needs_share", None, note=NEEDS_SHARE)
     unfixed = round(1.0 - fixed_rate_share, 4)
     if currency == "EUR":
         return FxExposure(currency, "not_applicable", unfixed, note="Invoice is in euro, so there is no exchange-rate exposure.")

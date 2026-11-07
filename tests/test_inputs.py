@@ -8,7 +8,7 @@ from pathlib import Path
 from corkathon.inputs import InputError, QUESTIONS, parse_inputs
 
 GOOD = {"importer": "Secret Coffee Ltd", "origin_port": "Santos", "destination_port": "Cork",
-        "transshipment_ports": "Rotterdam, ", "currency": "usd", "fixed_rate_share": "Some",
+        "transshipment_ports": "Rotterdam, ", "currency": "usd", "fixed_rate_share": "Some", "fixed_rate_pct": "50",
         "stock_days": "21", "lead_time_days": "35", "window_start": "2026-11-10", "window_end": "2026-12-15"}
 
 

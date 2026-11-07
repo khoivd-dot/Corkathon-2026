@@ -39,6 +39,22 @@ class FxTests(unittest.TestCase):
         f = fx_exposure("USD", 0, ecb(("2026-11-06", 1.1)))
         self.assertIn("say nothing about delays", f.note)
 
+    def test_some_without_share_shows_no_amount(self):
+        from corkathon.inputs import parse_inputs
+        from tests.test_inputs import GOOD
+        i = parse_inputs({**GOOD, "fixed_rate_share": "Some", "fixed_rate_pct": ""})
+        self.assertIsNone(i.fixed_rate_share)
+        f = fx_exposure("USD", i.fixed_rate_share, ecb(("2026-10-07", 1.2), ("2026-11-06", 1.1)))
+        self.assertEqual(f.status, "needs_share")
+        self.assertIsNone(f.eur_cost_change_pct)
+        self.assertEqual(f.note, "We need the share you've fixed to work out your euro cost.")
+
+    def test_some_with_share(self):
+        from corkathon.inputs import parse_inputs
+        from tests.test_inputs import GOOD
+        i = parse_inputs({**GOOD, "fixed_rate_share": "some", "fixed_rate_pct": "25%"})
+        self.assertEqual(i.fixed_rate_share, 0.25)
+
 
 if __name__ == "__main__":
     unittest.main()

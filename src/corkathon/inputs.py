@@ -18,11 +18,12 @@ QUESTIONS = {
     "destination_port": "Port your goods arrive at",
     "currency": "Invoice currency",
     "fixed_rate_share": "How much of this invoice have you already fixed an exchange rate for? (None, some, all)",
+    "fixed_rate_pct": "Roughly what share have you fixed? (for example 50%)",
     "stock_days": "How many days will your current stock last?",
     "lead_time_days": "How many days from placing an order until it arrives?",
     "order_window": "Dates your next shipment is expected to travel",
 }
-FIXED_SHARE = {"none": 0.0, "some": 0.5, "all": 1.0}
+FIXED_SHARE = {"none": 0.0, "some": None, "all": 1.0}  # "some" needs fixed_rate_pct
 
 
 class InputError(ValueError):
@@ -37,7 +38,7 @@ class ImporterInputs:
     origin_port: str
     destination_port: str
     currency: str
-    fixed_rate_share: float  # 0..1 of the invoice with a fixed rate
+    fixed_rate_share: float | None  # 0..1 fixed; None = "some" with no share given
     stock_days: int
     lead_time_days: int
     window_start: date
@@ -86,6 +87,17 @@ def parse_inputs(form: dict) -> ImporterInputs:
     share_raw = str(form.get("fixed_rate_share", "")).strip().lower()
     if share_raw not in FIXED_SHARE:
         errors["fixed_rate_share"] = "Choose none, some or all"
+    share = FIXED_SHARE.get(share_raw)
+    if share_raw == "some":
+        pct_raw = str(form.get("fixed_rate_pct", "")).strip().rstrip("%").strip()
+        if pct_raw:
+            try:
+                pct = float(pct_raw)
+                if not 0 < pct < 100:
+                    raise ValueError
+                share = round(pct / 100.0, 4)
+            except ValueError:
+                errors["fixed_rate_pct"] = "Enter a percentage between 1 and 99, or leave it blank"
     stock = _int(form, "stock_days", errors)
     lead = _int(form, "lead_time_days", errors, lo=1)
     ws, we = _date(form, "window_start", errors), _date(form, "window_end", errors)
@@ -95,7 +107,7 @@ def parse_inputs(form: dict) -> ImporterInputs:
         raise InputError(errors)
     return ImporterInputs(importer=text["importer"], origin_port=text["origin_port"],
                           destination_port=text["destination_port"], currency=cur,
-                          fixed_rate_share=FIXED_SHARE[share_raw], stock_days=stock,
+                          fixed_rate_share=share, stock_days=stock,
                           lead_time_days=lead, window_start=ws, window_end=we,
                           transshipment_ports=tranship)
 
