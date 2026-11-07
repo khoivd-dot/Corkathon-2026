@@ -72,9 +72,10 @@ class ServerTests(unittest.TestCase):
         fake = lambda sid: type("L", (), {"load": lambda self: calls.append(sid)})
         with mock.patch.dict(server.LOADERS, {s: fake(s) for s in server.CONTEXT_SOURCES}), \
              mock.patch.object(server, "PortGdeltLoader", lambda p: type("G", (), {"load": lambda self: calls.append(p)})()), \
-             mock.patch.object(server, "LANE_PORTS", ("Cork",)):
+             mock.patch.object(server, "PortWeatherLoader", lambda p, lat, lon: type("W", (), {"load": lambda self: calls.append("weather " + p)})()), \
+             mock.patch.object(server, "LANE_PORTS", ("Cork",)), mock.patch.dict(os.environ, {"WEATHER_ENABLED": "1"}):
             server.refresh_once()
-        self.assertEqual(calls, [*server.CONTEXT_SOURCES, "Cork"])
+        self.assertEqual(calls, [*server.CONTEXT_SOURCES, "Cork", "weather Cork"])
 
     def test_no_path_traversal(self):
         with self.assertRaises(urllib.error.HTTPError) as e:
