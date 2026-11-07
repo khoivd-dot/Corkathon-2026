@@ -429,6 +429,10 @@
   function renderPart(v, ans, inputs) {
     var sec = el("section", null, "part part-" + v.key); sec.id = "part-" + v.key; sec.setAttribute("data-tone", v.tone); sec.setAttribute("aria-labelledby", "t-" + v.key);
     var text = el("div", null, "part-text");
+    if (v.key === "route" && ans.notices && ans.notices.length && window.InTime) {
+      var nEl = window.InTime.renderNotices(ans.notices);
+      if (nEl) text.append(nEl);
+    }
     var h = el("h3", v.label); h.id = "t-" + v.key; text.append(h);
     var tone = el("p", null, "tone"); tone.setAttribute("data-tone", v.tone); tone.append(icon(v.tone), document.createTextNode(v.verdict)); text.append(tone);
     if (v.body) text.append(el("p", v.body, "body"));
@@ -509,6 +513,30 @@
     v.route.ais = aisBlock(ans.ais);
     var res = $("result"); res.hidden = false; res.removeAttribute("aria-busy");
     document.body.classList.add("answered");
+
+    if (ans.timing && window.InTime) {
+      var mOrder = $("mount-order-by");
+      if (mOrder) mOrder.replaceChildren(window.InTime.renderOrderBy(ans.timing));
+      var mTime = $("mount-timeline");
+      if (mTime) mTime.replaceChildren(window.InTime.renderTimeline(ans.timing));
+      var mAsOf = $("mount-asof");
+      if (mAsOf) {
+        mAsOf.replaceChildren(window.InTime.renderAsOf(ans.timing, function (targetDateIso) {
+          fetch("/api/timing", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(Object.assign({}, inputs, { as_of: targetDateIso }))
+          }).then(function (r) { return r.json(); }).then(function (newTiming) {
+            if (newTiming && !newTiming.error) {
+              ans.timing = newTiming;
+              if (mOrder) mOrder.replaceChildren(window.InTime.renderOrderBy(newTiming));
+              if (mTime) mTime.replaceChildren(window.InTime.renderTimeline(newTiming));
+            }
+          }).catch(function (e) { console.error("timing fetch error:", e); });
+        }));
+      }
+    }
+
     // The map is the route answer's picture: park it in the result before the parts are rebuilt.
     res.insertBefore($("routemap"), $("tiles"));
     var map = renderMap(ans.route_geo, ans);
@@ -585,9 +613,25 @@
     var tb = $("book-rows"); tb.replaceChildren();
     $("book").hidden = !book.length;
     $("book-count").textContent = book.length ? "(" + book.length + ")" : "";
+    book.sort(function (a, b) {
+      var da = (a.ans && a.ans.timing && a.ans.timing.order_by) || "9999";
+      var db = (b.ans && b.ans.timing && b.ans.timing.order_by) || "9999";
+      return da.localeCompare(db);
+    });
     book.forEach(function (s, i) {
       var tr = el("tr"); if (i === current) tr.className = "cur";
       var th = el("th"); th.scope = "row"; th.append(el("span", s.inputs.importer)); var sub = el("span", routeOf(s.inputs), "small"); sub.style.display = "block"; th.append(sub); tr.append(th);
+      var tdOrder = el("td"); tdOrder.setAttribute("data-label", "Order by");
+      if (s.ans && s.ans.timing) {
+        var t = s.ans.timing;
+        var tTime = el("time", t.order_by);
+        var tPill = el("span", t.status === "late" ? "Order today" : t.status === "soon" ? "This week" : "On plan", "status-pill status-" + (t.status || "plan"));
+        if (t.status === "late") tdOrder.className = "book-order-by-late";
+        tdOrder.append(tTime, document.createTextNode(" "), tPill);
+      } else {
+        tdOrder.textContent = "—";
+      }
+      tr.append(tdOrder);
       [["Stock", s.sum.stock], ["Route", s.sum.route], ["Cost in euro", s.sum.cost]].forEach(function (c) {
         var td = el("td"); td.setAttribute("data-label", c[0]);
         var v = el("span", null, "v"); v.setAttribute("data-tone", c[1][0]); v.append(icon(c[1][0]), document.createTextNode(c[1][1])); td.append(v); tr.append(td);
@@ -657,6 +701,45 @@
   form.addEventListener("submit", function (ev) {
     ev.preventDefault();
     var errs = validate(form);
+    var qText = form.q.value.trim();
+
+    if (errs.length > 0 && qText) {
+      busy(true, "Understanding your shipment…");
+      fetch("/api/parse", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ q: qText })
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (parsed) {
+        busy(false, "");
+        if (parsed.fields) {
+          fillForm(Object.assign(readForm(form), parsed.fields));
+        }
+        var mU = $("mount-understood");
+        if (mU && window.InTime) {
+          mU.replaceChildren(window.InTime.renderUnderstood(parsed));
+        }
+        var newErrs = validate(form);
+        if (parsed.missing && parsed.missing.length > 0) {
+          showErrors(newErrs);
+          var firstMissing = $(parsed.missing[0]);
+          if (firstMissing) firstMissing.focus();
+        } else if (!newErrs.length) {
+          showErrors([]);
+          var inputs = readForm(form);
+          run(inputs, qText, null).then(showEntry).catch(function () {});
+        } else {
+          showErrors(newErrs);
+        }
+      })
+      .catch(function () {
+        busy(false, "");
+        showErrors(errs);
+      });
+      return;
+    }
+
     showErrors(errs); if (errs.length) return;
     var inputs = readForm(form), q = form.q.value.trim();
     // The shipment on screen, unchanged: check it again. Otherwise it's a new one.
@@ -720,11 +803,13 @@
   $("copy").addEventListener("click", function () {
     if (!lastAnswer) return;
     var s = book[current], inputs = s ? s.inputs : lastInputs, v = verdicts(lastAnswer, inputs), btn = this;
+    var timingLine = lastAnswer.timing ? ("Order by: " + lastAnswer.timing.order_by + " · " + (lastAnswer.timing.headline || "") + " (" + (lastAnswer.timing.reason || "") + ")") : "";
     var lines = [(inputs ? inputs.importer + ": " + routeOf(inputs) : "Shipment"), "", lastAnswer.headline, "",
+      timingLine,
       "Stock: " + v.stock.verdict + ". " + v.stock.body, "Route: " + v.route.verdict + ". " + v.route.body, "Cost in euro: " + v.cost.verdict + ". " + (v.cost.body || ""), "", "Worth checking:"]
       .concat(Array.prototype.map.call($("todo").children, function (li, i) { return (i + 1) + ". " + li.textContent; }))
       .concat(["", lastAnswer.dates_line || lastAnswer.freshness || "", "Sources: " + (lastAnswer.sources || []).filter(function (x) { return x.mode !== "not_used"; }).map(function (x) { return x.name; }).join(", ") + ". Not your bank's rate. News is a signal, not proof."]);
-    (navigator.clipboard ? navigator.clipboard.writeText(lines.join("\n")) : Promise.reject())
+    (navigator.clipboard ? navigator.clipboard.writeText(lines.filter(Boolean).join("\n")) : Promise.reject())
       .then(function () { btn.textContent = "Copied"; setTimeout(function () { btn.textContent = "Copy a summary for a client"; }, 2500); },
         function () { btn.textContent = "Couldn’t copy: select the answer and copy it instead"; });
   });

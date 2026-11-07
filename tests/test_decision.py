@@ -63,7 +63,8 @@ class DecisionTests(unittest.TestCase):
     def test_flag_off_never_confirms_or_alerts(self):
         out = self.run_([PORT_NOTICE, NEWS])
         self.assertEqual(out["state"], "insufficient")
-        self.assertEqual(out["headline"], ABSTAIN)
+        self.assertIn("Order today", out["headline"])
+        self.assertIn(ABSTAIN, out["delay"]["reading"])
         self.assertTrue(all(f["status"] == "reported" for f in out["delay"]["findings"]))
         self.assertIn("runs out 14 days before", out["delay"]["action"])  # shortfall still shown
 

@@ -8,6 +8,7 @@
 <title>In Time: will my imports be late or dearer?</title>
 <link rel="preload" href="fonts/display.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="timing.css">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -34,12 +35,13 @@
         <li><button class="chip" type="button" data-q="Will it cost more in euro?">Will it cost more in euro?</button></li>
         <li><button class="chip" type="button" data-q="Is anything happening on my route?">Is anything happening on my route?</button></li>
       </ul>
+      <div id="mount-understood"></div>
     </div>
     <figure class="hero-shot">
       <div class="shot-frame beam" id="shot">
       <picture>
         <source srcset="img/answer-light.webp" media="(prefers-color-scheme: light)" type="image/webp">
-        <img src="img/answer-dark.webp" width="1792" height="764" fetchpriority="high" alt="A real answer from this page for Santos to Rotterdam to Cork: the headline says we can’t determine whether the shipment is affected, the stock is 14 days short, nothing is reported on the route, and the euro cost is about the same.">
+        <img src="img/answer-dark.webp" width="1792" height="764" fetchpriority="high" alt="A real answer from this page for Santos to Rotterdam to Cork: the headline says to order today because stock runs out 14 days before a new order arrives, nothing is reported on the route, and the euro cost is about the same.">
       </picture>
       </div>
       <figcaption>A real answer, Santos to Cork, from the team’s saved data of 7 November 2026.</figcaption>
@@ -157,6 +159,10 @@
   </form>
 
   <section id="result" class="result" aria-labelledby="answer" tabindex="-1" hidden>
+    <div id="mount-order-by"></div>
+    <div id="mount-timeline"></div>
+    <div id="mount-asof"></div>
+
     <div class="verdict">
       <p class="yourq" id="answer-q"></p>
       <h2 id="answer" class="headline"></h2>
@@ -247,7 +253,7 @@
     <p class="small">For accountants with several importing clients. Kept on this page only: closing the tab clears it.</p>
     <div class="tablewrap"><table class="book-table">
       <caption class="sr">Every shipment checked on this page</caption>
-      <thead><tr><th scope="col">Shipment</th><th scope="col">Stock</th><th scope="col">Route</th><th scope="col">Cost in euro</th><th scope="col">Checked</th><th scope="col"><span class="sr">Actions</span></th></tr></thead>
+      <thead><tr><th scope="col">Shipment</th><th scope="col">Order by</th><th scope="col">Stock</th><th scope="col">Route</th><th scope="col">Cost in euro</th><th scope="col">Checked</th><th scope="col"><span class="sr">Actions</span></th></tr></thead>
       <tbody id="book-rows"></tbody>
     </table></div>
   </section>
@@ -256,6 +262,7 @@
     <p>For Irish importers and the accountants who advise them. Built for Corkathon 2026 with open data from the ECB, Eurostat, the CSO and the GDELT Project. Every answer shows where its data came from and how fresh it is. The route map is a schematic, not for navigation.</p>
   </footer>
 </main>
+<script src="timing.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

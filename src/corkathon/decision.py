@@ -4,8 +4,8 @@ answer-card JSON that the #8 UI reads (web/examples/*.json shape).
 Rules (agreed in the Corkathon room):
 - An alert needs a route-matched, deduplicated CONFIRMED event plus a stock shortfall.
 - Confirmation is behind CONFIRMATION_ENABLED (off), so today every event is "reported".
-- We never say "No action needed". When we can't tell, we abstain with ABSTAIN and
-  still show any stock shortfall.
+- We never say "No action needed". When we can't tell, we abstain with ABSTAIN on the
+  route card and still show any stock shortfall.
 - Every source carries mode, source_updated_at and checked_at.
 - Nothing here is written to disk or logged.
 """
@@ -19,6 +19,9 @@ from .exposure import FxExposure, fx_exposure, stock_exposure, stock_sentence
 from .inputs import ImporterInputs, to_lane
 from .ports import lookup
 from .sources.base import SourceResult
+from .sources.holidays import country_for_port, load_holidays_for_country
+from .sources.met_warnings import warnings_for_port
+from .timing import compute_timing
 
 ABSTAIN = "We can't determine whether your shipment is affected."
 QUESTION = "Will my imports be late or dearer this month?"
@@ -44,10 +47,16 @@ def coverage(confirm_on: bool) -> dict:
     gaps = list(NOTICE_PAGES) if not confirm_on else []
     return {"line": f"We can't confirm events at {_join(gaps)} automatically. Check their notices directly."
             if gaps else "", "ports": [{"port": p, "url": NOTICE_PAGES[p]} for p in gaps]}
-SOURCE_USE = {"gdelt": ("GDELT news", "Signal, duplicates merged"),
-              "ecb_fx": ("ECB reference rates", "Cost answer only"),
-              "cso_trade": ("CSO imports", "Context only"),
-              "comext": ("Eurostat Comext", "Context only")}
+
+
+SOURCE_USE = {
+    "gdelt": ("GDELT news", "Signal, duplicates merged"),
+    "ecb_fx": ("ECB reference rates", "Cost answer only"),
+    "cso_trade": ("CSO imports", "Context only"),
+    "comext": ("Eurostat Comext", "Context only"),
+    "met_warnings": ("Met Éireann weather warnings", "Official route notices"),
+    "holidays": ("Nager.Date public holidays", "Timing calculation"),
+}
 
 
 def _when(iso: str | None) -> datetime | None:
@@ -90,6 +99,8 @@ def dates_line(checked_at: str, sources: dict[str, SourceResult]) -> str:
         parts.append(f"ECB rate as of {d.day} {d.strftime('%b')}" if d else "ECB rate date unknown")
     if "gdelt" in sources:
         parts.append(f"port news from {_hm(sources['gdelt'].checked_at)}")
+    if "met_warnings" in sources and sources["met_warnings"].checked_at:
+        parts.append(f"Met Éireann warnings from {_hm(sources['met_warnings'].checked_at)}")
     tail = (" " + ", ".join(parts)[0].upper() + ", ".join(parts)[1:] + ".") if parts else ""
     return f"Checked {_hm(checked_at)} UK time.{tail}"
 
@@ -140,7 +151,6 @@ def _fx_block(fx: FxExposure, records: list[dict] | None = None) -> dict:
              "action": "Request a current quote from your supplier."}
     if fx.status == "computed":
         block["eur_cost_change_pct"] = fx.eur_cost_change_pct
-        # Units of the invoice currency per EUR, so the page can compare a bank's quote.
         block.update(rate_then=fx.rate_from, rate_now=fx.rate_to, date_then=fx.date_from, date_now=fx.date_to,
                      currency=fx.currency, unfixed_share=fx.unfixed_share,
                      series=_fx_series(fx.currency, records or [], fx.date_from))
@@ -173,6 +183,47 @@ def decide(inp: ImporterInputs, sources: dict[str, SourceResult], gdelt_records:
     fx = fx_exposure(inp.currency, inp.fixed_rate_share, ecb.records if ecb else [])
     covers = stock_sentence(stock)
 
+    # 1. Met warnings notices for destination port
+    notices: list[dict] = []
+    met_src = sources.get("met_warnings")
+    if met_src and met_src.records:
+        matched_notices = warnings_for_port(met_src.records, inp.destination_port, now)
+        for n in matched_notices:
+            nc = dict(n)
+            nc["mode"] = met_src.mode
+            notices.append(nc)
+
+    # 2. Public holidays for origin and destination countries
+    origin_cc = country_for_port(inp.origin_port) or "CN"
+    dest_cc = country_for_port(inp.destination_port) or "IE"
+    hols_src = sources.get("holidays")
+    if hols_src and hols_src.records:
+        hols = hols_src.records
+    else:
+        # Load holidays for origin and destination if not in sources dict
+        hols = load_holidays_for_country(origin_cc, (now.year, now.year + 1)) + \
+               load_holidays_for_country(dest_cc, (now.year, now.year + 1))
+
+    # 3. Timing calculation
+    timing = compute_timing(
+        stock_days=inp.stock_days,
+        lead_days=inp.lead_time_days,
+        origin_country=origin_cc,
+        dest_country=dest_cc,
+        holidays=hols,
+        notices=notices,
+        as_of=now.date(),
+        origin_port=inp.origin_port,
+        dest_port=inp.destination_port,
+        sources=[
+            {"name": "Nager.Date public holidays",
+             "checked": hols_src.checked_at if hols_src else now.isoformat(),
+             "mode": hols_src.mode if hols_src else "live"}
+        ] if hols_src else None,
+    )
+
+    # 4. State and Headline rules
+    n_rep = len(events)
     if confirmed and stock.shortfall:
         state = "alert"
         headline = f"Check your forwarder's ETA today: {covers[0].lower() + covers[1:]}"
@@ -187,31 +238,49 @@ def decide(inp: ImporterInputs, sources: dict[str, SourceResult], gdelt_records:
         action = "Ask your forwarder for a current ETA if the event lasts."
     else:
         state = "insufficient"
-        headline = ABSTAIN
         heading = "Not enough evidence"
-        n_rep = len(events)
-        reading = (f"Checked {len(sources)} sources: {n_rep} unconfirmed report{'s' if n_rep != 1 else ''}, "
+        reading = (f"{ABSTAIN} Checked {len(sources)} sources: {n_rep} unconfirmed report{'s' if n_rep != 1 else ''}, "
                    "no carrier or port confirmation for your route.")
         action = (f"{covers} Ask your forwarder for a current ETA." if stock.shortfall
                   else f"{covers} Ask your forwarder for a current ETA if you're unsure.")
 
+        if timing.get("status") == "late":
+            days_short = abs(stock.buffer_days) if stock.shortfall else (inp.lead_time_days - inp.stock_days)
+            headline = f"Order today: even ordered now, it arrives {days_short} days after your stock runs out. Ask your forwarder about a faster option."
+        else:
+            headline = f"{timing['headline']} {timing['reason']}"
+
     route = " \u2192 ".join([inp.origin_port, *inp.transshipment_ports, inp.destination_port])
     checked = now.isoformat(timespec="seconds")
     return {
-        "state": state, "example": False, "question": QUESTION, "headline": headline,
-        "inputs": {"importer": inp.importer, "route": route, "currency": inp.currency,
-                   "hedged": inp.fixed_rate_share == 1.0, "stock_days": inp.stock_days,
-                   "lead_time_days": inp.lead_time_days},
-        "delay": {"heading": heading, "findings": [_finding(e) for e in (confirmed or events)[:5]],
-                  "exposure": {"stock_days": inp.stock_days, "lead_time_days": inp.lead_time_days,
-                               "buffer_days": stock.buffer_days, "shortfall": stock.shortfall,
-                               "sentence": covers, "arithmetic": stock.arithmetic},
-                  "reading": reading, "action": action},
+        "state": state,
+        "example": False,
+        "question": QUESTION,
+        "headline": headline,
+        "inputs": {
+            "importer": inp.importer, "route": route, "currency": inp.currency,
+            "hedged": inp.fixed_rate_share == 1.0, "stock_days": inp.stock_days,
+            "lead_time_days": inp.lead_time_days,
+        },
+        "delay": {
+            "heading": heading,
+            "findings": [_finding(e) for e in (confirmed or events)[:5]],
+            "exposure": {
+                "stock_days": inp.stock_days, "lead_time_days": inp.lead_time_days,
+                "buffer_days": stock.buffer_days, "shortfall": stock.shortfall,
+                "sentence": covers, "arithmetic": stock.arithmetic,
+            },
+            "reading": reading,
+            "action": action,
+            "abstain": ABSTAIN,
+        },
+        "timing": timing,
+        "notices": notices,
         "fx": _fx_block(fx, ecb.records if ecb else []),
         "sources": _source_rows(sources),
         "coverage": (cov := coverage(confirmation_enabled())),
         "coverage_line": cov["line"],
-        "route_geo": route_geo(inp, events),  # read by the #18 UI
+        "route_geo": route_geo(inp, events),
         "coverage_gaps": cov["ports"],
         "checked_at": checked,
         "dates_line": dates_line(checked, sources),

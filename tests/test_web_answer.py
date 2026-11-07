@@ -21,7 +21,10 @@ class AnswerExamples(unittest.TestCase):
         a = self.load("insufficient")
         text = json.dumps(a).lower()
         self.assertNotIn("no action needed", text)
-        self.assertIn("can't determine", a["headline"].lower())
+        self.assertTrue(
+            "can't determine" in a.get("headline", "").lower()
+            or "can't determine" in a.get("delay", {}).get("reading", "").lower()
+        )
 
     def test_ais_is_not_used(self):
         for name in ("alert", "insufficient"):
