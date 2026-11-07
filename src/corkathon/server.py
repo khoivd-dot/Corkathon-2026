@@ -4,6 +4,8 @@ GET  /healthz      -> 200 "ok"
 POST /api/answer   -> decision JSON for the form fields (held in memory only)
 POST /api/parse    -> plain-English query parsed into form fields and chips
 POST /api/timing   -> timing block only for as_of slider, using holidays & lead time
+GET  /api/vessel?mmsi=<9 digits>&to=<port>
+                   -> live position of one ship (aisstream.io), only when AIS_LIVE_ENABLED=1
 GET  /*            -> static files from web/ (the #8 answer-card UI)
 
 A background thread refreshes the per-port GDELT cache every REFRESH_S seconds
@@ -19,12 +21,14 @@ import time
 from datetime import date, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import parse_qs
 
 from .decision import decide
 from .inputs import InputError, parse_inputs
 from .parse import parse_query
 from .ports import lookup
 from .sources.ais import AisPortLoader, ais_enabled
+from .sources.aisstream import VesselLoader, live_enabled, nearest_port, nm_between, valid_mmsi
 from .sources.base import REPO_ROOT, SourceResult, now_iso
 from .sources.gdelt import PortGdeltLoader
 from .sources.holidays import HolidaysLoader, country_for_port, load_holidays_for_country
@@ -245,6 +249,32 @@ def ais_counts(ports: list[str]) -> dict:
             "note": "Counts within about 15 nautical miles of each port, from AISHub. A queue at anchor can mean congestion, or just normal waiting."}
 
 
+def vessel(mmsi: str, to: str = "") -> tuple[dict, int]:
+    """Where one ship is now, in words, with its source and how old the position is."""
+    if not live_enabled():
+        return {"enabled": False, "message": "Live ship positions are switched off on this site."}, 200
+    mmsi = (mmsi or "").strip()
+    if not valid_mmsi(mmsi):
+        return {"enabled": True, "error": "An MMSI is 9 digits and starts with 2 to 7, like 636019825."}, 400
+    r = VesselLoader(mmsi).load()
+    lic = VesselLoader.licence
+    out = {"enabled": True, "status": r.status, "mode": r.mode, "checked_at": r.checked_at,
+           "source": {"name": "aisstream.io", "url": lic.url, "attribution": lic.attribution, "licence": lic.name}}
+    if not r.records:
+        out["message"] = ("We heard no position from this ship just now. Live positions come from shore receivers, "
+                          "so a ship in open ocean is often out of range. Try a public tracker below.")
+        return out, 200
+    v = dict(r.records[0])
+    port, nm = nearest_port(v["lat"], v["lon"])
+    v["nearest_port"], v["nearest_port_nm"] = port, round(nm)
+    hit = lookup(to) if to else None
+    if hit:
+        v["to_port"], v["to_port_nm"] = hit[0], round(nm_between(v["lat"], v["lon"], hit[2], hit[3]))
+    v["map_url"] = f"https://www.openstreetmap.org/?mlat={v['lat']}&mlon={v['lon']}#map=8/{v['lat']}/{v['lon']}"
+    out["vessel"] = v
+    return out, 200
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "corkathon"
 
@@ -264,6 +294,10 @@ class Handler(BaseHTTPRequestHandler):
         path = self.path.split("?")[0]
         if path == "/healthz":
             return self._send(200, b"ok", "text/plain")
+        if path == "/api/vessel":
+            q = parse_qs(self.path.partition("?")[2])
+            out, code = vessel(q.get("mmsi", [""])[0][:12], q.get("to", [""])[0][:60])
+            return self._send(code, json.dumps(out, ensure_ascii=False).encode(), "application/json")
         rel = "index.html" if path in ("", "/") else path.lstrip("/")
         f = (WEB / rel).resolve()
         if WEB.resolve() not in f.parents or not f.is_file():

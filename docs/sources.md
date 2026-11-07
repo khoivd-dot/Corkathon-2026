@@ -9,14 +9,21 @@
 | comext | Eurostat Comext DS-045409, reporter IE, HS 0901, extra-EU27, monthly value EUR + 100 kg | Eurostat free re-use, Decision 2011/833/EU / CC BY 4.0 — https://ec.europa.eu/eurostat/web/main/help/copyright-notice ; statistical reuse incl. commercial display and snapshots permitted with acknowledgement; identify modifications and apply Eurostat's disclaimer (checked 2026-11-07) | Source: Eurostat | Context only |
 | gdelt (official) | Same GDELT API, query limited to `domain:` official carrier and port sites (CONFIRMING_DOMAINS in events.py). Only when `CONFIRMATION_ENABLED=1` | As gdelt. We show the headline and a link to the official page, never the page's text. Each carrier's and port's own site terms still apply to the page itself: **to confirm before public display** | Source: The GDELT Project; the linked carrier or port page | Confirmation: an official page naming a disruption and a port on the route |
 | ais | AISHub `ws.php` JSON, a 0.25° box around each known port, one request a minute. Only when `AIS_ENABLED=1` and `AISHUB_USERNAME` is set | AISHub data sharing: API access for members who contribute an AIS receiver feed, non-commercial — https://www.aishub.net/join-us . We keep and show **aggregate counts only** (at anchor, moored, moving), never ship names, positions or tracks. **Terms to confirm before public display** | Ship counts: AISHub | Context only |
+| aisstream | aisstream.io websocket `wss://stream.aisstream.io/v0/stream`, one short connection per lookup filtered to a single MMSI, waits up to `AIS_LIVE_WAIT_S` (25 s) for the next position report, cached 5 min per MMSI. Only when `AIS_LIVE_ENABLED=1` and `AISSTREAM_API_KEY` is set | aisstream.io free API (beta, no SLA, throttled per key and user); key from signing in with GitHub at https://aisstream.io . Docs ask that the key stays server-side, which we do. Written display/redistribution terms not found on 2026-11-07 (site not reachable from our build box): **terms to confirm before public display**, so the flag stays off on Render. Terrestrial receivers only, so ships in open ocean often have no position. Only the ship the user asked for is looked up; MMSIs of commercial ships are public identifiers, not personal data | Ship position: aisstream.io (terrestrial AIS) | Context only |
 | (page links) | Carrier tracking pages (Maersk, MSC, CMA CGM, Hapag-Lloyd, ONE, Evergreen, COSCO/OOCL, ZIM, Yang Ming, HMM) and public ship trackers (VesselFinder, MarineTraffic, MyShipTracking) | Not fetched by us. The user opens them in a new tab; their data, their terms. The container number check (ISO 6346) runs in the browser and sends nothing | n/a | Links only |
 | gdelt | GDELT DOC 2.0 artlist, shipping/port disruption query, 14 days; deduplicated into incidents | GDELT open data, free with citation — https://www.gdeltproject.org/about.html#termsofuse ; dataset reuse, snapshots and redistribution permitted with citation/link; does not license publishers' full articles (checked 2026-11-07); max 1 request / 5 s | Source: The GDELT Project | Signal, not proof |
+
+Live ship sources compared (2026-11-07): **aisstream.io** chosen (free key, live, server-side, any ship by MMSI near a coast).
+AISHub needs your own AIS receiver to join. Global Fishing Watch covers fishing vessels only and is delayed.
+Datalastic and MarineTraffic/VesselFinder APIs are paid (trials only). Map embeds load third-party scripts our CSP blocks.
 
 # Flags
 | Flag | Default | What it turns on |
 |---|---|---|
 | `CONFIRMATION_ENABLED` | `0` | The official-domain GDELT query, and "confirmed" events (which can raise an alert) |
 | `AIS_ENABLED` + `AISHUB_USERNAME` | off | Ship counts near each port in the route answer |
+| `AIS_LIVE_ENABLED` + `AISSTREAM_API_KEY` | off | Live position of one ship by MMSI in "Track it yourself" (`GET /api/vessel`) |
+| `AIS_LIVE_WAIT_S` | `25` | Longest a ship lookup listens for a position report (3 to 60) |
 | `REQUEST_GATE_WAIT_S` | `6` | Longest an answer waits for a free GDELT slot before using the cache or snapshot |
 
 Every live GDELT call, from the refresher or from an answer, goes through one process-wide gate

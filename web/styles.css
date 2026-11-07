@@ -444,6 +444,8 @@ input[type=range]:focus-visible{outline:2px solid var(--ring);outline-offset:2px
 .track-out .ok{color:var(--calm);font-weight:600}
 .track-out .bad{color:var(--error);font-weight:600}
 .track-out ul{margin:var(--s-2) 0 0;padding-left:var(--s-5)}
+.track-live{display:block;margin-bottom:var(--s-2)}
+.track-src{display:block;color:var(--muted-foreground);margin-top:var(--s-1)}
 .ais{margin-top:var(--s-5);font-size:var(--text-sm)}
 .ais table{margin-top:var(--s-2)}
 

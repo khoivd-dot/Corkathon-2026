@@ -198,8 +198,8 @@
           <p class="track-out" id="container-out" aria-live="polite"></p>
         </div>
         <div class="field">
-          <label for="vessel">Ship name or IMO number</label>
-          <span class="hint" id="vessel-hint">Opens a public ship tracker in a new tab. Positions come from that site, not from us.</span>
+          <label for="vessel">Ship name, IMO or MMSI number</label>
+          <span class="hint" id="vessel-hint">Opens a public ship tracker in a new tab. With a 9-digit MMSI we also look up where the ship is now, when live positions are switched on.</span>
           <span class="track-row"><input id="vessel" autocomplete="off" spellcheck="false" maxlength="60" aria-describedby="vessel-hint vessel-out"><button type="button" class="btn ghost" id="vessel-go">Show trackers</button></span>
           <p class="track-out" id="vessel-out" aria-live="polite"></p>
         </div>
@@ -236,7 +236,7 @@
         <li>News is a signal, not proof. We only count headlines that name a port on your route and a disruption, but quiet delays may never be reported.</li>
         <li>Official confirmation is switched off until the reuse terms of carrier and port notices are recorded, so today every event shows as “reported”. We link the notices of the ports we can’t check.</li>
         <li>The exchange rate is the ECB reference rate, published once a working day. It isn’t your bank’s rate and says nothing about delays.</li>
-        <li>Ship positions aren’t shown: we haven’t confirmed the right to display vessel-tracking data.</li>
+        <li>Live ship positions (aisstream.io, by MMSI) stay switched off until we confirm its display terms. They come from shore receivers, so a ship in open ocean often has no position.</li>
         <li>Official trade figures are two to three months old, so we use them as background only.</li>
       </ul>
     </details>

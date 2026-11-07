@@ -858,7 +858,8 @@
   $("vessel-go").addEventListener("click", function () {
     var out = $("vessel-out"); out.replaceChildren();
     var v = $("vessel").value.trim().replace(/^IMO\s*/i, "");
-    if (!v) { out.append(el("span", "Enter a ship name or IMO number.", "bad")); return; }
+    if (!v) { out.append(el("span", "Enter a ship name, IMO or MMSI number.", "bad")); return; }
+    if (/^\d{9}$/.test(v)) livePosition(v, out);
     var isImo = /^\d{7}$/.test(v);
     if (isImo && !imoOk(v)) { out.append(el("span", "Not a valid IMO number: ", "bad"), document.createTextNode("the last digit doesn’t match the check.")); return; }
     var q = encodeURIComponent(v);
@@ -868,6 +869,31 @@
       .forEach(function (t) { var li = el("li"); li.append(link(t[0], t[1])); ul.append(li); });
     out.append(ul);
   });
+  // Live position from our server (aisstream.io), only when the site has it switched on.
+  function ago(iso) { var m = Math.round((Date.now() - Date.parse(iso)) / 60000); return isNaN(m) ? "" : m < 1 ? "just now" : m < 120 ? m + " min ago" : Math.round(m / 60) + " h ago"; }
+  function livePosition(mmsi, out) {
+    var box = el("span", "Listening for MMSI " + mmsi + " (up to 30 seconds)…", "track-live");
+    out.prepend(box);
+    var to = ($("destination_port") || {}).value || "";
+    fetch("/api/vessel?mmsi=" + mmsi + "&to=" + encodeURIComponent(to)).then(function (r) { return r.json(); }).then(function (d) {
+      box.replaceChildren();
+      if (!d.enabled) { box.append(document.createTextNode(d.message)); return; }
+      if (d.error) { box.append(el("span", d.error, "bad")); return; }
+      var v = d.vessel;
+      if (!v) { box.append(document.createTextNode(d.message)); }
+      else {
+        var where = (v.name || "MMSI " + v.mmsi) + " is about " + v.nearest_port_nm + " nautical miles from " + v.nearest_port +
+          (v.status ? ", " + v.status : "") + (v.speed_kn != null ? ", moving at " + v.speed_kn + " knots" : "") + ". ";
+        box.append(el("strong", where));
+        if (v.to_port && v.to_port !== v.nearest_port) box.append(document.createTextNode(v.to_port_nm + " nm from " + v.to_port + " in a straight line; the sea route is longer. "));
+        if (v.destination) box.append(document.createTextNode("The crew lists its destination as “" + v.destination + "”. "));
+        box.append(link("See it on a map", v.map_url));
+      }
+      var chip = el("span", " Source: " + d.source.name + (v ? ", position " + ago(v.position_at) + " (" + v.position_at.slice(0, 16).replace("T", " ") + " UTC)" : "") +
+        (d.mode === "fallback" ? ". Live check failed, this is our last saved position" : "") + ".", "track-src");
+      box.append(chip);
+    }, function () { box.textContent = "We couldn’t reach our server for a live position. Try a public tracker below."; });
+  }
   ["container_no", "vessel"].forEach(function (id) {
     $(id).addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); $(id === "vessel" ? "vessel-go" : "container-go").click(); } });
   });
