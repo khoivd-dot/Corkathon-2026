@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en-IE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Imports check: will my imports be late or dearer?</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<main id="main">
+<p class="preview-banner" role="note">Example data, for preview only</p>
+<span class="tag" id="mode">Example data, not live</span>
+<h1 id="page-title">Will my imports be late or dearer this month?</h1>
+<p class="q">Tell us about one shipment route. We check dated public sources and give you one next step. We never guess your route.</p>
+
+<div class="error-summary" id="errors" role="alert" tabindex="-1" hidden>
+  <h2 class="lbl">There is a problem</h2><ul id="error-list"></ul>
+</div>
+
+<form id="inputs" class="card" novalidate>
+  <h2 class="lbl">Your shipment</h2>
+  <div class="field"><label for="importer">Who imports it?</label><span class="hint" id="importer-hint">The company named on the invoice.</span>
+    <span class="field-error" id="importer-error" hidden></span>
+    <input id="importer" name="importer" autocomplete="organization" aria-describedby="importer-hint importer-error" value="Example Coffee Ltd"></div>
+  <div class="field"><label for="route">Route, including any transshipment port</label><span class="hint" id="route-hint">For example: Santos, then Rotterdam, then Cork.</span>
+    <span class="field-error" id="route-error" hidden></span>
+    <input id="route" name="route" aria-describedby="route-hint route-error" value="Santos → Rotterdam → Cork (Ringaskiddy)"></div>
+  <fieldset class="radios"><legend>Invoice currency</legend>
+    <label><input type="radio" name="currency" value="USD" checked> US dollars</label>
+    <label><input type="radio" name="currency" value="EUR"> Euro</label></fieldset>
+  <fieldset class="radios"><legend>Is the currency hedged?</legend>
+    <label><input type="radio" name="hedged" value="no" checked> No</label>
+    <label><input type="radio" name="hedged" value="yes"> Yes</label></fieldset>
+  <div class="field"><label for="stock_days">How many days will your current stock last?</label>
+    <span class="field-error" id="stock_days-error" hidden></span>
+    <input id="stock_days" name="stock_days" type="number" inputmode="numeric" min="0" aria-describedby="stock_days-error" value="21"></div>
+  <div class="field"><label for="lead_time_days">How many days does a new order take to arrive?</label>
+    <span class="field-error" id="lead_time_days-error" hidden></span>
+    <input id="lead_time_days" name="lead_time_days" type="number" inputmode="numeric" min="0" aria-describedby="lead_time_days-error" value="35"></div>
+  <div class="field"><label for="scenario">Demo snapshot</label>
+    <select id="scenario" name="scenario"><option value="alert">7 Nov 2026: confirmed event on route</option><option value="insufficient">7 Nov 2026: unconfirmed report only</option></select></div>
+  <p class="hint" id="expect-note">Most weeks there’s no confirmed event on your route. We’ll tell you when we can’t tell.</p>
+  <p class="hint" id="privacy-note">Your route and stock figures stay in this session only. We don’t store them.</p>
+  <button type="submit">Check my route</button>
+</form>
+
+<section id="result" aria-labelledby="answer" tabindex="-1" hidden>
+  <p class="q" id="answer-q"></p>
+  <p class="src" id="freshness"></p><p class="src" id="staleness" hidden></p>
+  <h2 id="answer" style="font:600 clamp(24px,3.4vw,34px)/1.2 var(--serif);margin:0 0 var(--s4)"></h2>
+  <div class="two">
+    <section class="card stack" aria-labelledby="delay-h">
+      <h3 class="lbl" id="delay-h"></h3>
+      <ol id="delay-findings"></ol>
+      <div class="calc" id="exposure"></div>
+      <p><span class="lbl">Our reading</span><br><span id="delay-reading"></span></p>
+      <p id="delay-action"></p>
+      <details><summary id="working-summary">Show working</summary>
+        <div class="tablewrap"><table><caption class="lbl">Every source checked</caption>
+        <thead><tr><th scope="col">Source</th><th scope="col">Data for</th><th scope="col">Published</th><th scope="col">Retrieved</th><th scope="col">How we used it</th></tr></thead>
+        <tbody id="sources"></tbody></table></div></details>
+    </section>
+    <section class="card stack" aria-labelledby="fx-h">
+      <h3 class="lbl" id="fx-h">Cost: a separate answer</h3>
+      <p><strong>Finding:</strong> <span id="fx-finding"></span><span class="src" id="fx-src"></span></p>
+      <div class="calc" id="fx-calc"></div>
+      <p><span class="lbl">Our reading</span><br><span id="fx-reading"></span></p>
+      <p class="calm" id="fx-action"></p>
+    </section>
+  </div>
+</section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
