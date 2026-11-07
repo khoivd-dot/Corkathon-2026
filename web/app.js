@@ -74,7 +74,17 @@
     var fx = ans.fx;
     $("fx-finding").textContent = fx.finding;
     $("fx-src").textContent = fx.source + " as of " + (fx.source_updated_at || fx.as_of) + (fx.checked_at ? ", checked " + fx.checked_at : "");
-    $("fx-calc").textContent = usd.format(fx.invoice_usd) + " invoice: " + eur.format(fx.eur_before) + " then, about " + eur.format(fx.eur_now) + " now (illustrative).";
+    $("fx-calc").textContent = fx.invoice_usd ? usd.format(fx.invoice_usd) + " invoice: " + eur.format(fx.eur_before) + " then, about " + eur.format(fx.eur_now) + " now (illustrative)." : "";
+    var cov = $("coverage");
+    if (!cov) { cov = el("p"); cov.id = "coverage"; $("delay-reading").after(cov); }
+    cov.replaceChildren();
+    if (ans.coverage && ans.coverage.line) {
+      cov.append(ans.coverage.line + " ");
+      ans.coverage.ports.forEach(function (p, i) {
+        var a = el("a", p.port + " notices"); a.href = p.url; a.rel = "noopener"; a.target = "_blank";
+        if (i) cov.append(", "); cov.append(a);
+      });
+    }
     $("fx-reading").textContent = fx.reading;
     $("fx-action").textContent = fx.action;
     $("result").hidden = false; $("result").focus();
@@ -85,7 +95,16 @@
     var f = ev.target, errs = validate(f);
     showErrors(errs); if (errs.length) return;
     document.title = document.title.replace(/^Error: /, "");
-    fetch("examples/" + f.scenario.value + ".json").then(function (r) { return r.json(); })
+    var ports = f.route.value.split(/\s*(?:\u2192|->|,)\s*/).map(function (p) { return p.replace(/\s*\(.*\)$/, "").trim(); }).filter(Boolean);
+    var end = new Date(), start = new Date(end - 14 * 864e5), iso = function (d) { return d.toISOString().slice(0, 10); };
+    var body = { importer: f.importer.value, origin_port: ports[0] || "", destination_port: ports[ports.length - 1] || "",
+      transshipment_ports: ports.slice(1, -1).join(","), currency: f.currency.value,
+      fixed_rate_share: f.hedged.value === "yes" ? "all" : "none", stock_days: f.stock_days.value,
+      lead_time_days: f.lead_time_days.value, window_start: iso(start), window_end: iso(end) };
+    // Live answer from F; the example snapshots are only a labelled fallback when the API isn't there.
+    fetch("api/answer", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+      .then(function (r) { if (!r.ok) throw r; return r.json(); })
+      .catch(function () { return fetch("examples/" + f.scenario.value + ".json").then(function (r) { return r.json(); }); })
       .then(function (ans) { render(ans, +f.stock_days.value, +f.lead_time_days.value); })
       .catch(function () { $("answer").textContent = "We couldn\u2019t load the answer. Your details are kept; try again."; $("result").hidden = false; });
   });

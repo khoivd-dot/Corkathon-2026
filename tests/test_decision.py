@@ -86,6 +86,13 @@ class DecisionTests(unittest.TestCase):
                     blob = json.dumps(self.run_(recs, form={**FORM, "stock_days": stock}, confirm=c))
                     self.assertNotIn("no action needed", blob.lower())
 
+    def test_uncovered_ports_line_with_links(self):
+        cov = self.run_([])["coverage"]
+        self.assertEqual(cov["line"], "We can't confirm events at Rotterdam, Antwerp, Felixstowe, Dublin or Cork "
+                                      "automatically. Check their notices directly.")
+        self.assertEqual(len(cov["ports"]), 5)
+        self.assertTrue(all(p["url"].startswith("https://") for p in cov["ports"]))
+
     def test_dates_line(self):
         self.assertEqual(dates_line("2026-11-07T11:05:00+00:00", SOURCES),
                          "Checked 11:05 UK time. Trade figures are August data, ECB rate as of 6 Nov, port news from 10:40.")
