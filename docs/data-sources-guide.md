@@ -8,12 +8,30 @@ Figures are from the snapshots saved on 7 Nov 2026.
 
 | Source | What it tells us | Freshness | Cached for | Used for |
 |---|---|---|---|---|
+| **Met Éireann warnings** | Official weather warnings (Yellow, Orange, Red) for Irish destination ports | Updated every few hours | 15 min | **Official route notices** (High Value Dataset on data.gov.ie) |
+| **Nager.Date public holidays** | Public holidays at origin, transshipment, and Irish ports | Updated annually | 7 days | **Order-by timing calculation** |
 | ECB reference rates | USD, GBP, CNY, JPY, CHF per euro | Every working day (~1 day old) | 1 day | **Cost answer** |
 | GDELT | News on port strikes, closures, congestion, diversions | Minutes to hours | 30 min | **Delay answer** (signal) |
 | Carrier / port pages | Official advisories, via GDELT links | As published | 30 min | Would turn a report into **confirmed**; off until reuse terms are recorded |
 | CSO TSM06 | Irish imports by product group | Monthly, ~2–3 months behind | 31 days | Context only |
 | Eurostat Comext | Irish coffee imports, value and weight | Monthly, ~2–3 months behind | 31 days | Context only |
 | User inputs | Route, currency, stock, lead time | Typed now | Never stored | Everything |
+
+## Met Éireann weather warnings (`met_warnings`)
+
+- **What:** Official weather warnings published by Ireland's National Meteorological Service, listed on data.gov.ie as an EU High Value Dataset. JSON feed: `https://www.met.ie/Open_Data/json/warning_IRELAND.json`.
+- **How it's used:** Maps destination ports to Irish counties (Cork and Ringaskiddy `EI04`, Dublin `EI07`). When an active warning covers the destination port, it is rendered as an "Official notice on your route".
+- **Licence & rules:** Met Éireann custom open data licence (CC BY 4.0):
+  - Must display `headline`, `level`, `onset`, `expiry`, and `issued` **verbatim**.
+  - Never reword a warning or present it as a different severity.
+  - Automatically drop warnings whose `expiry` timestamp has passed (even when loaded from a snapshot).
+  - Credit "Met Éireann (data.gov.ie)".
+
+## Nager.Date public holidays (`holidays`)
+
+- **What:** Worldwide public holidays API (`https://date.nager.at/api/v3/PublicHolidays/{year}/{CC}`). Country codes are extracted from the first two characters of each port's UN/LOCODE in `ports.py` (e.g., `CNSHA` → `CN`, `IEDUB` → `IE`).
+- **How it's used:** `corkathon.timing.compute_timing` uses holidays at origin (dispatch delays), destination (clearance/arrival delays), and Chinese New Year dates to calculate the latest viable order date before stock depletion.
+- **Licence:** MIT licence. Cached per country and year for 7 days. Only `global: true` national holidays are kept.
 
 ## ECB reference rates (`ecb_fx`)
 
@@ -53,23 +71,3 @@ Figures are from the snapshots saved on 7 Nov 2026.
 - **Use:** context for the coffee example.
 - **Catches:** national average across all grades and origins; goods routed via another EU country aren't counted; recent months get revised.
 - **Licence:** Eurostat free reuse (checked 7 Nov 2026): commercial display and snapshots allowed with acknowledgement; identify any modifications and apply Eurostat's disclaimer.
-
-## Considered and not used
-
-| Source | Why not |
-|---|---|
-| AIS ship-tracking / port calls | Display rights unverified (shown as "unavailable" on the card) |
-| CRO company register | Sector code 5630 mixes pubs with cafés, and sole traders aren't registered companies; not reliable for counting importers |
-
-## Impact figures for the pitch
-
-- **~49,600 Irish businesses imported goods in 2022; 98% were small or medium** (CSO, *Ireland's Trade in Goods 2022*, trade by enterprise size: 36,365 micro, 9,768 small, 2,692 medium, 780 large).
-- **~3,500 cafés in Ireland, ~150 in Cork city** (poidata.io business listings, Dec 2025 / Jan 2026; not official). Useful only for the coffee example.
-
-## What every answer must show
-
-Each figure carries source, period and when we checked, e.g.:
-
-> EUR/USD moved from 1.1378 to 1.1165 (ECB reference rate, 28 Sep – 6 Nov 2026; checked 7 Nov 2026, 11:27). This is not your bank's rate.
-
-If a source fell back (`mode=fallback`), say "saved copy from <date>", not "live".
