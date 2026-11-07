@@ -3,11 +3,12 @@
 /* 1. OrderByHero */
 .order-by-card {
   background: var(--card);
-  border-radius: 18px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  border: 1px solid var(--secondary);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card, 28px);
+  corner-shape: var(--corner-shape);
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-1);
 }
 
 .order-by-header {
@@ -155,7 +156,8 @@
   align-items: center;
   gap: 0.375rem;
   padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
+  border-radius: 999px;
+  corner-shape: var(--corner-shape);
   font-size: 0.8125rem;
   font-weight: 500;
   line-height: 1;
@@ -180,25 +182,39 @@
 /* 2. TimelineStrip */
 .timeline-card {
   background: var(--card);
-  border-radius: 18px;
-  padding: 1.25rem;
-  margin-bottom: 1.5rem;
-  border: 1px solid var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card, 28px);
+  corner-shape: var(--corner-shape);
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-1);
 }
 
 .timeline-scroll-wrap {
   width: 100%;
   overflow-x: auto;
-  min-height: 150px;
   -webkit-overflow-scrolling: touch;
 }
 
 .timeline-svg {
   display: block;
-  min-width: 600px;
+  min-width: 760px;
   width: 100%;
-  height: 150px;
+  height: auto;
+  overflow: visible;
 }
+
+/* Timeline in the morphin-ui look (MIT, Ivan Oliinyk): see docs/third-party.md */
+.tl-track { fill: color-mix(in oklch, var(--foreground) 6%, transparent); }
+.tl-fill.tl-stock, .tl-stock .tl-thumb-out { fill: var(--data); }
+.tl-fill.tl-order, .tl-order .tl-thumb-out { fill: var(--brand); }
+.tl-thumb-in { fill: var(--primary-foreground); filter: drop-shadow(0 1px 1px oklch(0% 0 0 / .25)); }
+.tl-tick { stroke: var(--border); stroke-width: 1; }
+.tl-axis { fill: var(--muted-foreground); font: 500 11px var(--font-sans, sans-serif); }
+.tl-name { fill: var(--foreground); font: 600 13px var(--font-sans, sans-serif); }
+.tl-flag { stroke: var(--foreground); stroke-width: 2; stroke-dasharray: 2 4; stroke-linecap: round; }
+.tl-band { fill: color-mix(in oklch, var(--warn) 18%, transparent); }
+.tl-band-lab { fill: var(--warn); font: 600 11px var(--font-sans, sans-serif); }
 
 .timeline-marker {
   cursor: pointer;
@@ -251,10 +267,12 @@
 /* 3. AsOfSlider */
 .as-of-card {
   background: var(--card);
-  border-radius: 18px;
-  padding: 1.25rem;
-  margin-bottom: 1.5rem;
-  border: 1px solid var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card, 28px);
+  corner-shape: var(--corner-shape);
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-1);
 }
 
 .as-of-header {
@@ -273,12 +291,10 @@
 }
 
 .as-of-date-badge {
-  background: var(--secondary);
   color: var(--foreground);
-  padding: 0.25rem 0.625rem;
-  border-radius: 9999px;
   font-size: 0.875rem;
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
 .as-of-slider-row {
@@ -290,10 +306,6 @@
 
 .as-of-range {
   flex: 1;
-  accent-color: var(--brand);
-  height: 6px;
-  border-radius: 3px;
-  cursor: pointer;
 }
 
 .as-of-chips {
@@ -305,14 +317,18 @@
 }
 
 .as-of-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
   background: var(--secondary);
   border: 1px solid transparent;
   color: var(--foreground);
-  border-radius: 9999px;
-  padding: 0.3125rem 0.75rem;
-  font-size: 0.8125rem;
-  cursor: pointer;
+  border-radius: 999px;
+  corner-shape: var(--corner-shape);
+  font: 500 0.8125rem/1 inherit;
   font-family: inherit;
+  cursor: pointer;
 }
 
 .as-of-chip:hover {
@@ -327,11 +343,13 @@
 .as-of-delta-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.25rem 0.625rem;
-  border-radius: 9999px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  corner-shape: var(--corner-shape);
   font-size: 0.75rem;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .as-of-delta-pill.delta-warn {
@@ -340,8 +358,8 @@
 }
 
 .as-of-delta-pill.delta-calm {
-  background: color-mix(in oklch, var(--calm) 15%, transparent);
-  color: var(--calm);
+  background: var(--secondary);
+  color: var(--foreground);
 }
 
 .as-of-caption {

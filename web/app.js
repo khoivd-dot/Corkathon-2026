@@ -347,11 +347,19 @@
       if (hi > lo) g.append(sv("rect", { x: X(lo), y: 8, width: X(hi) - X(lo), height: 116, rx: 10, class: s < l ? "rw-gap short" : "rw-gap spare" }));
       [[30, "Your stock", s, "rw-stock"], [88, "A new order placed today", l, "rw-order"]].forEach(function (ln) {
         g.append(svgText(L, ln[0] - 8, ln[1], "rw-name"));
-        g.append(sv("rect", { x: X(0), y: ln[0], width: X(max) - X(0), height: 12, rx: 6, class: "rw-track" }));
-        g.append(sv("rect", { x: X(0), y: ln[0], width: Math.max(12, X(ln[2]) - X(0)), height: 12, rx: 6, class: ln[3] }));
-        g.append(sv("circle", { cx: X(ln[2]), cy: ln[0] + 6, r: 8, class: ln[3] + "-end" }));
+        // morphin-ui slider shape: 20 px pill track, fill to the value, pill thumb with a lighter pill inside.
+        var tx = Math.min(X(max) - 14, Math.max(X(0) + 14, X(ln[2])));
+        g.append(sv("rect", { x: X(0), y: ln[0] - 4, width: X(max) - X(0), height: 20, rx: 10, class: "rw-track" }));
+        g.append(sv("rect", { x: X(0), y: ln[0] - 4, width: Math.max(20, tx - X(0)), height: 20, rx: 10, class: ln[3] }));
+        g.append(sv("rect", { x: tx - 14, y: ln[0] - 4, width: 28, height: 20, rx: 10, class: ln[3] + "-end" }));
+        g.append(sv("rect", { x: tx - 12, y: ln[0] - 2, width: 24, height: 16, rx: 8, class: "rw-thumb-in" }));
       });
-      if (hi > lo && X(hi) - X(lo) > 90) g.append(svgText((X(lo) + X(hi)) / 2, 70, (s < l ? (l - s) + " days without stock" : (s - l) + " days to spare"), "rw-gaplab" + (s < l ? " short" : ""), "middle"));
+      if (hi > lo && X(hi) - X(lo) > 90) {
+        // The gap's size as a soft badge (morphin-ui Badge) between the lanes.
+        var gl = (s < l ? (l - s) + " days without stock" : (s - l) + " days to spare"), bw = gl.length * 7.4 + 20;
+        g.append(sv("rect", { x: (X(lo) + X(hi)) / 2 - bw / 2, y: 52, width: bw, height: 26, rx: 13, class: "rw-badge" + (s < l ? " short" : "") }));
+        g.append(svgText((X(lo) + X(hi)) / 2, 70, gl, "rw-gaplab" + (s < l ? " short" : ""), "middle"));
+      }
       for (var dd = 0; dd <= max; dd += 7) g.append(svgText(X(dd), 156, dd === 0 ? "Today" : "Day " + dd, "rw-axis", dd === 0 ? "start" : dd === max ? "end" : "middle"));
       svgBox.append(g);
       out.textContent = stockSentence(s, l);
@@ -589,7 +597,7 @@
       glance.append(a);
     });
     if (map) map.sail();
-    ui.fillAll(); ui.wake(res); ui.roll(res);
+    ui.fillAll(); ui.roll(res);
 
     var todo = $("todo"); todo.replaceChildren();
     var acts = [ans.delay && ans.delay.action];
@@ -928,37 +936,6 @@
     // ---- Border beam (libraries.dev): a 1px travelling stroke while a check runs.
     function beam(node, on) { if (!node) return; node.classList.add("beam"); node.classList.toggle("on", !!on); }
 
-    // ---- Wake slider (bencho): bars fill to the value; bars the value sweeps past take energy from the drag speed.
-    function wake(root) {
-      root.querySelectorAll(".rw-ctl input[type=range]").forEach(function (r) {
-        if (r.parentNode.classList.contains("wks")) return;
-        var n = 36, box = el("div", null, "wks"), bars = [], energy = new Float32Array(n), raf = 0, lastT = 0, at = 0, lastBar = -1;
-        for (var i = 0; i < n; i++) { var b = el("span", null, "wks-bar"); b.setAttribute("aria-hidden", "true"); bars.push(b); box.append(b); }
-        r.parentNode.insertBefore(box, r); box.append(r);
-        function frac() { var lo = +r.min || 0, hi = +r.max || 100; return (r.value - lo) / (hi - lo); }
-        function paint() { var lit = Math.round(at * (n - 1)); bars.forEach(function (b, i) { if (i <= lit) b.setAttribute("data-on", ""); else b.removeAttribute("data-on"); }); }
-        function loop() {
-          if (raf || calm) return;
-          var prev = performance.now();
-          function run(now) {
-            var dt = Math.min(0.05, (now - prev) / 1000); prev = now;
-            var live = false, fall = Math.exp(-dt * 6.5);
-            for (var i = 0; i < n; i++) { energy[i] *= fall; if (energy[i] < 0.002) energy[i] = 0; else live = true; bars[i].style.transform = energy[i] ? "scaleY(" + (1 + energy[i] * 1.6).toFixed(3) + ")" : ""; }
-            raf = live ? requestAnimationFrame(run) : 0;
-          }
-          raf = requestAnimationFrame(run);
-        }
-        at = frac(); paint();
-        r.addEventListener("input", function () {
-          var now = performance.now(), f = frac(), w = box.getBoundingClientRect().width || 300;
-          var speed = lastT ? Math.abs(f - at) * w / Math.max(0.008, (now - lastT) / 1000) : 0; lastT = now;
-          var a = Math.round(at * (n - 1)), b = Math.round(f * (n - 1)), push = (1 - Math.exp(-speed / 900));
-          for (var i = Math.min(a, b); i <= Math.max(a, b); i++) energy[i] = Math.max(energy[i], push);
-          at = f; if (b !== lastBar) { lastBar = b; } paint(); loop();
-        });
-      });
-    }
-
     // ---- Rolling counter (bencho): each digit is a strip 0-9 behind a window. A column's target is the count of
     // whole tens, hundreds... in the value, so the strips roll forward like an odometer, ones first, then each
     // column to the left a little later. Real value kept for screen readers.
@@ -1072,6 +1049,6 @@
     }
 
     magnetic($("page-title")); tilt($("shot")); dock($("glance"));
-    return { fillAll: fillAll, roll: roll, wake: wake, beam: beam };
+    return { fillAll: fillAll, roll: roll, beam: beam };
   })();
 })();

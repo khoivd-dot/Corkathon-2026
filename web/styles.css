@@ -321,24 +321,16 @@ input[type=date]{max-width:15rem}
 .rw-ctl input{grid-row:2;grid-column:1/-1}
 input[type=range]{--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:var(--h-md);min-height:0;background:transparent;border:0;border-radius:var(--pill);padding:0;margin:0;cursor:pointer}
 input[type=range]:hover{border:0}
-input[type=range]::-webkit-slider-runnable-track{height:20px;border-radius:var(--pill);background:linear-gradient(to right,var(--brand) 0 var(--fill),var(--secondary-2) var(--fill) 100%);box-shadow:inset 0 0 0 1px var(--input)}
-input[type=range]::-moz-range-track{height:20px;border-radius:var(--pill);background:var(--secondary-2);box-shadow:inset 0 0 0 1px var(--input)}
-input[type=range]::-moz-range-progress{height:20px;border-radius:var(--pill);background:var(--brand)}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:12px;margin-top:4px;border-radius:var(--pill);background:var(--primary-foreground);border:0;box-shadow:0 0 0 2px var(--brand);transition:transform var(--dur-1) var(--ease)}
-input[type=range]::-moz-range-thumb{width:24px;height:12px;border-radius:var(--pill);background:var(--primary-foreground);border:0;box-shadow:0 0 0 2px var(--brand)}
-input[type=range]:active::-webkit-slider-thumb{transform:scale(.9)}
+/* Slider, after morphin-ui's Slider (MIT, Ivan Oliinyk): a 20 px pill track, a primary fill that ends under
+   the thumb, and a thumb that is a primary pill with a lighter pill inside it. */
+input[type=range]::-webkit-slider-runnable-track{height:20px;border-radius:var(--pill);corner-shape:var(--corner-shape);background:linear-gradient(to right,var(--primary) 0 var(--fill),var(--secondary-2) var(--fill) 100%)}
+input[type=range]::-moz-range-track{height:20px;border-radius:var(--pill);background:var(--secondary-2)}
+input[type=range]::-moz-range-progress{height:20px;border-radius:var(--pill);background:var(--primary)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:28px;height:20px;margin-top:0;border-radius:var(--pill);corner-shape:var(--corner-shape);background:var(--primary-foreground);border:0;box-shadow:inset 0 0 0 2px var(--primary),0 1px 2px oklch(0% 0 0 / .25);cursor:grab;transition:transform 150ms cubic-bezier(.22,1,.36,1)}
+input[type=range]::-moz-range-thumb{width:28px;height:20px;border-radius:var(--pill);background:var(--primary-foreground);border:0;box-shadow:inset 0 0 0 2px var(--primary),0 1px 2px oklch(0% 0 0 / .25);cursor:grab}
+input[type=range]:active::-webkit-slider-thumb{transform:scale(.92);cursor:grabbing}
 input[type=range]:focus-visible{outline:2px solid var(--ring);outline-offset:2px;box-shadow:none}
-@media (prefers-color-scheme:dark){input[type=range]::-webkit-slider-thumb,input[type=range]::-moz-range-thumb{background:var(--foreground)}}
 
-/* Wake slider, ported from bencho "Wake slider" (MIT, Lorenzo Cabra): a row of thin bars, solid up to the
-   value, faint after it; bars the value sweeps past spring up with the speed of the drag. The native range
-   input sits on top, transparent, so keyboard, touch and screen readers work as before. */
-.wks{position:relative;display:flex;align-items:center;justify-content:space-between;height:var(--h-md);padding:0 var(--s-1);border-radius:var(--s-2);cursor:ew-resize}
-.wks-bar{flex:none;width:3px;height:20px;border-radius:3px;background:color-mix(in oklch,var(--foreground) 32%,var(--secondary));transform-origin:50% 50%;transition:background-color 160ms ease}
-.wks-bar[data-on]{background:var(--brand)}
-.wks input[type=range]{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:ew-resize}
-.wks:has(input:focus-visible){outline:2px solid var(--ring);outline-offset:4px}
-.rw-ctl .wks{grid-row:2;grid-column:1/-1}
 
 /* Stock runway */
 .rw-tick{stroke:var(--border);stroke-width:1}
@@ -766,7 +758,6 @@ h1 em,.section-h em{font-style:normal;color:var(--brand)}
 .rw-gaplab{font:600 14px var(--font-sans);fill:var(--foreground);stroke:none}
 .rw-gaplab.short{fill:var(--warn-ink)}
 @media (prefers-color-scheme:dark){.rw-stock{fill:color-mix(in oklch,var(--data) 80%,var(--secondary))}}
-.wks-bar{height:16px;width:2px;background:color-mix(in oklch,var(--foreground) 22%,var(--secondary))}
 
 /* Event cards: the status leads, amber for a confirmed event, grey-blue for a news report */
 .findings{gap:var(--s-3)}
@@ -788,3 +779,13 @@ h1 em,.section-h em{font-style:normal;color:var(--brand)}
 .rm-role-ev{fill:var(--warn-ink);font-weight:600}
 .rm-port{stroke-width:3}
 .rw-gap.short,.rw-gap.spare{stroke:none}
+
+/* Stock runway in the morphin-ui look (MIT, Ivan Oliinyk): 20 px pill tracks and pill thumbs. */
+.rw-track{fill:color-mix(in oklch,var(--foreground) 6%,transparent)}
+.rw-thumb-in{fill:var(--primary-foreground);filter:drop-shadow(0 1px 1px oklch(0% 0 0 / .25))}
+.rw-stock-end{fill:var(--data);stroke:none}
+.rw-order-end{fill:var(--brand);stroke:none}
+.rw-badge{fill:var(--card)}
+.rw-badge.short{fill:color-mix(in oklch,var(--warn) 16%,var(--card))}
+.rw-gaplab{font:600 13px var(--font-sans)}
+.rm-port{fill:var(--card);stroke:var(--foreground);stroke-width:2.5}
