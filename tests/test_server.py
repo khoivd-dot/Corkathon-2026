@@ -59,6 +59,32 @@ class ServerTests(unittest.TestCase):
             urllib.request.urlopen(req)
         self.assertEqual(e.exception.code, 400)
 
+    def _post(self, body, headers=None):
+        req = urllib.request.Request(self.base + "/api/answer", body,
+                                     {"Content-Type": "application/json", **(headers or {})})
+        with self.assertRaises(urllib.error.HTTPError) as e:
+            urllib.request.urlopen(req, timeout=5)
+        return e.exception
+
+    def test_json_that_is_not_an_object_400(self):
+        self.assertEqual(self._post(b"[1, 2]").code, 400)
+
+    def test_unexpected_error_is_json_500_not_a_dropped_connection(self):
+        with mock.patch.object(server, "answer", side_effect=RuntimeError("boom Secret Importer")):
+            err = self._post(json.dumps(FORM).encode())
+        self.assertEqual(err.code, 500)
+        self.assertIn("errors", json.loads(err.read()))
+
+    def test_refresh_once_warms_every_shared_source(self):
+        calls = []
+        fake = lambda sid: type("L", (), {"load": lambda self: calls.append(sid)})
+        with mock.patch.dict(server.LOADERS, {s: fake(s) for s in server.CONTEXT_SOURCES}), \
+             mock.patch.object(server, "PortGdeltLoader", lambda p: type("G", (), {"load": lambda self: calls.append(p)})()), \
+             mock.patch.object(server, "PortWeatherLoader", lambda p, lat, lon: type("W", (), {"load": lambda self: calls.append("weather " + p)})()), \
+             mock.patch.object(server, "LANE_PORTS", ("Cork",)), mock.patch.dict(os.environ, {"WEATHER_ENABLED": "1"}):
+            server.refresh_once()
+        self.assertEqual(calls, [*server.CONTEXT_SOURCES, "Cork", "weather Cork"])
+
     def test_no_path_traversal(self):
         with self.assertRaises(urllib.error.HTTPError) as e:
             urllib.request.urlopen(self.base + "/../render.yaml")
