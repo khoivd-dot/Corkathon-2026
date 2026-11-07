@@ -1,3 +1,6 @@
+/* Hallmark · v2.0.0 · redesign: full · scope: page + app · theme: Soft Pill (morphin-ui shapes, Inter, warm neutrals / pure black) · genre: product · hero: centred question + real captured answer · posture: Restrained · signature: three answer cards, each with something to try · components: ported by hand from bencho and libraries.dev (both MIT), see docs/third-party.md */
+/* Pre-emit critique: no eyebrows, no tracked caps, no middle-dot meta, tokens for colour and space, no glow shadows (the border beam is a thin stroke shown only while a check runs), h2 at 40px or more, controls 44 to 52px, hero headline 7 words and one 11-word sentence above the fold at 1280x800. */
+/* Sweep: hallmark's sloplint was not run (this environment does not run code from that repo); gates applied by hand. */
 /* Imports check, theme "Soft Pill" (v4). A clean slate after Night Harbour.
    Shapes and tokens follow the morphin-ui approach (MIT): pill controls with a superellipse
    corner, soft filled cards, Inter at a tight semibold, warm neutrals in light and pure black
@@ -9,7 +12,8 @@
 @font-face{font-family:Inter;src:url(fonts/inter-medium.woff2) format("woff2");font-weight:500;font-display:swap}
 @font-face{font-family:Inter;src:url(fonts/inter-semibold.woff2) format("woff2");font-weight:600;font-display:swap}
 @font-face{font-family:"Inter Display";src:url(fonts/inter-display-semibold.woff2) format("woff2");font-weight:600;font-display:swap}
-@property --beam{syntax:"<angle>";inherits:false;initial-value:0deg}
+@property --bb-angle{syntax:"<angle>";initial-value:0deg;inherits:true}
+@property --bb-opacity{syntax:"<number>";initial-value:0;inherits:true}
 
 /* ---------- Tokens ---------- */
 :root{color-scheme:light dark;
@@ -44,13 +48,15 @@
   --font-sans:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
   --font-display:"Inter Display",Inter,system-ui,sans-serif;
   --text-xs:12px;--text-sm:14px;--text-base:16px;--text-lg:18px;--text-xl:20px;--text-2xl:24px;
-  --text-3xl:clamp(26px,2.6vw,32px);--text-4xl:clamp(32px,3.6vw,44px);--text-5xl:clamp(36px,4.4vw,56px);--text-6xl:clamp(44px,6.4vw,84px);
+  --text-3xl:clamp(26px,2.6vw,32px);--text-4xl:clamp(40px,3.6vw,44px);--text-5xl:clamp(40px,4.4vw,56px);--text-6xl:clamp(44px,6.4vw,84px);
 
   --s-1:4px;--s-2:8px;--s-3:12px;--s-4:16px;--s-5:24px;--s-6:32px;--s-7:48px;--s-8:64px;--s-9:96px;--s-10:128px;
   --pill:999px;--corner-shape:superellipse(1.2);
   --r-field:16px;--r-card:28px;--r-card-lg:36px;--r-inner:20px;
-  --h-sm:36px;--h-md:44px;--h-lg:48px;
+  --h-sm:44px;--h-md:44px;--h-lg:48px;
   --container:1200px;
+  --beam-1:oklch(64% .23 10);--beam-2:oklch(64% .19 255);--beam-3:oklch(72% .2 145);--beam-4:oklch(71% .13 185);--beam-5:oklch(55% .25 285);--beam-6:oklch(70% .19 50);--beam-7:oklch(64% .25 340);--beam-8:oklch(58% .26 305);
+  --beam-sheen:oklch(0% 0 0 / .55);--tilt-dent:oklch(18% .03 265);--tilt-rim:oklch(100% 0 0);--mask:oklch(0% 0 0);
   --ease:cubic-bezier(.22,1,.36,1);--ease-spring:cubic-bezier(.34,1.35,.64,1);
   --dur-1:150ms;--dur-2:250ms;--dur-3:350ms}
 
@@ -80,7 +86,8 @@
   --ring:oklch(72% .14 262);
   --shadow-1:none;
   --shadow-2:0 0 0 1px oklch(100% 0 0 / .06);
-  --popover-shadow:0 0 0 1px oklch(100% 0 0 / .08),0 24px 48px oklch(0% 0 0 / .6)}}
+  --popover-shadow:0 0 0 1px oklch(100% 0 0 / .08),0 24px 48px oklch(0% 0 0 / .6);
+  --beam-sheen:oklch(100% 0 0 / .75)}}
 
 /* ---------- Base ---------- */
 *{box-sizing:border-box}
@@ -120,17 +127,29 @@ h1{font-size:var(--text-6xl);line-height:1;letter-spacing:-.035em;max-width:13ch
 .mag-w{display:inline-block;white-space:nowrap}
 .mag-l{display:inline-block;transform-origin:50% 90%;transition:transform 420ms var(--ease-spring),color var(--dur-2) var(--ease);will-change:transform}
 .lede{max-width:36ch;margin:var(--s-5) 0 0;color:var(--muted-foreground);font-size:var(--text-xl);line-height:1.45}
-.hero-shot{margin:0;width:min(100%,64rem);perspective:1400px}
-.shot-frame{position:relative;border-radius:var(--r-card-lg);padding:var(--s-2);background:var(--secondary);box-shadow:var(--shadow-2);transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform 600ms var(--ease);transform-style:preserve-3d}
+.hero-shot{margin:0;width:min(100%,64rem)}
+.tilt{perspective:1800px}
+.shot-frame{position:relative;border-radius:var(--r-card-lg);padding:var(--s-2);background:var(--secondary);box-shadow:var(--shadow-2)}
+.tlt-sheen{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1}
 .shot-frame img{display:block;width:100%;height:auto;border-radius:calc(var(--r-card-lg) - var(--s-2));border:1px solid var(--border)}
 .hero-shot figcaption{margin-top:var(--s-4);font-size:var(--text-sm);color:var(--muted-foreground)}
 
-/* Travelling border (after libraries.dev "border beam"), on the hero picture and the answer card */
-.beam{position:relative;isolation:isolate}
-.beam::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1.5px;background:conic-gradient(from var(--beam),transparent 0 70%,var(--brand) 80%,var(--data) 86%,transparent 92%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);pointer-events:none;z-index:1;opacity:.9}
-@media (prefers-reduced-motion:no-preference){.beam::before{animation:beam 6s linear infinite}}
-@media (prefers-reduced-motion:reduce){.beam::before{display:none}}
-@keyframes beam{to{--beam:360deg}}
+/* Border beam, ported from libraries.dev border-beam (MIT, Jakub Antalik), "md" size, colorful palette.
+   Kept to the 1px stroke layer (no inner glow, no bloom) and shown only while a check runs. */
+.beam{position:relative}
+.beam.on{animation:bb-spin 1.96s linear infinite,bb-in .6s ease forwards}
+.beam.on::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;z-index:2;
+  background:conic-gradient(from var(--bb-angle),transparent 0%,transparent 54%,oklch(from var(--beam-sheen) l c h / calc(alpha * .13)) 57%,oklch(from var(--beam-sheen) l c h / calc(alpha * .4)) 60%,oklch(from var(--beam-sheen) l c h / calc(alpha * .8)) 63%,var(--beam-sheen) 66%,oklch(from var(--beam-sheen) l c h / calc(alpha * .8)) 69%,oklch(from var(--beam-sheen) l c h / calc(alpha * .4)) 72%,oklch(from var(--beam-sheen) l c h / calc(alpha * .13)) 75%,transparent 78%,transparent 100%),
+    radial-gradient(ellipse 70px 40px at 33% -7.4%,var(--beam-1),transparent),radial-gradient(ellipse 60px 35px at 12% -5%,var(--beam-2),transparent),radial-gradient(ellipse 40px 70px at 2.1% 68.3%,var(--beam-3),transparent),radial-gradient(ellipse 20px 35px at 2.1% 68.3%,var(--beam-4),transparent),radial-gradient(ellipse 180px 32px at 74.4% 100%,var(--beam-5),transparent),radial-gradient(ellipse 85px 26px at 55% 100%,var(--beam-2),transparent),radial-gradient(ellipse 74px 32px at 93.9% 0%,var(--beam-6),transparent),radial-gradient(ellipse 26px 42px at 100% 27.1%,var(--beam-7),transparent),radial-gradient(ellipse 52px 48px at 100% 27.1%,var(--beam-8),transparent);
+  -webkit-mask:conic-gradient(from var(--bb-angle),transparent 0%,transparent 30%,oklch(from var(--mask) l c h / .1) 36%,oklch(from var(--mask) l c h / .35) 44%,var(--mask) 52%,var(--mask) 80%,oklch(from var(--mask) l c h / .35) 86%,oklch(from var(--mask) l c h / .1) 92%,transparent 95%,transparent 100%),linear-gradient(var(--mask) 0 0) content-box,linear-gradient(var(--mask) 0 0);
+  -webkit-mask-composite:source-in,xor;
+  mask:conic-gradient(from var(--bb-angle),transparent 0%,transparent 30%,oklch(from var(--mask) l c h / .1) 36%,oklch(from var(--mask) l c h / .35) 44%,var(--mask) 52%,var(--mask) 80%,oklch(from var(--mask) l c h / .35) 86%,oklch(from var(--mask) l c h / .1) 92%,transparent 95%,transparent 100%),linear-gradient(var(--mask) 0 0) content-box,linear-gradient(var(--mask) 0 0);
+  mask-composite:intersect,exclude;
+  opacity:calc(var(--bb-opacity) * .9);animation:bb-hue 12s ease-in-out infinite}
+@keyframes bb-spin{to{--bb-angle:360deg}}
+@keyframes bb-in{to{--bb-opacity:1}}
+@keyframes bb-hue{0%,100%{filter:hue-rotate(-30deg) brightness(1.3) saturate(1.2)}50%{filter:hue-rotate(30deg) brightness(1.3) saturate(1.2)}}
+@media (prefers-reduced-motion:reduce){.beam.on,.beam.on::after{animation:none;--bb-opacity:1;--bb-angle:200deg}}
 
 /* Once there's an answer, the hero steps back */
 .answered .hero{padding-block:var(--s-7) 0;gap:0}
@@ -168,7 +187,7 @@ h1{font-size:var(--text-6xl);line-height:1;letter-spacing:-.035em;max-width:13ch
 .linkbtn:disabled{color:var(--muted-foreground);cursor:not-allowed}
 
 /* Thinking orbs (after libraries.dev), replaces the spinner */
-.orbs{display:inline-flex;gap:5px;align-items:center;height:14px}
+.orbs{display:inline-flex;gap:var(--s-1);align-items:center;height:14px}
 .orbs i{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.85}
 @media (prefers-reduced-motion:no-preference){.orbs i{animation:orb 1.1s var(--ease) infinite}.orbs i:nth-child(2){animation-delay:.15s}.orbs i:nth-child(3){animation-delay:.3s}}
 @keyframes orb{0%,100%{transform:translateY(0) scale(.8);opacity:.45}40%{transform:translateY(-4px) scale(1.1);opacity:1}}
@@ -177,7 +196,7 @@ h1{font-size:var(--text-6xl);line-height:1;letter-spacing:-.035em;max-width:13ch
 .ship-form{padding-top:var(--s-10)}
 .answered .ship-form{padding-top:var(--s-6)}
 .section-h{font-size:var(--text-5xl);letter-spacing:-.03em}
-.answered #ship-title{font-size:var(--text-2xl)}
+.answered #ship-title{font-size:var(--text-4xl)}
 .ship{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--s-3) var(--s-5);margin-top:var(--s-4);padding:var(--s-4) var(--s-5);background:var(--card);border:1px solid var(--border);border-radius:var(--r-card);box-shadow:var(--shadow-1)}
 #ship-line{display:flex;flex-wrap:wrap;gap:var(--s-3) var(--s-6);margin:0}
 #ship-line dt{font-size:var(--text-xs);color:var(--muted-foreground);font-weight:500}
@@ -274,10 +293,7 @@ input[type=date]{max-width:15rem}
 .part{display:grid;gap:var(--s-6);padding:clamp(var(--s-5),3.5vw,var(--s-7));background:var(--card);border:1px solid var(--border);border-radius:var(--r-card-lg);box-shadow:var(--shadow-1);scroll-margin-top:84px}
 @media(min-width:1000px){.part{grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:var(--s-7)}}
 .part-text{display:flex;flex-direction:column;gap:var(--s-4);min-width:0}
-.part-text h3{display:inline-flex;align-self:flex-start;align-items:center;gap:var(--s-2);font:500 var(--text-sm)/1 var(--font-sans);letter-spacing:-.006em;color:var(--muted-foreground);background:var(--secondary);border-radius:var(--pill);padding:var(--s-2) var(--s-3);corner-shape:var(--corner-shape)}
-.part[data-tone=warn] h3{background:var(--warn-soft);color:var(--foreground)}
-.part[data-tone=calm] h3{background:var(--calm-soft);color:var(--foreground)}
-.part[data-tone=unk] h3{background:var(--unk-soft);color:var(--foreground)}
+.part-text h3{font:600 var(--text-xl)/1.2 var(--font-display);letter-spacing:-.02em;color:var(--foreground)}
 .tone{display:flex;align-items:flex-start;gap:var(--s-3);font:600 var(--text-4xl)/1.05 var(--font-display);letter-spacing:-.03em;margin:0}
 .tone svg{width:28px;height:28px;flex:none;margin-top:var(--s-1)}
 .tone[data-tone=warn] svg{color:var(--warn)}
@@ -324,6 +340,16 @@ input[type=range]::-moz-range-thumb{width:24px;height:12px;border-radius:var(--p
 input[type=range]:active::-webkit-slider-thumb{transform:scale(.9)}
 input[type=range]:focus-visible{outline:2px solid var(--ring);outline-offset:2px;box-shadow:none}
 @media (prefers-color-scheme:dark){input[type=range]::-webkit-slider-thumb,input[type=range]::-moz-range-thumb{background:var(--foreground)}}
+
+/* Wake slider, ported from bencho "Wake slider" (MIT, Lorenzo Cabra): a row of thin bars, solid up to the
+   value, faint after it; bars the value sweeps past spring up with the speed of the drag. The native range
+   input sits on top, transparent, so keyboard, touch and screen readers work as before. */
+.wks{position:relative;display:flex;align-items:center;justify-content:space-between;height:var(--h-md);padding:0 var(--s-1);border-radius:var(--s-2);cursor:ew-resize}
+.wks-bar{flex:none;width:3px;height:20px;border-radius:3px;background:color-mix(in oklch,var(--foreground) 32%,var(--secondary));transform-origin:50% 50%;transition:background-color 160ms ease}
+.wks-bar[data-on]{background:var(--foreground)}
+.wks input[type=range]{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:ew-resize}
+.wks:has(input:focus-visible){outline:2px solid var(--ring);outline-offset:4px}
+.rw-ctl .wks{grid-row:2;grid-column:1/-1}
 
 /* Stock runway */
 .rw-tick{stroke:var(--border);stroke-width:1}
@@ -425,12 +451,16 @@ input[type=range]:focus-visible{outline:2px solid var(--ring);outline-offset:2px
 .changes ul{margin:0;padding-left:var(--s-5)}
 
 .watch{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-3) var(--s-5);margin-top:var(--s-4);padding:var(--s-4) var(--s-5);background:var(--card);border:1px solid var(--border);border-radius:var(--r-card)}
-/* Switch: the track changes at once, the thumb overshoots by a pixel (after morphin-ui) */
+/* Liquid toggle, after bencho "Liquid toggle" (MIT, Lorenzo Cabra): off is the slab with a grey drop,
+   on inverts to an ink track with a slab drop, and the drop stretches as it travels. */
 .check{display:inline-flex;align-items:center;gap:var(--s-3);font-weight:500;font-size:var(--text-sm);margin:0;min-height:var(--h-md);cursor:pointer}
-.check input{-webkit-appearance:none;appearance:none;position:relative;flex:none;width:44px;height:26px;min-height:0;padding:0;margin:0;border:0;border-radius:var(--pill);background:var(--secondary-2);box-shadow:inset 0 0 0 1px var(--input);cursor:pointer}
-.check input::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--card);box-shadow:var(--shadow-1),0 0 0 1px var(--input);transition:transform var(--dur-3) var(--ease-spring)}
-.check input:checked{background:var(--brand);box-shadow:none}
-.check input:checked::after{transform:translateX(18px);box-shadow:none}
+.check input{-webkit-appearance:none;appearance:none;position:relative;flex:none;width:56px;height:32px;min-height:0;padding:0;margin:0;border:0;border-radius:var(--pill);background:var(--card);box-shadow:0 0 0 1px var(--input);cursor:pointer;transition:background 420ms ease}
+.check input::after{content:"";position:absolute;top:var(--s-1);left:var(--s-1);width:24px;height:24px;border-radius:var(--pill);background:color-mix(in oklch,var(--foreground) 40%,var(--card));transition:left 420ms var(--ease-spring),background 420ms ease}
+.check input:checked{background:var(--foreground);box-shadow:none}
+.check input:checked::after{left:28px;background:var(--card)}
+@media (prefers-reduced-motion:no-preference){.check input::after{animation:drop-off 420ms var(--ease)}.check input:checked::after{animation:drop-on 420ms var(--ease)}}
+@keyframes drop-on{40%{width:34px;margin-left:-10px}}
+@keyframes drop-off{40%{width:34px}}
 .check input:focus-visible{outline:2px solid var(--ring);outline-offset:3px}
 
 .panel{margin-top:var(--s-3);background:var(--card);border:1px solid var(--border);border-radius:var(--r-card);padding:0 var(--s-5)}
@@ -452,7 +482,7 @@ tr.hl{background:var(--brand-soft)}
 @media (prefers-reduced-motion:no-preference){tr.hl{transition:background 600ms}}
 
 /* Shipments book */
-.book{margin-top:var(--s-9);padding:clamp(var(--s-5),3.5vw,var(--s-7));background:var(--card);border:1px solid var(--border);border-radius:var(--r-card-lg)}
+.book{margin-top:var(--s-10);padding:clamp(var(--s-5),3.5vw,var(--s-7));background:var(--card);border:1px solid var(--border);border-radius:var(--r-card-lg)}
 .book-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:var(--s-4)}
 .book .section-h{font-size:var(--text-4xl)}
 .count{color:var(--muted-foreground)}
@@ -515,3 +545,13 @@ tr.hl{background:var(--brand-soft)}
   .verdict,.part,.todo{box-shadow:none;border:1px solid CanvasText}
   .panel{display:block}.panel>*{display:block!important}
 }
+
+/* Rolling counter, ported from bencho "Rolling counter" (MIT, Lorenzo Cabra): digit strips behind a window
+   that fades at its top and bottom edge. */
+.odo{display:inline-flex;vertical-align:top;height:1.1em;line-height:1.1em;overflow:hidden;font-variant-numeric:tabular-nums;-webkit-mask-image:linear-gradient(transparent,var(--mask) 20%,var(--mask) 80%,transparent);mask-image:linear-gradient(transparent,var(--mask) 20%,var(--mask) 80%,transparent)}
+.odo-col{display:inline-block;width:.64em;height:1.1em;overflow:hidden;text-align:center}
+.odo-strip{display:flex;flex-direction:column;will-change:transform}
+.odo-strip>span{height:1.1em}
+.odo-sep{display:inline-block}
+.viz .btn.ghost,.quote .btn.ghost{background:var(--card);box-shadow:0 0 0 1px var(--border)}
+.viz .btn.ghost:hover{background:var(--background)}
