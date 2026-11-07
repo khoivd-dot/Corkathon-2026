@@ -1,0 +1,27 @@
+# Render Blueprint. Approved by Tran: Starter web service + 1 GB disk.
+# Auto-deploy is OFF: a deploy needs Tran's explicit yes. No secrets here.
+services:
+  - type: web
+    name: corkathon
+    runtime: python
+    plan: starter
+    region: frankfurt
+    buildCommand: "echo 'stdlib only, nothing to install'"
+    startCommand: "PYTHONPATH=src python -m corkathon.server"
+    healthCheckPath: /healthz
+    autoDeployTrigger: "off"
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: CACHE_DIR
+        value: /var/data/cache
+      - key: REFRESH_S
+        value: "1800"
+      - key: CONFIRMATION_ENABLED
+        value: "0"
+      - key: LANE_PORTS
+        value: "Rotterdam,Antwerp,Felixstowe,Dublin,Cork"
+    disk:
+      name: cache
+      mountPath: /var/data
+      sizeGB: 1
