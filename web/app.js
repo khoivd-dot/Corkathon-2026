@@ -42,6 +42,8 @@
   function render(ans, stock, lead) {
     $("mode").textContent = ans.example ? "Example data, not live" : "Snapshot data";
     $("answer-q").textContent = "Your question: \u201c" + ans.question + "\u201d";
+    $("freshness").textContent = ans.freshness || "";
+    $("staleness").textContent = ans.staleness || ""; $("staleness").hidden = !(ans.mode === "fallback" && ans.staleness);
     var exp = exposureText(stock, lead);
     var headline = ans.state === "alert"
       ? (exp.short ? "Check your forwarder\u2019s ETA today: your stock runs out " + (lead - stock) + " days before a new order would arrive." : "Check your forwarder\u2019s ETA today.")
@@ -51,7 +53,7 @@
     var ol = $("delay-findings"); ol.replaceChildren();
     ans.delay.findings.forEach(function (f) {
       var li = el("li"); li.append(el("strong", "Finding: "), document.createTextNode(f.text));
-      li.append(el("span", f.source + ", as of " + f.as_of + (f.note ? " \u00b7 " + f.note : ""), "src")); ol.append(li);
+      li.append(el("span", f.source + " as of " + (f.source_updated_at || f.as_of) + (f.checked_at ? ", checked " + f.checked_at : "") + (f.note ? " \u00b7 " + f.note : ""), "src")); ol.append(li);
     });
     ol.hidden = !ans.delay.findings.length;
     $("exposure").textContent = exp.text;
@@ -64,13 +66,14 @@
     var tb = $("sources"); tb.replaceChildren();
     ans.sources.forEach(function (s) {
       var tr = el("tr"); var th = el("th", s.name); th.scope = "row"; tr.append(th);
-      [s.reference_period, s.published_at, s.retrieved_at, s.use + (s.status === "snapshot" ? " (snapshot)" : "")].forEach(function (v) { tr.append(el("td", v)); });
+      var heads = ["Data for", "Published", "Retrieved", "How we used it"];
+      [s.reference_period, s.published_at, s.retrieved_at, s.use + (s.status === "snapshot" ? " (snapshot)" : "")].forEach(function (v, i) { var td = el("td", v); td.setAttribute("data-label", heads[i]); tr.append(td); });
       tb.append(tr);
     });
     $("working-summary").textContent = "Show working (" + ans.sources.length + " sources)";
     var fx = ans.fx;
     $("fx-finding").textContent = fx.finding;
-    $("fx-src").textContent = fx.source + ", as of " + fx.as_of;
+    $("fx-src").textContent = fx.source + " as of " + (fx.source_updated_at || fx.as_of) + (fx.checked_at ? ", checked " + fx.checked_at : "");
     $("fx-calc").textContent = usd.format(fx.invoice_usd) + " invoice: " + eur.format(fx.eur_before) + " then, about " + eur.format(fx.eur_now) + " now (illustrative).";
     $("fx-reading").textContent = fx.reading;
     $("fx-action").textContent = fx.action;

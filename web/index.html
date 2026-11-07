@@ -9,6 +9,7 @@
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <main id="main">
+<p class="preview-banner" role="note">Example data, for preview only</p>
 <span class="tag" id="mode">Example data, not live</span>
 <h1 id="page-title">Will my imports be late or dearer this month?</h1>
 <p class="q">Tell us about one shipment route. We check dated public sources and give you one next step. We never guess your route.</p>
@@ -39,11 +40,14 @@
     <input id="lead_time_days" name="lead_time_days" type="number" inputmode="numeric" min="0" aria-describedby="lead_time_days-error" value="35"></div>
   <div class="field"><label for="scenario">Demo snapshot</label>
     <select id="scenario" name="scenario"><option value="alert">7 Nov 2026: confirmed event on route</option><option value="insufficient">7 Nov 2026: unconfirmed report only</option></select></div>
+  <p class="hint" id="expect-note">Most weeks there’s no confirmed event on your route. We’ll tell you when we can’t tell.</p>
+  <p class="hint" id="privacy-note">Your route and stock figures stay in this session only. We don’t store them.</p>
   <button type="submit">Check my route</button>
 </form>
 
 <section id="result" aria-labelledby="answer" tabindex="-1" hidden>
   <p class="q" id="answer-q"></p>
+  <p class="src" id="freshness"></p><p class="src" id="staleness" hidden></p>
   <h2 id="answer" style="font:600 clamp(24px,3.4vw,34px)/1.2 var(--serif);margin:0 0 var(--s4)"></h2>
   <div class="two">
     <section class="card stack" aria-labelledby="delay-h">

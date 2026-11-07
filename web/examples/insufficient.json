@@ -29,7 +29,9 @@
     "eur_before": 11009,
     "eur_now": 11225,
     "reading": "This is not your bank's rate, and exchange rates say nothing about delays.",
-    "action": "Request a current quote from your supplier."
+    "action": "Request a current quote from your supplier.",
+    "source_updated_at": "6 Nov",
+    "checked_at": "11:05 UK time"
   },
   "sources": [
     {
@@ -80,5 +82,9 @@
       "use": "Not used: display rights unverified",
       "status": "unavailable"
     }
-  ]
+  ],
+  "mode": "fallback",
+  "checked_at": "11:05 UK time",
+  "freshness": "Checked 11:05 UK time. Trade figures are August data, ECB rate as of 6 Nov, port news from 10:40.",
+  "staleness": "Showing saved example data. Port news last refreshed 2 hours ago."
 }

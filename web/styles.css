@@ -39,3 +39,7 @@ button{font:inherit;font-weight:600;min-height:44px;padding:10px 20px;border-rad
 [aria-invalid=true]{border-color:var(--error)}
 [hidden]{display:none!important}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.preview-banner{position:sticky;top:0;z-index:5;margin:0 0 16px;border-radius:10px;background:var(--warn-bg);color:var(--warn);font-weight:600;font-size:15px;text-align:center;padding:8px 16px;border-bottom:1px solid var(--line)}
+@media (max-width:599px){table,thead,tbody,tr,th,td{display:block}thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+tbody tr{border-bottom:1px solid var(--line);padding:10px 0}tbody th,tbody td{border:0;padding:2px 0}tbody th{font-weight:700}
+tbody td::before{content:attr(data-label) ": ";font-weight:600;color:var(--muted)}.tablewrap{overflow:visible}}
