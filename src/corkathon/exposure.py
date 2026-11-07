@@ -76,4 +76,17 @@ def fx_exposure(currency: str, fixed_rate_share: float | None, ecb_records: list
     # Foreign currency per EUR: a lower rate means each foreign unit costs more euro.
     pct = round((a / b - 1.0) * 100.0 * unfixed, 2)
     return FxExposure(currency, "computed", unfixed, a, b, first["reference_period"], last["reference_period"], pct,
-                      note="ECB reference rate, not your bank's rate. Exchange rates say nothing about delays.")
+                      note=fx_sentence(first["reference_period"], last["reference_period"], pct))
+
+
+def _d(iso: str) -> str:
+    from datetime import date
+    x = date.fromisoformat(iso)
+    return f"{x.day} {x.strftime('%b')}"
+
+
+def fx_sentence(start: str, end: str, pct: float) -> str:
+    word = "higher" if pct >= 0 else "lower"
+    return (f"Since {_d(start)}, the euro cost of the part you haven't fixed would be about "
+            f"{abs(pct):.1f}% {word} (ECB rate as of {_d(end)}). This isn't your bank's rate. "
+            "Ask for a current quote. Exchange rates say nothing about delays.")
