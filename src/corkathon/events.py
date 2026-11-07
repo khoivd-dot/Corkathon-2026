@@ -8,7 +8,8 @@ if the user gave no ports, nothing matches.
 Status rules:
 - "reported": only news reports (GDELT). Never treated as confirmation.
 - "confirmed": an advisory on a carrier/port domain (CONFIRMING_DOMAINS)
-  that itself names a place on the user's confirmed lane, inside the window.
+  that itself names an event type, a place on the user's confirmed lane,
+  and falls inside the window.
   A news story that merely links or is merged with such a page is not enough.
   The advisory URL is kept in confirmation_url.
 An alert still needs the decision engine's stock-exposure check on top.
@@ -58,6 +59,15 @@ class Event:
     match_reason: str
     domains: list[str] = field(default_factory=list)
     confirmation_url: str | None = None
+
+
+EVENT_TERMS = ("strike", "closure", "closed", "congestion", "suspended", "suspension",
+               "diverted", "diversion", "blank sailing", "delay", "disruption", "industrial action")
+
+
+def _event_type(text: str) -> str | None:
+    t = text.lower()
+    return next((w for w in EVENT_TERMS if re.search(r"\b" + re.escape(w), t)), None)
 
 
 def _dt(s: str) -> datetime:
@@ -113,7 +123,8 @@ def filter_events(records: list[dict], lane: Lane, window_start: date, window_en
         # Confirmed only if an incident sourced *solely* from carrier/port pages
         # itself names a place on the lane inside the window (checked above).
         conf = next((r["urls"][0] for r, _ in g
-                     if r.get("urls") and all(_domain_confirms(u) for u in r["urls"])), None)
+                     if r.get("urls") and all(_domain_confirms(u) for u in r["urls"])
+                     and _event_type(r.get("title", ""))), None)
         confirmed = conf is not None
         events.append(Event(
             title=g[0][0].get("title", "").strip(), matched_places=matched,

@@ -73,6 +73,13 @@ class EventTests(unittest.TestCase):
                     urls=("https://www.portofrotterdam.com/en/news/x",))]
         self.assertEqual(filter_events(recs, LANE, *W), [])
 
+    def test_matching_domain_alone_is_reported(self):
+        recs = [inc("Rotterdam welcomes new container terminal", "2026-11-05",
+                    urls=("https://www.portofrotterdam.com/en/news/terminal",))]
+        ev = filter_events(recs, LANE, *W)
+        self.assertEqual(ev[0].status, "reported")
+        self.assertIsNone(ev[0].confirmation_url)
+
 
 if __name__ == "__main__":
     unittest.main()
