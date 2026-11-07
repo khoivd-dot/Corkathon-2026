@@ -2,6 +2,8 @@
 
 | source_id | Endpoint | Licence | Attribution | Role |
 |---|---|---|---|---|
+| met_warnings | `https://www.met.ie/Open_Data/json/warning_IRELAND.json` | Met Éireann custom open data licence (CC BY 4.0, verbatim, expiry-filtered) — listed on data.gov.ie as EU High Value Dataset | Source: Met Éireann (data.gov.ie) | Official route notices for Irish ports |
+| holidays | `https://date.nager.at/api/v3/PublicHolidays/{year}/{CC}` | Nager.Date public holidays (MIT) — https://date.nager.at | Source: Nager.Date | Public holidays at origin/destination for order-by engine |
 | cso_trade | CSO PxStat TSM06 (imports by SITC group, monthly, EUR thousand) | CC BY 4.0 — https://www.cso.ie/en/aboutus/whoweare/copyrightpolicy/ | Source: Central Statistics Office, Ireland | Context only |
 | ecb_fx | ECB Data Portal EXR D.<CUR>.EUR.SP00.A (daily reference rate) for USD, GBP, CNY, JPY, CHF plus 19 more ECB currencies (the 7 Nov snapshot holds the first five) | ESCB free reuse policy — https://www.ecb.europa.eu/stats/ecb_statistics/governance_and_quality_framework/html/usage_policy.en.html (must not modify statistics) | Source: ECB statistics. | Rate series only |
 | comext | Eurostat Comext DS-045409, reporter IE, HS 0901, extra-EU27, monthly value EUR + 100 kg | Eurostat free re-use, Decision 2011/833/EU / CC BY 4.0 — https://ec.europa.eu/eurostat/web/main/help/copyright-notice ; statistical reuse incl. commercial display and snapshots permitted with acknowledgement; identify modifications and apply Eurostat's disclaimer (checked 2026-11-07) | Source: Eurostat | Context only |
@@ -28,6 +30,6 @@ osv-scanner in CI still runs and exits 128 (no lockfiles), which the workflow ac
 # Freshness and cache
 Every result carries `source_updated_at` (when the data itself last changed) and `checked_at`
 (when we fetched it), plus `mode` (`live` or `fallback`). Live fetches are cached in `CACHE_DIR`
-(default `./.cache`): ECB 1 day, CSO and Comext 31 days, GDELT 30 minutes. If a live fetch fails we
+(default `./.cache`): Met warnings 15 minutes, Holidays 7 days, ECB 1 day, CSO and Comext 31 days, GDELT 30 minutes. If a live fetch fails we
 serve the stale cache, else the newest dated snapshot, both as `mode=fallback`. The cache holds
 source results only, never user inputs. `SNAPSHOT_ONLY=1` is for tests and CI.

@@ -1,0 +1,33 @@
+{
+ "source_id": "met_warnings",
+ "endpoint": "https://www.met.ie/Open_Data/json/warning_IRELAND.json",
+ "licence": {
+  "name": "Met Éireann open data licence (CC BY 4.0, verbatim, expiry-filtered)",
+  "url": "https://www.met.ie/Open_Data/Licence.txt",
+  "attribution": "Source: Met Éireann (data.gov.ie)"
+ },
+ "status": "ok",
+ "checked_at": "2026-11-07T11:44:30+00:00",
+ "retrieved_at": "2026-11-07T11:44:30+00:00",
+ "reference_period": "2026-11-07",
+ "published_at": "2026-11-07T11:44:30.805395+00:00",
+ "source_updated_at": "2026-11-07T11:44:30.805395+00:00",
+ "reason": null,
+ "records": [
+  {
+   "id": "2.49.0.1.372.0.261107114430.3d12d93b-6112-40c7-ade5-6b0e8b968ae1",
+   "level": "yellow",
+   "type": "Fog",
+   "headline": "Status Yellow - Fog warning for Connacht, Leinster, Munster, Cavan, Monaghan",
+   "issued": "2026-11-07T11:44:30.805395+00:00",
+   "onset": "2026-11-07T21:00:00+00:00",
+   "expiry": "2026-11-08T11:00:00+00:00",
+   "regions": [
+    "EI10", "EI07", "EI15", "EI12", "EI14", "EI29", "EI20", "EI19", "EI03",
+    "EI18", "EI23", "EI21", "EI11", "EI02", "EI30", "EI25", "EI13", "EI16",
+    "EI31", "EI01", "EI27", "EI24", "EI22", "EI26", "EI04"
+   ],
+   "description_text": "Areas of dense fog developing. Potential impacts: Poor visibility Difficult travelling conditions"
+  }
+ ]
+}

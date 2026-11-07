@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "capId": "2.49.0.1.372.0.261107114430.3d12d93b-6112-40c7-ade5-6b0e8b968ae1",
+    "type": "Fog",
+    "severity": "Moderate",
+    "certainty": "Likely",
+    "level": "yellow",
+    "issued": "2026-11-07T11:44:30.805395+00:00",
+    "updated": "2026-11-07T11:44:30.805395+00:00",
+    "onset": "2026-11-07T21:00:00+00:00",
+    "expiry": "2026-11-08T11:00:00+00:00",
+    "headline": "Status Yellow - Fog warning for Connacht, Leinster, Munster, Cavan, Monaghan",
+    "description": "<p>Areas of dense fog developing.</p><p>Potential impacts:</p><ul><li>Poor visibility</li><li>Difficult travelling conditions</li></ul>",
+    "status": "Warning",
+    "regions": [
+      "EI10", "EI07", "EI15", "EI12", "EI14", "EI29", "EI20", "EI19", "EI03",
+      "EI18", "EI23", "EI21", "EI11", "EI02", "EI30", "EI25", "EI13", "EI16",
+      "EI31", "EI01", "EI27", "EI24", "EI22", "EI26", "EI04"
+    ]
+  }
+]

@@ -1,0 +1,475 @@
+/* Timing layer components for In Time: OrderByHero, TimelineStrip, AsOfSlider, OfficialNotice, UnderstoodChips */
+
+/* 1. OrderByHero */
+.order-by-card {
+  background: var(--card);
+  border-radius: 18px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--secondary);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.order-by-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.order-by-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.order-by-date {
+  font-family: "Inter Display", var(--font-display, sans-serif);
+  font-size: 2.25rem;
+  font-weight: 600;
+  color: var(--foreground);
+  line-height: 1.15;
+  margin: 0.25rem 0 0.5rem 0;
+  display: block;
+}
+
+.order-by-sub {
+  font-size: 1rem;
+  color: var(--foreground);
+  line-height: 1.4;
+  margin-bottom: 1rem;
+}
+
+.order-by-meta {
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+  margin-bottom: 1.25rem;
+  line-height: 1.4;
+}
+
+.rule-thumb-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--brand);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.rule-thumb-btn:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.assumptions-panel {
+  background: var(--secondary);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--foreground);
+}
+
+.assumptions-panel ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.order-by-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn-calendar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--foreground);
+  color: var(--background);
+  border: none;
+  border-radius: 9999px;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-calendar:hover {
+  opacity: 0.9;
+}
+
+.btn-calendar:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.btn-copy-accountant {
+  background: none;
+  border: none;
+  color: var(--brand);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  text-decoration: underline;
+}
+
+.btn-copy-accountant:hover {
+  opacity: 0.85;
+}
+
+.btn-copy-accountant:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Status pills */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.status-pill.status-plan {
+  background: color-mix(in oklch, var(--calm) 15%, transparent);
+  color: var(--calm);
+}
+
+.status-pill.status-soon,
+.status-pill.status-late {
+  background: color-mix(in oklch, var(--warn) 15%, transparent);
+  color: var(--warn);
+}
+
+.status-pill svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* 2. TimelineStrip */
+.timeline-card {
+  background: var(--card);
+  border-radius: 18px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--secondary);
+}
+
+.timeline-scroll-wrap {
+  width: 100%;
+  overflow-x: auto;
+  min-height: 150px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.timeline-svg {
+  display: block;
+  min-width: 600px;
+  width: 100%;
+  height: 150px;
+}
+
+.timeline-marker {
+  cursor: pointer;
+}
+
+.timeline-marker:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.timeline-details {
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.timeline-details summary {
+  color: var(--brand);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.timeline-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+.timeline-table th,
+.timeline-table td {
+  text-align: left;
+  padding: 0.375rem 0.5rem;
+  border-bottom: 1px solid var(--secondary);
+  font-size: 0.8125rem;
+}
+
+.timeline-popover {
+  position: absolute;
+  background: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--secondary);
+  border-radius: 10px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+  max-width: 260px;
+  pointer-events: none;
+}
+
+/* 3. AsOfSlider */
+.as-of-card {
+  background: var(--card);
+  border-radius: 18px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--secondary);
+}
+
+.as-of-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.as-of-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.as-of-date-badge {
+  background: var(--secondary);
+  color: var(--foreground);
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.as-of-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.75rem 0;
+}
+
+.as-of-range {
+  flex: 1;
+  accent-color: var(--brand);
+  height: 6px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.as-of-chips {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.as-of-chip {
+  background: var(--secondary);
+  border: 1px solid transparent;
+  color: var(--foreground);
+  border-radius: 9999px;
+  padding: 0.3125rem 0.75rem;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.as-of-chip:hover {
+  border-color: var(--brand);
+}
+
+.as-of-chip:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.as-of-delta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.as-of-delta-pill.delta-warn {
+  background: color-mix(in oklch, var(--warn) 15%, transparent);
+  color: var(--warn);
+}
+
+.as-of-delta-pill.delta-calm {
+  background: color-mix(in oklch, var(--calm) 15%, transparent);
+  color: var(--calm);
+}
+
+.as-of-caption {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  margin-top: 0.75rem;
+}
+
+/* 4. OfficialNotice */
+.notice-callout {
+  background: var(--card);
+  border-left: 4px solid var(--warn);
+  border-radius: 0 14px 14px 0;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.notice-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.notice-level-pill {
+  background: color-mix(in oklch, var(--warn) 18%, transparent);
+  color: var(--warn);
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+.notice-headline {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin: 0.25rem 0;
+}
+
+.notice-desc {
+  font-size: 0.875rem;
+  color: var(--foreground);
+  margin: 0.5rem 0;
+  line-height: 1.45;
+}
+
+.notice-meta {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  margin-top: 0.5rem;
+  line-height: 1.4;
+}
+
+.notice-link {
+  color: var(--brand);
+  text-decoration: underline;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* 5. UnderstoodChips */
+.understood-row {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.understood-title {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  margin-bottom: 0.375rem;
+}
+
+.understood-list {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.understood-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: var(--secondary);
+  color: var(--foreground);
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  padding: 0.3125rem 0.75rem;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.understood-chip:hover {
+  border-color: var(--brand);
+}
+
+.understood-chip:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.missing-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: transparent;
+  color: var(--warn);
+  border: 1px dashed var(--warn);
+  border-radius: 9999px;
+  padding: 0.3125rem 0.75rem;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.missing-chip:hover {
+  background: color-mix(in oklch, var(--warn) 8%, transparent);
+}
+
+.missing-chip:focus-visible {
+  outline: 2px solid var(--warn);
+  outline-offset: 2px;
+}
+
+/* Book Order-By styling */
+.book-order-by-late {
+  border-left: 3px solid var(--warn);
+  padding-left: 0.375rem;
+}
+
+/* Accessibility & Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

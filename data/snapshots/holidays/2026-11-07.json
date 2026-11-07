@@ -1,0 +1,2436 @@
+{
+ "source_id": "holidays",
+ "endpoint": "https://date.nager.at/api/v3/PublicHolidays/{year}/{CC}",
+ "licence": {
+  "name": "Nager.Date public holidays (MIT)",
+  "url": "https://date.nager.at",
+  "attribution": "Source: Nager.Date"
+ },
+ "status": "ok",
+ "checked_at": "2026-11-07T12:00:00+00:00",
+ "retrieved_at": "2026-11-07T12:00:00+00:00",
+ "reference_period": "2026-2027",
+ "published_at": null,
+ "source_updated_at": "2026-11-07",
+ "reason": null,
+ "records": [
+  {
+   "country": "BE",
+   "date": "2026-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2026-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "CN",
+   "date": "2026-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "DE",
+   "date": "2026-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "ES",
+   "date": "2026-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2026-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2026-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2026-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2026-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "KE",
+   "date": "2026-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2026-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2026-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2026-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2026-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "VN",
+   "date": "2026-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2026-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "ES",
+   "date": "2026-01-06",
+   "name": "Epiphany",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2026-01-06",
+   "name": "Epiphany",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2026-01-07",
+   "name": "Christmas Day (Orthodox)",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2026-01-19",
+   "name": "Martin Luther King, Jr. Day",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2026-01-29",
+   "name": "Revolution Day 2011 / National Police Day",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2026-02-02",
+   "name": "Saint Brigid's Day",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2026-02-16",
+   "name": "Carnival",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2026-02-16",
+   "name": "Lunar New Year",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2026-02-16",
+   "name": "Presidents Day",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2026-02-17",
+   "name": "Carnival",
+   "global": true
+  },
+  {
+   "country": "CN",
+   "date": "2026-02-17",
+   "name": "Chinese New Year (Spring Festival)",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2026-02-17",
+   "name": "Lunar New Year",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2026-02-17",
+   "name": "Lunar New Year",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2026-02-17",
+   "name": "Chinese New Year",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2026-02-18",
+   "name": "Second day of Lunar New Year",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2026-02-18",
+   "name": "Lunar New Year",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2026-02-18",
+   "name": "Chinese New Year",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2026-02-19",
+   "name": "Third day of Lunar New Year",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2026-02-23",
+   "name": "Clean Monday",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2026-03-02",
+   "name": "Independence Movement Day",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2026-03-17",
+   "name": "Saint Patrick's Day",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2026-03-21",
+   "name": "Hari Raya Puasa",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2026-03-21",
+   "name": "Human Rights Day",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2026-03-25",
+   "name": "Annunciation",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2026-03-25",
+   "name": "Independence Day",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2026-04-03",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2026-04-03",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "DE",
+   "date": "2026-04-03",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "ES",
+   "date": "2026-04-03",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "GB",
+   "date": "2026-04-03",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2026-04-03",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2026-04-03",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "KE",
+   "date": "2026-04-03",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2026-04-03",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2026-04-03",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2026-04-03",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2026-04-04",
+   "name": "Holy Saturday",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2026-04-05",
+   "name": "Easter Sunday",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2026-04-05",
+   "name": "Easter Sunday",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2026-04-05",
+   "name": "Easter Sunday",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2026-04-06",
+   "name": "Easter Monday",
+   "global": true
+  },
+  {
+   "country": "DE",
+   "date": "2026-04-06",
+   "name": "Easter Monday",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2026-04-06",
+   "name": "Easter Monday",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2026-04-06",
+   "name": "Ching Ming Festival",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2026-04-06",
+   "name": "Easter Monday",
+   "global": true
+  },
+  {
+   "country": "KE",
+   "date": "2026-04-06",
+   "name": "Easter Monday",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2026-04-06",
+   "name": "Easter Monday",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2026-04-06",
+   "name": "Family Day",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2026-04-07",
+   "name": "Easter Monday",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2026-04-10",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2026-04-12",
+   "name": "Easter Sunday",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2026-04-13",
+   "name": "Easter Monday",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2026-04-13",
+   "name": "Easter Monday",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2026-04-21",
+   "name": "Tiradentes",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2026-04-25",
+   "name": "Sinai Liberation Day",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2026-04-27",
+   "name": "King's Day",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2026-04-27",
+   "name": "Freedom Day",
+   "global": true
+  },
+  {
+   "country": "VN",
+   "date": "2026-04-30",
+   "name": "Reunification Day",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2026-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2026-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "CN",
+   "date": "2026-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "DE",
+   "date": "2026-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "ES",
+   "date": "2026-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2026-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2026-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2026-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "KE",
+   "date": "2026-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2026-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2026-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "VN",
+   "date": "2026-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2026-05-01",
+   "name": "Workers' Day",
+   "global": true
+  },
+  {
+   "country": "GB",
+   "date": "2026-05-04",
+   "name": "Early May Bank Holiday",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2026-05-04",
+   "name": "May Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2026-05-05",
+   "name": "Children's Day",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2026-05-05",
+   "name": "Liberation Day",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2026-05-07",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2026-05-08",
+   "name": "Victory in Europe Day",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2026-05-14",
+   "name": "Ascension Day",
+   "global": true
+  },
+  {
+   "country": "DE",
+   "date": "2026-05-14",
+   "name": "Ascension Day",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2026-05-14",
+   "name": "Ascension Day",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2026-05-14",
+   "name": "Ascension Day",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2026-05-15",
+   "name": "Day after Ascension Day",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2026-05-24",
+   "name": "Pentecost",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2026-05-25",
+   "name": "Whit Monday",
+   "global": true
+  },
+  {
+   "country": "DE",
+   "date": "2026-05-25",
+   "name": "Whit Monday",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2026-05-25",
+   "name": "Whit Monday",
+   "global": true
+  },
+  {
+   "country": "GB",
+   "date": "2026-05-25",
+   "name": "Spring Bank Holiday",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2026-05-25",
+   "name": "Buddha's Birthday",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2026-05-25",
+   "name": "Buddha's Birthday",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2026-05-25",
+   "name": "Whit Monday",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2026-05-25",
+   "name": "Memorial Day",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2026-05-27",
+   "name": "Eid Al-Adha",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2026-05-27",
+   "name": "Hari Raya Haji",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2026-05-28",
+   "name": "Eid Al-Adha",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2026-05-29",
+   "name": "Eid Al-Adha",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2026-05-30",
+   "name": "Eid Al-Adha",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2026-05-31",
+   "name": "Eid Al-Adha",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2026-05-31",
+   "name": "Pentecost",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2026-06-01",
+   "name": "Whit Monday",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2026-06-01",
+   "name": "June Holiday",
+   "global": true
+  },
+  {
+   "country": "KE",
+   "date": "2026-06-01",
+   "name": "Madaraka Day",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2026-06-01",
+   "name": "Vesak Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2026-06-03",
+   "name": "Local Election Day",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2026-06-04",
+   "name": "Corpus Christi",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2026-06-06",
+   "name": "Memorial Day",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2026-06-16",
+   "name": "Youth Day",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2026-06-18",
+   "name": "Islamic New Year",
+   "global": true
+  },
+  {
+   "country": "CN",
+   "date": "2026-06-19",
+   "name": "Dragon Boat Festival",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2026-06-19",
+   "name": "Dragon Boat Festival",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2026-06-19",
+   "name": "Juneteenth National Independence Day",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2026-07-01",
+   "name": "Hong Kong Special Administrative Region Establishment Day",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2026-07-02",
+   "name": "June 30 Revolution",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2026-07-03",
+   "name": "Independence Day",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2026-07-14",
+   "name": "Bastille Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2026-07-17",
+   "name": "Constitution Day",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2026-07-21",
+   "name": "Belgian National Day",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2026-07-23",
+   "name": "Revolution Day",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2026-08-03",
+   "name": "August Holiday",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2026-08-10",
+   "name": "National Day",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2026-08-10",
+   "name": "National Women's Day",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2026-08-15",
+   "name": "Assumption Day",
+   "global": true
+  },
+  {
+   "country": "ES",
+   "date": "2026-08-15",
+   "name": "Assumption",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2026-08-15",
+   "name": "Assumption Day",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2026-08-15",
+   "name": "Assumption Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2026-08-17",
+   "name": "Liberation Day",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2026-08-26",
+   "name": "Prophet Muhammad's Birthday",
+   "global": true
+  },
+  {
+   "country": "VN",
+   "date": "2026-09-02",
+   "name": "National Day",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2026-09-07",
+   "name": "Independence Day",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2026-09-07",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2026-09-24",
+   "name": "Chuseok",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2026-09-24",
+   "name": "Heritage Day",
+   "global": true
+  },
+  {
+   "country": "CN",
+   "date": "2026-09-25",
+   "name": "Mid-Autumn Festival",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2026-09-25",
+   "name": "Chuseok",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2026-09-26",
+   "name": "Day following the Mid-Autumn Festival",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2026-09-26",
+   "name": "Chuseok",
+   "global": true
+  },
+  {
+   "country": "CN",
+   "date": "2026-10-01",
+   "name": "National Day",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2026-10-01",
+   "name": "National Day",
+   "global": true
+  },
+  {
+   "country": "DE",
+   "date": "2026-10-03",
+   "name": "German Unity Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2026-10-05",
+   "name": "National Foundation Day",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2026-10-06",
+   "name": "Armed Forces Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2026-10-09",
+   "name": "Hangul Day",
+   "global": true
+  },
+  {
+   "country": "KE",
+   "date": "2026-10-10",
+   "name": "Mazingira Day",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2026-10-12",
+   "name": "Our Lady of Aparecida",
+   "global": true
+  },
+  {
+   "country": "ES",
+   "date": "2026-10-12",
+   "name": "National Day of Spain",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2026-10-12",
+   "name": "Columbus Day",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2026-10-19",
+   "name": "Chung Yeung Festival",
+   "global": true
+  },
+  {
+   "country": "KE",
+   "date": "2026-10-20",
+   "name": "Mashujaa Day",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2026-10-26",
+   "name": "October Holiday",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2026-10-28",
+   "name": "Ochi Day",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2026-11-01",
+   "name": "All Saints' Day",
+   "global": true
+  },
+  {
+   "country": "ES",
+   "date": "2026-11-01",
+   "name": "All Saints Day",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2026-11-01",
+   "name": "All Saints' Day",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2026-11-02",
+   "name": "All Souls' Day",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2026-11-04",
+   "name": "Election Day",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2026-11-09",
+   "name": "Deepavali",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2026-11-11",
+   "name": "Armistice Day",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2026-11-11",
+   "name": "Armistice Day",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2026-11-11",
+   "name": "Veterans Day",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2026-11-15",
+   "name": "Republic Proclamation Day",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2026-11-20",
+   "name": "Black Awareness Day",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2026-11-26",
+   "name": "Thanksgiving Day",
+   "global": true
+  },
+  {
+   "country": "ES",
+   "date": "2026-12-06",
+   "name": "Constitution Day",
+   "global": true
+  },
+  {
+   "country": "ES",
+   "date": "2026-12-08",
+   "name": "Immaculate Conception",
+   "global": true
+  },
+  {
+   "country": "KE",
+   "date": "2026-12-12",
+   "name": "Jamhuri Day",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2026-12-16",
+   "name": "Day of Reconciliation",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2026-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2026-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "DE",
+   "date": "2026-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "ES",
+   "date": "2026-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2026-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "GB",
+   "date": "2026-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2026-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2026-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2026-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "KE",
+   "date": "2026-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2026-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2026-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2026-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2026-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2026-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2026-12-26",
+   "name": "St. Stephen's Day",
+   "global": true
+  },
+  {
+   "country": "DE",
+   "date": "2026-12-26",
+   "name": "St. Stephen's Day",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2026-12-26",
+   "name": "St. Stephen's Day",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2026-12-26",
+   "name": "Boxing Day",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2026-12-26",
+   "name": "St. Stephen's Day",
+   "global": true
+  },
+  {
+   "country": "KE",
+   "date": "2026-12-26",
+   "name": "Boxing Day",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2026-12-26",
+   "name": "St. Stephen's Day",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2026-12-26",
+   "name": "Day of Goodwill",
+   "global": true
+  },
+  {
+   "country": "GB",
+   "date": "2026-12-28",
+   "name": "St. Stephen's Day",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2027-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2027-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "CN",
+   "date": "2027-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "DE",
+   "date": "2027-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "ES",
+   "date": "2027-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2027-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2027-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2027-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2027-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "KE",
+   "date": "2027-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2027-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2027-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2027-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2027-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "VN",
+   "date": "2027-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2027-01-01",
+   "name": "New Year's Day",
+   "global": true
+  },
+  {
+   "country": "ES",
+   "date": "2027-01-06",
+   "name": "Epiphany",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2027-01-06",
+   "name": "Epiphany",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2027-01-07",
+   "name": "Christmas Day (Orthodox)",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2027-01-18",
+   "name": "Martin Luther King, Jr. Day",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2027-01-25",
+   "name": "Revolution Day 2011 / National Police Day",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2027-02-01",
+   "name": "Saint Brigid's Day",
+   "global": true
+  },
+  {
+   "country": "CN",
+   "date": "2027-02-06",
+   "name": "Chinese New Year (Spring Festival)",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2027-02-06",
+   "name": "Lunar New Year",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2027-02-06",
+   "name": "Lunar New Year",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2027-02-06",
+   "name": "Chinese New Year",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2027-02-08",
+   "name": "Carnival",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2027-02-08",
+   "name": "Second day of Lunar New Year",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2027-02-08",
+   "name": "Lunar New Year",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2027-02-08",
+   "name": "Chinese New Year",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2027-02-09",
+   "name": "Carnival",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2027-02-09",
+   "name": "Third day of Lunar New Year",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2027-02-09",
+   "name": "Lunar New Year",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2027-02-15",
+   "name": "Presidents Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2027-03-01",
+   "name": "Independence Movement Day",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2027-03-10",
+   "name": "Hari Raya Puasa",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2027-03-15",
+   "name": "Clean Monday",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2027-03-17",
+   "name": "Saint Patrick's Day",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2027-03-22",
+   "name": "Human Rights Day",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2027-03-25",
+   "name": "Annunciation",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2027-03-25",
+   "name": "Independence Day",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2027-03-26",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2027-03-26",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "DE",
+   "date": "2027-03-26",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "ES",
+   "date": "2027-03-26",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "GB",
+   "date": "2027-03-26",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2027-03-26",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2027-03-26",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "KE",
+   "date": "2027-03-26",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2027-03-26",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2027-03-26",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2027-03-26",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2027-03-27",
+   "name": "Holy Saturday",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2027-03-28",
+   "name": "Easter Sunday",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2027-03-28",
+   "name": "Easter Sunday",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2027-03-28",
+   "name": "Easter Sunday",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2027-03-29",
+   "name": "Easter Monday",
+   "global": true
+  },
+  {
+   "country": "DE",
+   "date": "2027-03-29",
+   "name": "Easter Monday",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2027-03-29",
+   "name": "Easter Monday",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2027-03-29",
+   "name": "Easter Monday",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2027-03-29",
+   "name": "Easter Monday",
+   "global": true
+  },
+  {
+   "country": "KE",
+   "date": "2027-03-29",
+   "name": "Easter Monday",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2027-03-29",
+   "name": "Easter Monday",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2027-03-29",
+   "name": "Family Day",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2027-04-05",
+   "name": "Ching Ming Festival",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2027-04-21",
+   "name": "Tiradentes",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2027-04-25",
+   "name": "Sinai Liberation Day",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2027-04-27",
+   "name": "King's Day",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2027-04-27",
+   "name": "Freedom Day",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2027-04-30",
+   "name": "Good Friday",
+   "global": true
+  },
+  {
+   "country": "VN",
+   "date": "2027-04-30",
+   "name": "Reunification Day",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2027-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2027-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "CN",
+   "date": "2027-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "DE",
+   "date": "2027-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2027-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "ES",
+   "date": "2027-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2027-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2027-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2027-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "KE",
+   "date": "2027-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2027-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "VN",
+   "date": "2027-05-01",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2027-05-01",
+   "name": "Workers' Day",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2027-05-02",
+   "name": "Easter Sunday",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2027-05-03",
+   "name": "Easter Monday",
+   "global": true
+  },
+  {
+   "country": "GB",
+   "date": "2027-05-03",
+   "name": "Early May Bank Holiday",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2027-05-03",
+   "name": "Easter Monday",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2027-05-03",
+   "name": "May Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2027-05-03",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2027-05-05",
+   "name": "Children's Day",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2027-05-05",
+   "name": "Liberation Day",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2027-05-06",
+   "name": "Ascension Day",
+   "global": true
+  },
+  {
+   "country": "DE",
+   "date": "2027-05-06",
+   "name": "Ascension Day",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2027-05-06",
+   "name": "Ascension Day",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2027-05-06",
+   "name": "Ascension Day",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2027-05-07",
+   "name": "Day after Ascension Day",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2027-05-08",
+   "name": "Victory in Europe Day",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2027-05-13",
+   "name": "Buddha's Birthday",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2027-05-13",
+   "name": "Buddha's Birthday",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2027-05-16",
+   "name": "Pentecost",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2027-05-17",
+   "name": "Whit Monday",
+   "global": true
+  },
+  {
+   "country": "DE",
+   "date": "2027-05-17",
+   "name": "Whit Monday",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2027-05-17",
+   "name": "Whit Monday",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2027-05-17",
+   "name": "Whit Monday",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2027-05-17",
+   "name": "Hari Raya Haji",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2027-05-20",
+   "name": "Vesak Day",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2027-05-27",
+   "name": "Corpus Christi",
+   "global": true
+  },
+  {
+   "country": "GB",
+   "date": "2027-05-31",
+   "name": "Spring Bank Holiday",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2027-05-31",
+   "name": "Memorial Day",
+   "global": true
+  },
+  {
+   "country": "KE",
+   "date": "2027-06-01",
+   "name": "Madaraka Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2027-06-06",
+   "name": "Memorial Day",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2027-06-07",
+   "name": "June Holiday",
+   "global": true
+  },
+  {
+   "country": "CN",
+   "date": "2027-06-09",
+   "name": "Dragon Boat Festival",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2027-06-09",
+   "name": "Dragon Boat Festival",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2027-06-10",
+   "name": "Islamic New Year",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2027-06-16",
+   "name": "Youth Day",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2027-06-18",
+   "name": "Juneteenth National Independence Day",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2027-06-20",
+   "name": "Pentecost",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2027-06-21",
+   "name": "Whit Monday",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2027-07-01",
+   "name": "June 30 Revolution",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2027-07-01",
+   "name": "Hong Kong Special Administrative Region Establishment Day",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2027-07-05",
+   "name": "Independence Day",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2027-07-14",
+   "name": "Bastille Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2027-07-19",
+   "name": "Constitution Day",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2027-07-21",
+   "name": "Belgian National Day",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2027-07-23",
+   "name": "Revolution Day",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2027-08-02",
+   "name": "August Holiday",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2027-08-09",
+   "name": "National Day",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2027-08-09",
+   "name": "National Women's Day",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2027-08-14",
+   "name": "Prophet Muhammad's Birthday (Tentative Date)",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2027-08-15",
+   "name": "Assumption Day",
+   "global": true
+  },
+  {
+   "country": "ES",
+   "date": "2027-08-15",
+   "name": "Assumption",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2027-08-15",
+   "name": "Assumption Day",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2027-08-15",
+   "name": "Assumption Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2027-08-16",
+   "name": "Liberation Day",
+   "global": true
+  },
+  {
+   "country": "VN",
+   "date": "2027-09-02",
+   "name": "National Day",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2027-09-06",
+   "name": "Labour Day",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2027-09-07",
+   "name": "Independence Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2027-09-14",
+   "name": "Chuseok",
+   "global": true
+  },
+  {
+   "country": "CN",
+   "date": "2027-09-15",
+   "name": "Mid-Autumn Festival",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2027-09-15",
+   "name": "Chuseok",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2027-09-16",
+   "name": "Day following the Mid-Autumn Festival",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2027-09-16",
+   "name": "Chuseok",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2027-09-24",
+   "name": "Heritage Day",
+   "global": true
+  },
+  {
+   "country": "CN",
+   "date": "2027-10-01",
+   "name": "National Day",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2027-10-01",
+   "name": "National Day",
+   "global": true
+  },
+  {
+   "country": "DE",
+   "date": "2027-10-03",
+   "name": "German Unity Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2027-10-04",
+   "name": "National Foundation Day",
+   "global": true
+  },
+  {
+   "country": "EG",
+   "date": "2027-10-06",
+   "name": "Armed Forces Day",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2027-10-08",
+   "name": "Chung Yeung Festival",
+   "global": true
+  },
+  {
+   "country": "KE",
+   "date": "2027-10-11",
+   "name": "Mazingira Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2027-10-11",
+   "name": "Hangul Day",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2027-10-11",
+   "name": "Columbus Day",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2027-10-12",
+   "name": "Our Lady of Aparecida",
+   "global": true
+  },
+  {
+   "country": "ES",
+   "date": "2027-10-12",
+   "name": "National Day of Spain",
+   "global": true
+  },
+  {
+   "country": "KE",
+   "date": "2027-10-20",
+   "name": "Mashujaa Day",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2027-10-25",
+   "name": "October Holiday",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2027-10-28",
+   "name": "Ochi Day",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2027-10-28",
+   "name": "Deepavali",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2027-11-01",
+   "name": "All Saints' Day",
+   "global": true
+  },
+  {
+   "country": "ES",
+   "date": "2027-11-01",
+   "name": "All Saints Day",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2027-11-01",
+   "name": "All Saints' Day",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2027-11-02",
+   "name": "All Souls' Day",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2027-11-11",
+   "name": "Armistice Day",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2027-11-11",
+   "name": "Armistice Day",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2027-11-11",
+   "name": "Veterans Day",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2027-11-15",
+   "name": "Republic Proclamation Day",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2027-11-20",
+   "name": "Black Awareness Day",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2027-11-25",
+   "name": "Thanksgiving Day",
+   "global": true
+  },
+  {
+   "country": "ES",
+   "date": "2027-12-06",
+   "name": "Constitution Day",
+   "global": true
+  },
+  {
+   "country": "ES",
+   "date": "2027-12-08",
+   "name": "Immaculate Conception",
+   "global": true
+  },
+  {
+   "country": "KE",
+   "date": "2027-12-13",
+   "name": "Jamhuri Day",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2027-12-16",
+   "name": "Day of Reconciliation",
+   "global": true
+  },
+  {
+   "country": "US",
+   "date": "2027-12-24",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2027-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "BR",
+   "date": "2027-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "DE",
+   "date": "2027-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "ES",
+   "date": "2027-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "FR",
+   "date": "2027-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2027-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2027-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2027-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "KE",
+   "date": "2027-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "KR",
+   "date": "2027-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2027-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "SG",
+   "date": "2027-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2027-12-25",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "BE",
+   "date": "2027-12-26",
+   "name": "St. Stephen's Day",
+   "global": true
+  },
+  {
+   "country": "DE",
+   "date": "2027-12-26",
+   "name": "St. Stephen's Day",
+   "global": true
+  },
+  {
+   "country": "GR",
+   "date": "2027-12-26",
+   "name": "St. Stephen's Day",
+   "global": true
+  },
+  {
+   "country": "IE",
+   "date": "2027-12-26",
+   "name": "St. Stephen's Day",
+   "global": true
+  },
+  {
+   "country": "KE",
+   "date": "2027-12-26",
+   "name": "Boxing Day",
+   "global": true
+  },
+  {
+   "country": "NL",
+   "date": "2027-12-26",
+   "name": "St. Stephen's Day",
+   "global": true
+  },
+  {
+   "country": "GB",
+   "date": "2027-12-27",
+   "name": "Christmas Day",
+   "global": true
+  },
+  {
+   "country": "HK",
+   "date": "2027-12-27",
+   "name": "Boxing Day",
+   "global": true
+  },
+  {
+   "country": "ZA",
+   "date": "2027-12-27",
+   "name": "Day of Goodwill",
+   "global": true
+  },
+  {
+   "country": "GB",
+   "date": "2027-12-28",
+   "name": "St. Stephen's Day",
+   "global": true
+  }
+ ]
+}

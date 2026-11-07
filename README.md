@@ -97,6 +97,8 @@ flowchart TD
 
 | Source | Module | Endpoint | Licence | Cache expiry |
 |---|---|---|---|---|
+| Met Éireann weather warnings | `sources/met_warnings.py` | `https://www.met.ie/Open_Data/json/warning_IRELAND.json` | Met Éireann CC BY 4.0 (verbatim, expiry-filtered, data.gov.ie High Value Dataset) | 15 min |
+| Nager.Date public holidays | `sources/holidays.py` | `https://date.nager.at/api/v3/PublicHolidays/{year}/{CC}` | MIT licence | 7 days |
 | CSO imports (TSM06) | `sources/cso_trade.py` | `https://ws.cso.ie/public/api.jsonrpc` (PxStat ReadDataset) | CC BY 4.0 | 31 days |
 | Eurostat Comext (DS-045409) | `sources/comext.py` | `https://ec.europa.eu/eurostat/api/comext/dissemination/statistics/1.0/data/DS-045409` | Eurostat free re-use, CC BY 4.0, modifications stated | 31 days |
 | ECB reference rates (24 currencies per EUR; the saved snapshot holds USD, GBP, CNY, JPY, CHF only) | `sources/ecb_fx.py` | `https://data-api.ecb.europa.eu/service/data/EXR/D.<24 codes>.EUR.SP00.A` | ESCB free reuse, unmodified, source quoted | 1 day |
@@ -215,6 +217,10 @@ CI runs the tests and osv-scanner on every pull request.
 - **News is a signal, not proof.** A headline must name a port on your route *and* a disruption, and off-topic stories (football, hurling, wine) are dropped, but quiet delays may never be reported.
 - **Confirmation is built but off by default.** With `CONFIRMATION_ENABLED=1`, a headline from an official carrier or port site (found through GDELT's domain filter) that names a disruption and a port on your route counts as "confirmed". It stays off on the public site until the reuse terms of those pages are recorded.
 - **Few confirming sources.** "Confirmed" relies on a fixed list of major carriers and ports (18 domains); smaller ones can only ever show as "reported".
+- **Holiday buffers are rules of thumb.** Chinese New Year (14 days) and holiday dispatch/clearance buffers reflect real-world shipping slowdowns, but supplier factory schedules vary. All rule delays are explicitly labelled with their assumptions.
+- **Met warnings look ahead ~48 hours** and cover Irish destination ports only (Cork, Dublin). They reflect official civil protection warnings, not open-ocean sea conditions.
+- **National holidays only, not regional closures.** Nager.Date provides country-wide public holidays; individual factory or municipal holidays are not included.
+- **The date slider ignores news and FX.** Asking on another date recomputes order timing based on holidays and lead time only; news and currency rates reflect current data.
 - **Not your bank's rate.** Currency figures use ECB reference rates, published once a working day. You can type your bank's quote to see its margin against the reference rate.
 - **24 foreign currencies** from the ECB, but our saved copy (used when the ECB is unreachable) holds only the dollar, sterling, yuan, yen and Swiss franc.
 - **Ship positions are counts, not tracks.** With `AIS_ENABLED=1` and an AISHub account, the route answer shows how many ships are at anchor or moving near each port. We never show names or positions; for a single ship we link public trackers.
