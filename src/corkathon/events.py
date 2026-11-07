@@ -122,19 +122,35 @@ def confirmation_enabled() -> bool:
     return os.environ.get("CONFIRMATION_ENABLED") == "1"
 
 
+NEWS_LOOKBACK_DAYS = 14  # matches the GDELT timespan: news older than this isn't fetched
+
+
+def news_window(window_start: date, window_end: date, today: date) -> tuple[date, date]:
+    """Which news dates can bear on a shipment travelling window_start..window_end.
+
+    News is about the past, the travel window is usually in the future. A strike
+    reported four days ago can still be running when the ship sails, so we keep
+    reports from NEWS_LOOKBACK_DAYS before the earlier of today and window_start."""
+    return min(window_start, today) - timedelta(days=NEWS_LOOKBACK_DAYS), max(window_end, today)
+
+
 def filter_events(records: list[dict], lane: Lane, window_start: date, window_end: date,
-                  merge_threshold: float = 0.5, confirm: bool | None = None) -> list[Event]:
+                  merge_threshold: float = 0.5, confirm: bool | None = None,
+                  news_from: date | None = None) -> list[Event]:
+    """news_from widens the window back in time for reported news only. A confirmation
+    still needs the official notice itself to fall inside window_start..window_end."""
     if confirm is None:
         confirm = confirmation_enabled()
     places = lane.places()
     if not places:
         return []
     lo, hi = datetime.combine(window_start, datetime.min.time()), datetime.combine(window_end, datetime.min.time())
+    news_lo = datetime.combine(min(news_from, window_start), datetime.min.time()) if news_from else lo
     kept = []
     for r in records:
         if r.get("kind") != "incident" or not r.get("last_seen"):
             continue
-        if _dt(r["last_seen"]) < lo or _dt(r["first_seen"]) > hi:
+        if _dt(r["last_seen"]) < news_lo or _dt(r["first_seen"]) > hi:
             continue
         hits = [p for p in places if _mentions(r.get("title", ""), p)]
         if hits and relevant(r.get("title", "")):
@@ -158,7 +174,7 @@ def filter_events(records: list[dict], lane: Lane, window_start: date, window_en
         # itself names a place on the lane inside the window (checked above).
         conf = next((r["urls"][0] for r, _ in g
                      if r.get("urls") and all(_domain_confirms(u) for u in r["urls"])
-                     and _event_type(r.get("title", ""))), None)
+                     and _event_type(r.get("title", "")) and _dt(r["last_seen"]) >= lo), None)
         if not confirm:
             conf = None
         confirmed = conf is not None

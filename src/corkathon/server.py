@@ -42,7 +42,15 @@ REQUEST_GATE_WAIT_S = float(os.environ.get("REQUEST_GATE_WAIT_S", "6"))
 _RANK = {"ok": 0, "snapshot": 1, "stale": 2, "unavailable": 3}
 
 
+CONTEXT_SOURCES = ("ecb_fx", "cso_trade", "comext")
+
+
 def refresh_once() -> None:
+    """Keep every shared source warm, so a user's answer reads the cache instead of
+    waiting on a live fetch when a TTL runs out (ECB daily, CSO and Comext monthly).
+    Each load() returns the cached copy while it's fresh, so this costs nothing then."""
+    for sid in CONTEXT_SOURCES:
+        LOADERS[sid]().load()
     for port in LANE_PORTS:  # GATE in sources/gdelt.py spaces the calls >= 5 s apart
         PortGdeltLoader(port).load()
 
@@ -85,7 +93,7 @@ def answer(form: dict) -> dict:
         if gdelt is None or _RANK.get(r.status, 9) > _RANK.get(gdelt.status, 9):
             gdelt = r
     sources = {"gdelt": gdelt or PortGdeltLoader(inp.destination_port).load_snapshot("no known port")}
-    for sid in ("ecb_fx", "cso_trade", "comext"):
+    for sid in CONTEXT_SOURCES:
         sources[sid] = LOADERS[sid]().load()
     out = decide(inp, sources, records)
     out["news_ports"] = {"checked": per_port, "unknown": unknown}
@@ -145,16 +153,26 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if self.path.split("?")[0] != "/api/answer":
             return self._send(404, b"not found", "text/plain")
-        n = int(self.headers.get("Content-Length") or 0)
+        try:
+            n = int(self.headers.get("Content-Length") or 0)
+        except ValueError:
+            n = -1
+        if n < 0:
+            return self._send(400, b"bad length", "text/plain")
         if n > MAX_BODY:
             return self._send(413, b"too large", "text/plain")
         try:
             form = json.loads(self.rfile.read(n) or b"{}")
+            if not isinstance(form, dict):
+                raise ValueError("not an object")
             out, code = answer(form), 200
         except InputError as e:
             out, code = {"errors": e.errors}, 400
         except ValueError:
             out, code = {"errors": {"_": "Send the form as JSON."}}, 400
+        except Exception as e:  # noqa: BLE001 - answer with JSON, never drop the connection
+            print(f"answer failed: {type(e).__name__}", flush=True)  # type only: no user input in logs
+            out, code = {"errors": {"_": "Something went wrong on our side. Try again in a minute."}}, 500
         self._send(code, json.dumps(out, ensure_ascii=False).encode(), "application/json")
 
 
