@@ -14,7 +14,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
-from .events import Event, filter_events
+from .events import Event, confirmation_enabled, filter_events
 from .exposure import FxExposure, fx_exposure, stock_exposure, stock_sentence
 from .inputs import ImporterInputs, to_lane
 from .sources.base import SourceResult
@@ -22,6 +22,27 @@ from .sources.base import SourceResult
 ABSTAIN = "We can't determine whether your shipment is affected."
 QUESTION = "Will my imports be late or dearer this month?"
 UK = ZoneInfo("Europe/London")
+# Ports we can't confirm automatically (no advisory feed cleared for reuse yet),
+# with each port's own notices page. Researchy, 7 Nov 2026.
+NOTICE_PAGES = {
+    "Rotterdam": "https://pin.portofrotterdam.com/",
+    "Antwerp": "https://www.portofantwerpbruges.com/en/shipping/nautical-messages",
+    "Felixstowe": "https://hha.co.uk/category/notices-to-mariners/",
+    "Dublin": "https://www.dublinport.ie/information-centre/notice-to-mariners-2026/",
+    "Cork": "https://www.portofcork.ie/notices-to-mariners/",
+}
+
+
+def _join(xs: list[str]) -> str:
+    return xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + " or " + xs[-1]
+
+
+def coverage(confirm_on: bool) -> dict:
+    """Behavioural Evidence: say which ports we can't check, so 'We can't determine'
+    is never read as 'we checked everywhere'. With confirmation off, that's all five."""
+    gaps = list(NOTICE_PAGES) if not confirm_on else []
+    return {"line": f"We can't confirm events at {_join(gaps)} automatically. Check their notices directly."
+            if gaps else "", "ports": [{"port": p, "url": NOTICE_PAGES[p]} for p in gaps]}
 SOURCE_USE = {"gdelt": ("GDELT news", "Signal, duplicates merged"),
               "ecb_fx": ("ECB reference rates", "Cost answer only"),
               "cso_trade": ("CSO imports", "Context only"),
@@ -158,6 +179,7 @@ def decide(inp: ImporterInputs, sources: dict[str, SourceResult], gdelt_records:
                   "reading": reading, "action": action},
         "fx": _fx_block(fx),
         "sources": _source_rows(sources),
+        "coverage": coverage(confirmation_enabled()),
         "checked_at": checked,
         "dates_line": dates_line(checked, sources),
     }
