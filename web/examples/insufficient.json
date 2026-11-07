@@ -1,0 +1,84 @@
+{
+  "state": "insufficient",
+  "example": true,
+  "question": "Will my coffee imports be late or dearer this month?",
+  "headline": "We can't determine whether your shipment is affected.",
+  "inputs": {
+    "importer": "Example Coffee Ltd",
+    "route": "Santos → Rotterdam → Cork (Ringaskiddy)",
+    "currency": "USD",
+    "hedged": false,
+    "stock_days": 21,
+    "lead_time_days": 35
+  },
+  "delay": {
+    "heading": "Not enough evidence",
+    "findings": [],
+    "exposure": {
+      "stock_days": 21,
+      "lead_time_days": 35
+    },
+    "reading": "Checked 5 sources: 1 unconfirmed report, no carrier or port confirmation for your route.",
+    "action": "Your stock shortfall below still applies. Ask your forwarder for a current ETA."
+  },
+  "fx": {
+    "finding": "EUR/USD moved from 1.090 to 1.069 since your last order.",
+    "source": "ECB reference rate",
+    "as_of": "6 Nov 2026",
+    "invoice_usd": 12000,
+    "eur_before": 11009,
+    "eur_now": 11225,
+    "reading": "This is not your bank's rate, and exchange rates say nothing about delays.",
+    "action": "Request a current quote from your supplier."
+  },
+  "sources": [
+    {
+      "name": "Port notice",
+      "reference_period": "7 Nov 2026",
+      "published_at": "7 Nov 2026",
+      "retrieved_at": "7 Nov 2026",
+      "use": "Signal",
+      "status": "snapshot"
+    },
+    {
+      "name": "GDELT news",
+      "reference_period": "1–7 Nov 2026",
+      "published_at": "—",
+      "retrieved_at": "7 Nov 2026",
+      "use": "Signal, duplicates merged",
+      "status": "snapshot"
+    },
+    {
+      "name": "ECB EUR/USD",
+      "reference_period": "6 Nov 2026",
+      "published_at": "6 Nov 2026",
+      "retrieved_at": "7 Nov 2026",
+      "use": "Cost answer only",
+      "status": "snapshot"
+    },
+    {
+      "name": "CSO coffee imports",
+      "reference_period": "August 2026",
+      "published_at": "16 Oct 2026",
+      "retrieved_at": "7 Nov 2026",
+      "use": "Context only",
+      "status": "snapshot"
+    },
+    {
+      "name": "Eurostat Comext",
+      "reference_period": "August 2026",
+      "published_at": "—",
+      "retrieved_at": "7 Nov 2026",
+      "use": "Context only",
+      "status": "snapshot"
+    },
+    {
+      "name": "AIS port calls",
+      "reference_period": "—",
+      "published_at": "—",
+      "retrieved_at": "—",
+      "use": "Not used: display rights unverified",
+      "status": "unavailable"
+    }
+  ]
+}
