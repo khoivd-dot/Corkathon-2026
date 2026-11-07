@@ -8,5 +8,7 @@
 | [sources.md](sources.md) | Developers | Licence and attribution table (required by team rules) |
 | [pitch-and-demo.md](pitch-and-demo.md) | Pitch team | One-liner, user, judging fit, demo questions, script, checklist |
 | [contributing.md](contributing.md) | Everyone | How to get a change in, branch names, PR checklist |
+| [market.md](market.md) | Everyone | Who it's for, market size, today's alternatives, who pays, how we'd test it |
+| [brand.md](brand.md) | Everyone | Name, voice, colours, typefaces, logo guidance |
 
 Team rules and the brief: [`../CLAUDE.md`](../CLAUDE.md).
