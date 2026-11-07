@@ -51,6 +51,41 @@
     $("errors").hidden = false; $("errors").focus();
   }
 
+
+  var SVGNS = "http://www.w3.org/2000/svg";
+  function sv(tag, attrs) { var n = document.createElementNS(SVGNS, tag); for (var k in attrs) n.setAttribute(k, attrs[k]); return n; }
+  function renderMap(geo) {
+    var fig = $("routemap"), box = $("routemap-svg"); box.replaceChildren();
+    var pts = (geo || []).filter(function (p) { return typeof p.lat === "number" && typeof p.lon === "number"; });
+    if (pts.length < 2) { fig.hidden = true; return; }
+    var W = Math.max(320, Math.min(800, box.clientWidth || 800)), H = Math.round(Math.max(260, W * 0.45)), pad = 56;
+    var lons = pts.map(function (p) { return p.lon; }), lats = pts.map(function (p) { return p.lat; });
+    var x0 = Math.min.apply(0, lons), x1 = Math.max.apply(0, lons), y0 = Math.min.apply(0, lats), y1 = Math.max.apply(0, lats);
+    var k = Math.min((W - 2 * pad) / Math.max(x1 - x0, 1), (H - 2 * pad) / Math.max(y1 - y0, 1));
+    var ox = (W - (x1 - x0) * k) / 2, oy = (H - (y1 - y0) * k) / 2;
+    var P = function (p) { return [ox + (p.lon - x0) * k, oy + (y1 - p.lat) * k]; };
+    var names = pts.map(function (p) { return p.port; }).join(", then ");
+    var svg = sv("svg", { viewBox: "0 0 " + W + " " + H, role: "img", "aria-labelledby": "routemap-title", class: "rm" });
+    var t = sv("title", { id: "routemap-title" }); t.textContent = "Your route: " + names + "."; svg.append(t);
+    for (var g = -180; g <= 180; g += 10) { var gx = ox + (g - x0) * k; if (gx > 0 && gx < W) svg.append(sv("line", { x1: gx, y1: 0, x2: gx, y2: H, class: "rm-grat" })); }
+    for (var g2 = -80; g2 <= 80; g2 += 10) { var gy = oy + (y1 - g2) * k; if (gy > 0 && gy < H) svg.append(sv("line", { x1: 0, y1: gy, x2: W, y2: gy, class: "rm-grat" })); }
+    var d = "";
+    pts.forEach(function (p, i) { var c = P(p); if (!i) { d = "M" + c[0] + " " + c[1]; return; } var pr = P(pts[i - 1]); var mx = (pr[0] + c[0]) / 2, my = Math.min(pr[1], c[1]) - Math.abs(c[0] - pr[0]) * 0.15; d += " Q" + mx + " " + my + " " + c[0] + " " + c[1]; });
+    svg.append(sv("path", { d: d, class: "rm-route-halo" }), sv("path", { d: d, class: "rm-route" }));
+    var placed = [];
+    pts.forEach(function (p) {
+      var c = P(p), ev = p.event === "confirmed" || p.event === "unconfirmed";
+      svg.append(sv("circle", { cx: c[0], cy: c[1], r: ev ? 9 : 6, class: "rm-port" + (p.event === "confirmed" ? " rm-confirmed" : ev ? " rm-unconfirmed" : "") }));
+      var n = pts.indexOf(p) + 1, right = c[0] > W * 0.6;
+      var lab = sv("text", { x: c[0] + (right ? -12 : 12), y: c[1] + (n % 2 ? -12 : 26), class: "rm-label", "text-anchor": right ? "end" : "start" });
+      lab.textContent = String(n);
+      svg.append(lab);
+    });
+    box.append(svg);
+    var missing = (geo || []).filter(function (p) { return pts.indexOf(p) < 0; }).map(function (p) { return p.port; });
+    $("routemap-cap").textContent = pts.map(function (p, i) { return (i + 1) + " " + p.port + (p.event === "confirmed" ? " (confirmed event)" : p.event === "unconfirmed" ? " (unconfirmed report)" : ""); }).join(" \u00b7 ") + ". Route sketch, not for navigation." + (missing.length ? " We couldn\u2019t place " + missing.join(", ") + " on the map." : "");
+    fig.hidden = false;
+  }
   function render(ans, stock, lead) {
     $("mode").textContent = ans.example ? "Example data, not live" : (ans.mode === "fallback" || (ans.sources || []).some(function (x) { return x.mode === "fallback"; }) ? "Live sources unavailable: using saved data" : "Live public data");
     $("answer-q").textContent = "Your question: \u201c" + ans.question + "\u201d";
@@ -100,7 +135,7 @@
     }
     $("fx-reading").textContent = fx.reading;
     $("fx-action").textContent = fx.action;
-    $("result").hidden = false; $("result").focus();
+    renderMap(ans.route_geo); $("result").hidden = false; $("result").focus();
   }
 
   document.querySelectorAll("input[name=fixed_rate_share]").forEach(function (r) {
