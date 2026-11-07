@@ -105,7 +105,7 @@ def _source_rows(sources: dict[str, SourceResult]) -> list[dict]:
                      "attribution": r.licence.attribution})
     rows.append({"name": "Carrier and port advisories", "reference_period": "\u2014",
                  "published_at": "\u2014", "retrieved_at": "\u2014", "checked_at": None,
-                 "source_updated_at": None, "mode": "fallback",
+                 "source_updated_at": None, "mode": "not_used",
                  "use": "Not used yet: reuse terms not recorded", "status": "unavailable"})
     return rows
 

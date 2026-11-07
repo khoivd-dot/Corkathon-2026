@@ -51,8 +51,15 @@
     $("errors").hidden = false; $("errors").focus();
   }
 
+  // Placeholder rows (mode "not_used", or status "unavailable" with no fetch) never set the label.
+  function modeLabel(ans) {
+    if (ans.example) return "Example data, not live";
+    var used = (ans.sources || []).filter(function (x) { return x.mode !== "not_used" && !(x.status === "unavailable" && !x.checked_at); });
+    return (ans.mode === "fallback" || used.some(function (x) { return x.mode === "fallback"; })) ? "Live sources unavailable: using saved data" : "Live public data";
+  }
+
   function render(ans, stock, lead) {
-    $("mode").textContent = ans.example ? "Example data, not live" : (ans.mode === "fallback" || (ans.sources || []).some(function (x) { return x.mode === "fallback"; }) ? "Live sources unavailable: using saved data" : "Live public data");
+    $("mode").textContent = modeLabel(ans);
     $("answer-q").textContent = "Your question: \u201c" + ans.question + "\u201d";
     $("freshness").textContent = ans.dates_line || ans.freshness || "";
     $("staleness").textContent = ans.staleness || ""; $("staleness").hidden = !(ans.mode === "fallback" && ans.staleness);
