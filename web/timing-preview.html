@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Timing Components Preview - In Time</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="timing.css">
+  <style>
+    body {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .preview-header {
+      margin-bottom: 2rem;
+    }
+    .preview-controls {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .preview-btn {
+      background: var(--secondary);
+      color: var(--foreground);
+      border: 1px solid var(--secondary);
+      border-radius: 9999px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .preview-btn.active {
+      background: var(--foreground);
+      color: var(--background);
+    }
+    .section-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin: 2rem 0 1rem 0;
+      color: var(--foreground);
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-header">
+    <h1>Timing Layer Preview</h1>
+    <p>Standalone preview rendering components from <code>web/examples/timing.json</code>.</p>
+    <div class="preview-controls">
+      <button type="button" class="preview-btn active" id="btn-cny">CNY Slowdown (20 Dec)</button>
+      <button type="button" class="preview-btn" id="btn-late">Late / Shortfall</button>
+      <button type="button" class="preview-btn" id="btn-notice">Met Éireann Notice</button>
+    </div>
+  </div>
+
+  <div id="preview-container">
+    <div class="section-title">Understood Chips (Query Parser)</div>
+    <div id="mount-understood"></div>
+
+    <div class="section-title">Official Notice Callout</div>
+    <div id="mount-notices"></div>
+
+    <div class="section-title">Order By Hero</div>
+    <div id="mount-hero"></div>
+
+    <div class="section-title">Timeline Strip</div>
+    <div id="mount-timeline"></div>
+
+    <div class="section-title">As-Of Date Slider</div>
+    <div id="mount-asof"></div>
+  </div>
+
+  <script src="timing.js"></script>
+  <script>
+    (function () {
+      var examples = null;
+      var activeKey = "cny_example";
+
+      fetch("examples/timing.json")
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          examples = data;
+          renderAll();
+        })
+        .catch(function (e) {
+          console.error("Failed to load examples:", e);
+        });
+
+      function renderAll() {
+        if (!examples || !window.InTime) return;
+        var ex = examples[activeKey];
+
+        // 1. Understood chips
+        var mountUnderstood = document.getElementById("mount-understood");
+        mountUnderstood.replaceChildren();
+        var sampleParse = {
+          understood: [
+            { field: "origin_port", text: "From Shanghai" },
+            { field: "transshipment_ports", text: "Via Rotterdam" },
+            { field: "destination_port", text: "To Dublin" },
+            { field: "currency", text: "Paid in USD" }
+          ],
+          missing: ["stock_days", "lead_time_days"]
+        };
+        mountUnderstood.append(window.InTime.renderUnderstood(sampleParse));
+
+        // 2. Official notices
+        var mountNotices = document.getElementById("mount-notices");
+        mountNotices.replaceChildren();
+        var noticeEl = window.InTime.renderNotices(ex.notices);
+        if (noticeEl) {
+          mountNotices.append(noticeEl);
+        } else {
+          var p = document.createElement("p");
+          p.className = "text-muted";
+          p.textContent = "(No active notices for this example)";
+          mountNotices.append(p);
+        }
+
+        // 3. OrderByHero
+        var mountHero = document.getElementById("mount-hero");
+        mountHero.replaceChildren();
+        mountHero.append(window.InTime.renderOrderBy(ex));
+
+        // 4. Timeline
+        var mountTimeline = document.getElementById("mount-timeline");
+        mountTimeline.replaceChildren();
+        mountTimeline.append(window.InTime.renderTimeline(ex));
+
+        // 5. AsOfSlider
+        var mountAsOf = document.getElementById("mount-asof");
+        mountAsOf.replaceChildren();
+        mountAsOf.append(window.InTime.renderAsOf(ex, function (newDate) {
+          console.log("Slider changed date to:", newDate);
+        }));
+      }
+
+      document.getElementById("btn-cny").addEventListener("click", function () {
+        setActive("cny_example", this);
+      });
+      document.getElementById("btn-late").addEventListener("click", function () {
+        setActive("late_example", this);
+      });
+      document.getElementById("btn-notice").addEventListener("click", function () {
+        setActive("met_notice_example", this);
+      });
+
+      function setActive(key, btn) {
+        activeKey = key;
+        document.querySelectorAll(".preview-btn").forEach(function (b) { b.classList.remove("active"); });
+        btn.classList.add("active");
+        renderAll();
+      }
+    })();
+  </script>
+</body>
+</html>
