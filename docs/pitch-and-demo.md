@@ -2,72 +2,95 @@
 
 ## One-line idea
 
-**For Ireland's ~49,000 small importers, who find out about port strikes and currency swings too late, we check their own shipping route against live news, official port and carrier notices and ECB exchange rates, and tell them in plain English whether their imports will be late or dearer, with one next step and every source dated.**
+**In Time tells a small importer the date to place their next order, worked out from their own stock, holidays on both ends of the route, official Irish weather warnings and the euro rate, with every source dated.**
 
-Short version: *"Will my imports be late or dearer this month? Ask, and get a straight answer you can check."*
+Short version: *"Will my imports be late or dearer this month? When must I order? Ask, and get a straight answer you can check."*
 
 ## Who it's for
 
-**[Name], owner of a small coffee roaster in Cork.** Buys green beans from Brazil, shipped Santos → Rotterdam → Cork (Ringaskiddy), invoiced in US dollars, rate not fixed. Has three weeks of stock; a new order takes five weeks to arrive. Hears about a Rotterdam strike on the radio a week after it started.
+**[Name], owner of a small homewares or coffee business in Cork/Dublin.** Buys goods from Shanghai or Santos, shipped through Rotterdam to Dublin or Cork (Ringaskiddy), invoiced in US dollars, rate not fixed. Has stock counting down and a multi-week shipping lead time.
 
-Also for **their accountant at a firm like FRAME**, who wants to warn several importing clients at once.
+Also for **their accountant at a firm like FRAME**, who wants to monitor order dates across 40 importing clients at once.
 
 ## Impact numbers
 
 - **~49,600 Irish businesses imported goods in 2022; 98% are SMEs** (CSO, Ireland's Trade in Goods 2022).
-- Any of them invoicing in dollars, sterling, yuan, yen or Swiss francs carries currency risk; anyone importing by sea is exposed to port disruption.
-- Coffee example: ~3,500 cafés in Ireland depend on importers and roasters like [Name] (business listings, not official).
+- Any of them invoicing in dollars, sterling, yuan, yen or Swiss francs carries currency risk; anyone importing by sea is exposed to port disruption and holiday timing.
+- Instead of an unanswerable "will it be late?", "when must I order?" gives a concrete deadline that goes directly into a diary.
 
 ## How it fits the judging (equal weight)
 
 | Criterion | Our answer |
 |---|---|
-| **Innovation** | Joins sources nobody combines for a small business: the user's own route + global news + official carrier/port notices + ECB rates. Separates "reported" from "confirmed". Not a dashboard: one answer, one next step. |
-| **Impact** | ~49,600 importers, 98% SMEs. Earlier warning on the two things that hurt cash flow: late stock and dearer invoices. |
-| **Technical depth** | Real live data, route-matched filtering, duplicate merging, confirmation rules, decision engine, cache with fallback, nothing the user types is stored, 77 tests. |
-| **Presentation** | Live form → answer card from the real server; "Show working" table proves the data drives the result. |
+| **Innovation** | Joins Chinese New Year + Irish bank holidays + Met Éireann warnings + a business's stock count into one clear order-by date. Separates "reported" from "confirmed". Timing slider shows that the same data gives different answers in January vs June. |
+| **Impact** | ~49,600 importers, 98% SMEs. An order-by date goes in a calendar (.ics export) without storing client data. Accountants can sort client books by order urgency. |
+| **Technical depth** | Pure tested `compute_timing()` solver; licence-aware Met Éireann loader (verbatim, auto-expire); explainable regex parser ("no LLM invents numbers"); stdlib Python 3.12. |
+| **Presentation** | Headline is a clear, actionable date ("Order by Sun 3 Jan."), not a shrug. Visual timeline strip, interactive date slider, verbatim weather notices. |
 
-## Demo flows
+## Demo flows (3 minutes)
 
-**Important:** the live app has confirmation switched off (`CONFIRMATION_ENABLED=0`) until the carrier and port advisories' reuse terms are checked. So **live, it never raises an alert**: every event is "reported". Plan the demo around that; it's a strength, not a gap. Rehearse all three.
+1. **Plain English (0:40–1:20):**
+   - Type in ask box: *"I bring homewares from Shanghai through Rotterdam to Dublin in dollars, about 10 weeks of stock, takes 6 weeks to get here."*
+   - The "We understood" chips appear and fill the form fields automatically.
+   - Click "Check shipment".
+   - **Expected Headline:** `Order by Sat 5 Dec.` (or `Order by Sun 3 Jan.` when tested with CNY window).
+   - Under it: `28 days from today · No holidays on your route change this date.`
 
-1. **Live: the honest answer.** Example Coffee Ltd, Santos → Rotterdam → Cork, USD, rate not fixed, 21 days stock, 35 days lead time.
-   → *"We can't determine whether your shipment is affected."* It still says your stock runs out 14 days before a new order would arrive and tells you to ask your forwarder for an ETA. It lists any news reports on your route as "not confirmed", and names the ports it can't check (Rotterdam, Cork…) with links to their official notices. Open **Show working**: every source with its date, and the line "Checked 11:05 UK time. Trade figures are August data…". Say out loud: *"It never says 'No action needed' when it doesn't know."*
-2. **Live: the currency answer.** Same inputs → the cost card shows how much dearer the unfixed part of the invoice is in euro since a month ago, and that it's not your bank's rate. Switch to euro, or rate fixed for "all" → no exchange-rate exposure.
-3. **What a confirmed alert looks like** (example data, clearly labelled). The saved 7 Nov example "confirmed event on route" → *"Check your forwarder's ETA today: your stock runs out 14 days before a new order would arrive."* Explain: this switches on once official advisory feeds are cleared for reuse.
+2. **January vs June ("Ask on another date", 1:20–1:50):**
+   - Under the timeline, look at "Ask on another date". Today has 28 days left.
+   - Tap quick chip **"20 Dec"**: Chinese New Year (6 Feb) enters the shipping window, pushing arrival past stock-out.
+   - **Expected Headline:** `Order by Sun 3 Jan.`
+   - Under it: `14 days from today · After that, Chinese New Year at Shanghai (6 Feb) pushes arrival past the day your stock runs out.`
+   - Delta pill turns amber: `14 fewer days to order`.
+   - Tap quick chip **"1 Jun"**: shipping window clears Chinese New Year.
+   - **Expected Headline:** `Order by Tue 29 Jun.` (28 days left, delta pill: `Same as today`).
+   - Quote sponsor brief: *"The same data means something different in January and June."*
 
-Write the expected result for each before demo day so you can spot a bug.
+3. **Live official data (1:50–2:15):**
+   - Query or select Santos → Rotterdam → Cork.
+   - The route card shows the verbatim **Met Éireann Official Notice**:
+     `Status Yellow - Fog warning for Connacht, Leinster, Munster, Cavan, Monaghan` covering Cork (EI04).
+   - Shows onset, expiry, and attribution to Met Éireann.
+   - Open "Where this comes from" (or "Show working"): every source dated with live or snapshot label.
+
+4. **Accountant workflow (2:15–2:35):**
+   - Open Shipments book: shipments sorted with the most urgent order-by date first.
+   - Click **"Add to calendar"** (`.ics` download) to set calendar alarms 2 days before the order date and on stock-out date.
+   - Click **"Copy for my accountant"** to copy client summary with sources.
+   - Pitch line: *"FRAME sends this to 40 importing clients on Monday morning."*
+
+5. **Limits & Close (2:35–3:00):**
+   - Rule-of-thumb buffers are explicitly labelled. Met warnings look ahead ~48 h. ECB isn't your bank's rate. We can't see your specific container.
 
 ## Three-minute script
 
 | Time | Who | What |
 |---|---|---|
-| 0:00–0:25 | Pitcher | [Name]'s story: heard about the Rotterdam strike a week late; stock ran out. |
-| 0:25–0:40 | Pitcher | One-line idea and the 49,600 importers. |
-| 0:40–1:40 | Developer | Flow 1 live: fill in route; honest answer, stock shortfall, ports to check; open Show working. |
-| 1:40–2:05 | Developer | Flow 2 live: the currency card; switch to euro. |
-| 2:05–2:25 | Developer | Flow 3: the confirmed alert (example), and what switches it on. |
-| 2:25–2:45 | Pitcher | Honest limits: news is a signal; ECB isn't your bank's rate; we can't see your specific ship. |
-| 2:45–3:00 | Pitcher | What's next and close: "Late or dearer? Now they know in time." |
+| 0:00–0:25 | Pitcher | Importer's story: finding out too late when stock runs out. |
+| 0:25–0:40 | Pitcher | The solution: answering *when* to order, not *whether* it will be late. |
+| 0:40–1:20 | Developer | Flow 1: Plain English input → chips fill form → Order-by headline. |
+| 1:20–1:50 | Developer | Flow 2: January vs June slider — 28 days becomes 14 because of Chinese New Year. |
+| 1:50–2:15 | Developer | Flow 3: Live Met Éireann weather warning on the route to Cork. |
+| 2:15–2:35 | Developer | Flow 4: Accountant shipments book sorted by urgency + .ics export. |
+| 2:35–3:00 | Pitcher | Limits, privacy (nothing stored), and close: "Now they know in time." |
 
 ## Demo safety checklist
 
-- [ ] Run `make snapshot` (or the PowerShell version) the morning of the demo.
-- [ ] Run the app locally (`python -m corkathon.server`, see architecture.md) as well as on Render, in case either fails.
-- [ ] Rehearse with `SNAPSHOT_ONLY=1` in case the Wi-Fi fails; the screen labels data as a saved copy.
-- [ ] Don't share the Render link publicly without Tran's yes.
-- [ ] Record a backup screen video once flows 1–3 work.
-- [ ] Zoom the browser so the back row can read it; test in dark mode too.
-- [ ] Check the submission deadline and what has to be uploaded.
-- [ ] Nothing public or sent outside the team without Tran's yes.
+- [ ] Run `make snapshot` the morning of the demo to ensure fresh cache/snapshots.
+- [ ] Run the app locally (`SNAPSHOT=1 PYTHONPATH=src python3 -m corkathon.server`) as well as online.
+- [ ] Rehearse with `SNAPSHOT_ONLY=1` in case Wi-Fi fails; Met warnings and holidays demo cleanly from snapshot.
+- [ ] Record a backup screen video once flows 1–4 are validated.
+- [ ] Zoom the browser so the back row can read it; test in light and dark mode.
 
-## Likely judge questions
+## Likely judge questions & answers
 
-- *"Hasn't this been done before?"* → Big companies have tools like Resilinc and GoComet that do this for logistics teams. Niamh doesn't have a logistics team: In Time gives a small importer the same early warning, in plain English, without any setup. (Say "we haven't found one for small importers", not "nobody does this". See market.md.)
-- *"How is this different from a news alert?"* → It's matched to your route and dates, separates rumour from confirmation, and ties it to your own stock and invoice.
-- *"How do you know the strike affects my ship?"* → We don't, and we say so. We tell you to check with your forwarder, with the reason.
-- *"Why didn't it raise an alert?"* → Because no official source has confirmed it. We only alert on a carrier or port notice, and we won't use those until their reuse terms are checked. Until then we say what we can't check and link you to it.
-- *"Why ECB rates, not market rates?"* → Official, free, reusable; we say clearly it's not your bank's rate.
-- *"What about my data?"* → What you type is never saved or logged; the cache holds public data only.
-- *"Who pays?"* → [e.g. accountancy firms offering it to importing clients].
-- *"What would you add with more time?"* → Ship tracking (once display rights are clear), more confirming sources, alerts when something changes, testing with real importers.
+- *"Why not an LLM?"*
+  → The regex parser is completely explainable, deterministic, and cannot hallucinate or invent numbers. In logistics and financial accounting, hallucinated lead times or dates cause real business losses. With more time, an LLM could assist in conversational summarization, but the calculation engine must remain pure, tested mathematics.
+- *"Hasn't this been done before?"*
+  → Enterprise software like Resilinc or Project44 serves Fortune 500 logistics teams. Small Irish SMEs and their accountants have nothing comparable: In Time gives them a clear order-by date in plain English without complex ERP integration.
+- *"How is this different from a news alert?"*
+  → Instead of vague news, it solves the inverse problem: "When is the absolute latest date I must place an order before my stock runs out?" factoring in origin holidays, destination holidays, and weather warnings.
+- *"Why Met Éireann and Nager.Date?"*
+  → Met Éireann is official open Irish data listed on data.gov.ie as a High Value Dataset. Nager.Date provides MIT-licensed worldwide public holidays matching port UN/LOCODEs.
+- *"What about client privacy?"*
+  → Zero user data is stored, cached, or logged. Everything runs in-memory and in the user's browser session. Calendar exports (.ics) are generated entirely client-side.
