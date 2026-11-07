@@ -17,6 +17,7 @@ from zoneinfo import ZoneInfo
 from .events import Event, confirmation_enabled, filter_events
 from .exposure import FxExposure, fx_exposure, stock_exposure, stock_sentence
 from .inputs import ImporterInputs, to_lane
+from .ports import lookup
 from .sources.base import SourceResult
 
 ABSTAIN = "We can't determine whether your shipment is affected."
@@ -132,6 +133,21 @@ def _fx_block(fx: FxExposure) -> dict:
     return block
 
 
+def route_geo(inp: ImporterInputs, events: list[Event]) -> list[dict]:
+    """One entry per typed port, origin first. event is null, "unconfirmed" or "confirmed"."""
+    stops = [(inp.origin_port, "origin"), *((p, "transshipment") for p in inp.transshipment_ports),
+             (inp.destination_port, "destination")]
+    out = []
+    for name, role in stops:
+        hit = lookup(name)
+        key = hit[0] if hit else name
+        st = {e.status for e in events if any(m.lower() in (name.lower(), key.lower()) for m in e.matched_places)}
+        ev = "confirmed" if "confirmed" in st else "unconfirmed" if st else None
+        out.append({"port": name, "role": role, "locode": hit[1] if hit else None,
+                    "lat": hit[2] if hit else None, "lon": hit[3] if hit else None, "event": ev})
+    return out
+
+
 def decide(inp: ImporterInputs, sources: dict[str, SourceResult], gdelt_records: list[dict],
            now: datetime | None = None) -> dict:
     now = now or datetime.now(timezone.utc)
@@ -180,7 +196,8 @@ def decide(inp: ImporterInputs, sources: dict[str, SourceResult], gdelt_records:
         "fx": _fx_block(fx),
         "sources": _source_rows(sources),
         "coverage": (cov := coverage(confirmation_enabled())),
-        "coverage_line": cov["line"],  # read by the #18 UI
+        "coverage_line": cov["line"],
+        "route_geo": route_geo(inp, events),  # read by the #18 UI
         "coverage_gaps": cov["ports"],
         "checked_at": checked,
         "dates_line": dates_line(checked, sources),

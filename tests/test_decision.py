@@ -103,6 +103,16 @@ class DecisionTests(unittest.TestCase):
         for f in Path("web/examples").glob("*.json"):
             self.assertNotIn("last order", f.read_text())
 
+    def test_route_geo(self):
+        g = self.run_([NEWS], form={**FORM, "destination_port": "Cork (Ringaskiddy)", "transshipment_ports": "Rotterdam, Atlantis"})["route_geo"]
+        self.assertEqual([x["role"] for x in g], ["origin", "transshipment", "transshipment", "destination"])
+        self.assertEqual(g[0], {"port": "Santos", "role": "origin", "locode": "BRSSZ", "lat": -23.96, "lon": -46.33, "event": None})
+        self.assertEqual(g[1]["event"], "unconfirmed")
+        self.assertIsNone(g[2]["lat"]); self.assertIsNone(g[2]["lon"])
+        self.assertEqual(g[3]["locode"], "IEORK")
+        c = self.run_([PORT_NOTICE], confirm="1")["route_geo"]
+        self.assertEqual(c[1]["event"], "confirmed")
+
     def test_dates_line(self):
         self.assertEqual(dates_line("2026-11-07T11:05:00+00:00", SOURCES),
                          "Checked 11:05 UK time. Trade figures are August data, ECB rate as of 6 Nov, port news from 10:40.")
