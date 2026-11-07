@@ -219,84 +219,79 @@
     var minTime = asOfD.getTime();
     var totalSpan = Math.max(1, maxTime - minTime);
 
-    var W = 700;
-    var H = 150;
+    // Drawn in the morphin-ui look (MIT, Ivan Oliinyk): 20 px pill tracks, a fill that ends under a
+    // pill thumb (a coloured pill with a lighter pill inside), status labels as soft badges.
+    var hasBands = (timing.delays || []).some(function (d) { return d.date_from; }) ||
+      (timing.notices || []).some(function (n) { return n.onset && n.expiry; });
+    var W = 1080, TR = 20, PADX = 16;
+    var laneY = [34, 96], bandY = 140;
+    var H = hasBands ? 216 : 168, axisY = H - 10;
     var svg = sv("svg", { class: "timeline-svg", viewBox: "0 0 " + W + " " + H, role: "img", "aria-label": "Shipment timing timeline" });
 
     function xOf(d) {
       var t = typeof d === "number" ? d : d.getTime();
-      return 40 + Math.max(0, Math.min(W - 80, (t - minTime) / totalSpan * (W - 80)));
+      return PADX + Math.max(0, Math.min(W - 2 * PADX, (t - minTime) / totalSpan * (W - 2 * PADX)));
+    }
+    function txt(x, y, s, cls, anchor) {
+      var t = sv("text", { x: x, y: y, class: cls, "text-anchor": anchor || "start" });
+      t.textContent = s; svg.append(t); return t;
+    }
+    function thumb(x, y, cls) {
+      var g = sv("g", { class: "tl-thumb " + cls });
+      g.append(sv("rect", { x: x - 14, y: y, width: 28, height: TR, rx: TR / 2, class: "tl-thumb-out" }));
+      g.append(sv("rect", { x: x - 12, y: y + 2, width: 24, height: TR - 4, rx: (TR - 4) / 2, class: "tl-thumb-in" }));
+      svg.append(g);
+    }
+    function lane(y, label, x1, x2, cls) {
+      txt(PADX, y - 10, label, "tl-name");
+      svg.append(sv("rect", { x: PADX, y: y, width: W - 2 * PADX, height: TR, rx: TR / 2, class: "tl-track" }));
+      svg.append(sv("rect", { x: x1, y: y, width: Math.max(TR, x2 - x1), height: TR, rx: TR / 2, class: "tl-fill " + cls }));
+      thumb(Math.max(x1 + 14, x2), y, cls);
     }
 
-    // Weekly ticks
+    // Weekly ticks: faint guides and a date under each.
     var curTick = minTime;
     var tableRows = [];
     while (curTick <= maxTime) {
       var x = xOf(curTick);
-      var tickD = new Date(curTick);
-      var line = sv("line", { x1: x, y1: 15, x2: x, y2: 120, stroke: "var(--secondary)", "stroke-width": "1" });
-      svg.append(line);
-      var txt = sv("text", { x: x, y: 135, fill: "var(--muted-foreground)", "font-size": "10", "text-anchor": "middle" });
-      txt.textContent = fmtDay(tickD);
-      svg.append(txt);
+      svg.append(sv("line", { x1: x, y1: 18, x2: x, y2: axisY - 16, class: "tl-tick" }));
+      txt(x, axisY, fmtDay(new Date(curTick)), "tl-axis", "middle");
       curTick += 7 * 864e5;
     }
 
-    // Lane 1: Stock bar
-    var xStockStart = xOf(minTime);
-    var xStockEnd = xOf(stockOutD);
-    var stockBar = sv("rect", { x: xStockStart, y: 30, width: Math.max(2, xStockEnd - xStockStart), height: 16, rx: "4", fill: "var(--data)" });
-    svg.append(stockBar);
-    var stockTxt = sv("text", { x: xStockEnd - 4, y: 24, fill: "var(--data)", "font-size": "11", "font-weight": "500", "text-anchor": "end" });
-    stockTxt.textContent = "Stock runs out (" + fmtDay(stockOutD) + ")";
-    svg.append(stockTxt);
+    // Lane 1: stock, from today to the day it runs out.
+    lane(laneY[0], "Your stock runs out " + fmtDay(stockOutD), xOf(minTime), xOf(stockOutD), "tl-stock");
     tableRows.push({ name: "Stock runs out", date: timing.stock_out, source: "Importer stock count", type: "Stock" });
 
-    // Lane 2: Lead time arrow
+    // Lane 2: a new order, from the order-by date to its arrival.
+    var leadDays = timing.effective_lead_days || timing.base_lead_days;
+    var effArr = new Date(orderD.getTime() + leadDays * 864e5);
     var xOrder = xOf(orderD);
-    var effArrTime = orderD.getTime() + (timing.effective_lead_days || timing.base_lead_days) * 864e5;
-    var xArr = xOf(effArrTime);
-    var leadBar = sv("rect", { x: xOrder, y: 56, width: Math.max(2, xArr - xOrder), height: 12, rx: "4", fill: "var(--brand)", opacity: "0.8" });
-    svg.append(leadBar);
-    var leadTxt = sv("text", { x: xOrder + 4, y: 52, fill: "var(--brand)", "font-size": "10", "font-weight": "500" });
-    leadTxt.textContent = "Lead time: " + (timing.effective_lead_days || timing.base_lead_days) + "d";
-    svg.append(leadTxt);
+    lane(laneY[1], "Ordered " + fmtDay(orderD) + ", arrives " + fmtDay(effArr) + " (" + leadDays + " days)", xOrder, xOf(effArr), "tl-order");
 
-    // Lane 3: Order by flag
+    // The order-by date: a focusable marker across both lanes.
     var flagG = sv("g", { class: "timeline-marker", tabindex: "0", role: "img", "aria-label": "Order by date: " + timing.order_by });
-    var flagPole = sv("line", { x1: xOrder, y1: 20, x2: xOrder, y2: 75, stroke: "var(--foreground)", "stroke-width": "2" });
-    var flagHead = sv("circle", { cx: xOrder, cy: 20, r: "5", fill: "var(--foreground)" });
-    flagG.append(flagPole);
-    flagG.append(flagHead);
+    flagG.append(sv("line", { x1: xOrder, y1: laneY[0] - 4, x2: xOrder, y2: laneY[1] + TR + 4, class: "tl-flag" }));
     svg.append(flagG);
     tableRows.push({ name: "Order by date", date: timing.order_by, source: "In Time decision", type: "Order" });
 
-    // Delays: rule or holiday
+    // Delays and official notices: soft warning badges on their own lane.
+    function band(x1, x2, label) {
+      var w = Math.max(TR, x2 - x1);
+      svg.append(sv("rect", { x: x1, y: bandY, width: w, height: TR, rx: TR / 2, class: "tl-band" }));
+      if (label) txt(x1 + 8, bandY + TR + 16, label, "tl-band-lab");
+    }
     (timing.delays || []).forEach(function (del) {
       if (del.date_from) {
-        var dFrom = parseDate(del.date_from);
-        var dTo = parseDate(del.date_to || del.date_from);
-        var x1 = xOf(dFrom);
-        var x2 = Math.max(x1 + 10, xOf(dTo));
-
-        var band = sv("rect", { x: x1, y: 76, width: Math.max(4, x2 - x1), height: 16, rx: "3", fill: "var(--warn)", opacity: "0.6" });
-        var lbl = sv("text", { x: x1 + 2, y: 104, fill: "var(--warn)", "font-size": "9", "font-weight": "500" });
-        lbl.textContent = (del.label || del.place || "Delay") + " (+" + del.days_added + "d)";
-        svg.append(band);
-        svg.append(lbl);
+        var x1 = xOf(parseDate(del.date_from));
+        band(x1, Math.max(x1 + 10, xOf(parseDate(del.date_to || del.date_from))), (del.label || del.place || "Delay") + " (+" + del.days_added + "d)");
         tableRows.push({ name: del.label || "Delay", date: del.date_from, source: del.source || "Rule of thumb", type: "Delay" });
       }
     });
-
-    // Notices: Met Éireann
     (timing.notices || []).forEach(function (n) {
       if (n.onset && n.expiry) {
-        var nOn = parseDate(n.onset);
-        var nExp = parseDate(n.expiry);
-        var nx1 = xOf(nOn);
-        var nx2 = Math.max(nx1 + 10, xOf(nExp));
-        var nBand = sv("rect", { x: nx1, y: 110, width: Math.max(4, nx2 - nx1), height: 8, rx: "2", fill: "var(--warn)" });
-        svg.append(nBand);
+        var nx1 = xOf(parseDate(n.onset));
+        band(nx1, Math.max(nx1 + 10, xOf(parseDate(n.expiry))), "");
         tableRows.push({ name: n.headline || "Notice", date: n.onset, source: "Met Éireann", type: "Notice" });
       }
     });
@@ -348,6 +343,7 @@
     range.setAttribute("max", "400");
     range.setAttribute("value", "0");
     range.setAttribute("aria-label", "Days from today to ask on");
+    range.style.setProperty("--fill", "0%");
     sliderRow.append(range);
 
     var deltaPill = el("span", "Same as today", "as-of-delta-pill delta-calm");
@@ -376,13 +372,10 @@
       var targetIso = iso(target);
       badge.textContent = fmtDay(target) + " (" + targetIso + ")";
 
-      if (dOffset > 0 && dOffset <= 60) {
-        deltaPill.textContent = "14 fewer days to order";
-        deltaPill.className = "as-of-delta-pill delta-warn";
-      } else {
-        deltaPill.textContent = "Same as today";
-        deltaPill.className = "as-of-delta-pill delta-calm";
-      }
+      range.style.setProperty("--fill", (dOffset / 400 * 100).toFixed(1) + "%");
+      // Say only what we know: the date asked about. The recomputed answer shows in the cards above.
+      deltaPill.textContent = dOffset ? "Asked as of " + fmtDay(target) : "Same as today";
+      deltaPill.className = "as-of-delta-pill delta-calm";
 
       liveAnnounce.textContent = "Asked on " + fmtDay(target) + ", timing recomputed.";
 

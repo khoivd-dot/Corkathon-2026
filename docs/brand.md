@@ -30,12 +30,12 @@ From the app's design tokens (`web/styles.css`, defined in OKLCH; hex values are
 
 | Role | Token | Light | Dark | Used for |
 |---|---|---|---|---|
-| Background | `--background` | `#FBFAF7` | `#000000` | Page |
-| Card | `--card` | `#FFFFFF` | `#171717` | Cards, answer, form |
-| Soft fill | `--secondary` | `#F2F0ED` | `#262626` | Chips, charts, inner panels |
-| Text | `--foreground` | `#110F0C` | `#FAFAFA` | Body, headings, main button |
-| Muted text | `--muted-foreground` | `#58554F` | `#A4A4A4` | Captions, "How sure" |
-| Brand (blue) | `--brand` | `#245FD4` | `#73A3FC` | Links, sliders, route line, focus |
+| Background | `--background` | `#FBFAF7` | `#1D222A` | Page |
+| Card | `--card` | `#FFFFFF` | `#282E38` | Cards, answer, form |
+| Soft fill | `--secondary` | `#F2F0ED` | `#323844` | Chips, charts, inner panels |
+| Text | `--foreground` | `#1A1F29` | `#F3F5F9` | Body, headings |
+| Muted text | `--muted-foreground` | `#58554F` | `#BFC4CE` | Captions, "How sure" |
+| Brand (blue) | `--brand` | `#245FD4` | `#73A3FC` | Main buttons, links, sliders, route line, focus, accent panels (soft tint) |
 | Data (green) | `--data` | `#0E8C41` | `#53DE73` | Stock bar, exchange-rate line |
 | Warning (amber) | `--warn` | `#C66000` | `#FCA942` | Stock shortfall, confirmed event |
 | Calm | `--calm` | `#007E46` | `#60DB89` | "About the same", nothing to act on |
@@ -44,6 +44,7 @@ From the app's design tokens (`web/styles.css`, defined in OKLCH; hex values are
 Rules:
 - **Amber means "act", not "danger".** There is no red status colour: the product warns, it doesn't alarm.
 - **Colour never carries meaning alone.** Every status has a word and an icon ("⚠ 14 days short").
+- **No heavy dark colours** (Khoa, 7 Nov): dark mode is a soft blue-tinted charcoal, not pure black; buttons and accent panels use the brand blue, not black.
 - **Contrast:** WCAG 2.2 AA in both themes (the team rule; the page passes automated checks with 0 violations).
 
 The pitch deck still uses the old Night Harbour colours (navy `#13233A`, off-white `#F6F3EC`, amber `#E8913A`) and needs updating to match.
