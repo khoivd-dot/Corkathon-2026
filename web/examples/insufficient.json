@@ -2,7 +2,7 @@
   "state": "insufficient",
   "example": true,
   "question": "Will my coffee imports be late or dearer this month?",
-  "headline": "We can't determine whether your shipment is affected.",
+  "headline": "Order today: even ordered now, it arrives 14 days after your stock runs out. Ask your forwarder about a faster option.",
   "inputs": {
     "importer": "Example Coffee Ltd",
     "route": "Santos → Rotterdam → Cork (Ringaskiddy)",
@@ -18,9 +18,32 @@
       "stock_days": 21,
       "lead_time_days": 35
     },
-    "reading": "Checked 5 sources: 1 unconfirmed report, no carrier or port confirmation for your route.",
+    "reading": "We can't determine whether your shipment is affected. Checked 5 sources: 1 unconfirmed report, no carrier or port confirmation for your route.",
     "action": "Your stock shortfall below still applies. Ask your forwarder for a current ETA."
   },
+  "timing": {
+    "as_of": "2026-11-07",
+    "order_by": "2026-11-07",
+    "days_left": 0,
+    "status": "late",
+    "headline": "Order today.",
+    "reason": "Even ordered now, it arrives 14 days after your stock runs out. Ask your forwarder about a faster option.",
+    "stock_out": "2026-11-28",
+    "arrival_if_ordered_today": "2026-12-12",
+    "base_lead_days": 35,
+    "effective_lead_days": 35,
+    "delays": [],
+    "notices": [],
+    "assumptions": [],
+    "sources": [
+      {
+        "name": "Nager.Date public holidays",
+        "checked": "2026-11-07T12:00:00+00:00",
+        "mode": "live"
+      }
+    ]
+  },
+  "notices": [],
   "fx": {
     "finding": "Since 7 Oct, the euro cost of the part you haven't fixed would be about 1.9% higher (ECB rate as of 6 Nov). This isn't your bank's rate. Ask for a current quote.",
     "source": "ECB reference rate",
