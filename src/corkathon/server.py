@@ -31,7 +31,7 @@ LANE_PORTS = tuple(p.strip() for p in os.environ.get(
     "LANE_PORTS", "Rotterdam,Antwerp,Felixstowe,Dublin,Cork").split(",") if p.strip())
 MAX_BODY = 8 * 1024
 TYPES = {".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript",
-         ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png",
+         ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".webp": "image/webp",
          ".ttf": "font/ttf", ".woff2": "font/woff2", ".txt": "text/plain; charset=utf-8"}
 HEADERS = {"Content-Security-Policy": "default-src 'self'; img-src 'self' data:; frame-ancestors 'none'",
            "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer",

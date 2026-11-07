@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="dark light">
+<meta name="description" content="For Irish importers and the accountants who advise them: check one shipment's route and currency against dated public data, and see what to check today.">
 <title>Imports check: will my imports be late or dearer?</title>
 <link rel="preload" href="fonts/display.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="styles.css">
@@ -14,44 +15,51 @@
 <header class="bar">
   <div class="wrap bar-in">
     <span class="brand"><svg viewBox="0 0 28 16" aria-hidden="true" class="brand-mark"><path d="M2 12 C 9 2, 18 2, 26 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="2" cy="12" r="2.5"/><circle cx="26" cy="8" r="2.5"/></svg>Imports check</span>
-    <span class="pill" id="mode-pill" data-tone="idle"><span class="dot" aria-hidden="true"></span><span id="mode">Public data, checked when you ask</span></span>
+    <span class="pill" id="mode-pill" data-tone="idle"><span class="dot" aria-hidden="true"></span><span id="mode" role="status">Public data, checked when you ask</span></span>
   </div>
 </header>
 
 <main id="main" class="wrap">
   <section class="hero" aria-labelledby="page-title">
-    <p class="kicker">For Irish importers and the accountants who advise them</p>
-    <h1 id="page-title">Will my imports be late or dearer?</h1>
-    <p class="lede">Ask in your own words and describe one shipment. We check dated public sources against the route you give us, and tell you what to check today. We never guess your route.</p>
+    <div class="hero-text">
+      <h1 id="page-title">Will my imports be late or dearer?</h1>
+      <p class="lede">We check your shipment’s route and currency against dated public data.</p>
+      <div class="ask" role="group" aria-label="Ask about your imports">
+        <label for="q" class="sr">Your question</label>
+        <input id="q" name="q" form="inputs" type="text" autocomplete="off" maxlength="200" placeholder="Will my next coffee order be late?">
+        <button class="btn" type="submit" form="inputs" id="ask-btn">Check</button>
+      </div>
+      <ul class="chips" aria-label="Suggested questions">
+        <li><button class="chip" type="button" data-q="Will my next shipment be late?">Will my next shipment be late?</button></li>
+        <li><button class="chip" type="button" data-q="Will it cost more in euro?">Will it cost more in euro?</button></li>
+        <li><button class="chip" type="button" data-q="Is anything happening on my route?">Is anything happening on my route?</button></li>
+      </ul>
+    </div>
+    <figure class="hero-shot">
+      <picture>
+        <source srcset="img/answer-light.webp" media="(prefers-color-scheme: light)" type="image/webp">
+        <img src="img/answer-dark.webp" width="1400" height="861" fetchpriority="high" alt="A real answer from this page for Santos to Rotterdam to Cork: the headline says we can’t determine whether the shipment is affected, the stock is 14 days short, nothing is reported on the route, and the euro cost is about the same.">
+      </picture>
+      <figcaption>A real answer, Santos to Cork, from the team’s saved data of 7 November 2026.</figcaption>
+    </figure>
   </section>
 
   <div class="error-summary" id="errors" role="alert" tabindex="-1" hidden>
-    <h2 class="lbl">There is a problem</h2><ul id="error-list"></ul>
+    <h2 class="err-h">There is a problem</h2><ul id="error-list"></ul>
   </div>
 
-  <form id="inputs" novalidate aria-labelledby="page-title">
-    <div class="ask">
-      <label for="q" class="sr">Your question</label>
-      <input id="q" name="q" type="text" autocomplete="off" maxlength="200" placeholder="For example: will my next coffee order be late or cost more?">
-      <button class="btn" type="submit" id="ask-btn">Check</button>
-    </div>
-    <ul class="chips" aria-label="Suggested questions">
-      <li><button class="chip" type="button" data-q="Will my next shipment be late?">Will my next shipment be late?</button></li>
-      <li><button class="chip" type="button" data-q="Will it cost more in euro?">Will it cost more in euro?</button></li>
-      <li><button class="chip" type="button" data-q="Is anything happening on my route?">Is anything happening on my route?</button></li>
-    </ul>
-
-    <section class="ship" id="ship-summary" aria-labelledby="ship-h" hidden>
-      <span class="ship-h" id="ship-h">Your shipment</span>
-      <span id="ship-line"></span>
+  <form id="inputs" class="ship-form" novalidate aria-labelledby="ship-title">
+    <h2 id="ship-title" class="section-h">Your shipment</h2>
+    <div class="ship" id="ship-summary" hidden>
+      <dl id="ship-line"></dl>
       <button class="linkbtn" type="button" id="edit" aria-expanded="false" aria-controls="shipment">Change</button>
-    </section>
+    </div>
 
     <div id="shipment" class="shipment">
-      <p class="sub">Your shipment <span class="muted">· kept on this page only, never saved, cached or logged</span></p>
+      <p class="sub">Three short parts. What you type stays on this page: it is never saved, cached or logged.</p>
 
       <fieldset class="group" id="g-route">
-        <legend><span class="step" aria-hidden="true">1</span> The route</legend>
+        <legend>The route</legend>
         <div class="rail">
           <div class="field stop">
             <label for="origin_port">Leaves from</label>
@@ -77,7 +85,7 @@
       </fieldset>
 
       <fieldset class="group" id="g-money">
-        <legend><span class="step" aria-hidden="true">2</span> The invoice</legend>
+        <legend>The invoice</legend>
         <div class="cols">
           <div class="field">
             <label for="currency">Invoice currency</label>
@@ -103,7 +111,7 @@
       </fieldset>
 
       <fieldset class="group" id="g-time">
-        <legend><span class="step" aria-hidden="true">3</span> Your stock and timing</legend>
+        <legend>Your stock and timing</legend>
         <div class="cols">
           <div class="field">
             <label for="stock_days">How many days will your current stock last?</label>
@@ -137,8 +145,9 @@
 
       <div class="actions">
         <button type="submit" class="btn" id="submit">Check this shipment</button>
-        <span class="or">or see an example:</span>
+        <span class="or">No shipment to hand? See an example with</span>
         <button type="button" class="linkbtn" data-example="alert">a confirmed event</button>
+        <span class="or">or</span>
         <button type="button" class="linkbtn" data-example="insufficient">an unconfirmed report</button>
       </div>
     </div>
@@ -147,28 +156,32 @@
 
   <section id="result" class="result" aria-labelledby="answer" tabindex="-1" hidden>
     <div class="verdict">
-      <div class="verdict-text">
-        <p class="yourq" id="answer-q"></p>
-        <h2 id="answer" class="headline"></h2>
-        <p class="fresh" id="freshness"></p>
-        <p class="fresh warn-text" id="staleness" hidden></p>
-      </div>
-      <figure class="routemap" id="routemap" hidden>
-        <div id="routemap-svg"></div>
-        <figcaption id="routemap-cap"></figcaption>
-      </figure>
+      <p class="yourq" id="answer-q"></p>
+      <h2 id="answer" class="headline"></h2>
+      <p class="fresh" id="freshness"></p>
+      <p class="fresh warn-text" id="staleness" hidden></p>
+      <nav class="glance" id="glance" aria-label="The three answers"></nav>
     </div>
 
-    <div class="tiles" id="tiles"></div>
+    <figure class="routemap" id="routemap" hidden>
+      <div class="rm-stage">
+        <div id="routemap-svg"></div>
+        <div class="port-card" id="port-card" role="region" aria-live="polite" aria-label="Port details" hidden></div>
+      </div>
+      <figcaption id="routemap-cap"></figcaption>
+      <button type="button" class="linkbtn" id="sail">Sail the route again</button>
+    </figure>
+
+    <div class="parts" id="tiles"></div>
 
     <section class="todo" aria-labelledby="todo-h">
-      <h3 id="todo-h" class="lbl">Worth checking today</h3>
+      <h3 id="todo-h" class="sub-h">Worth checking today</h3>
       <ol id="todo"></ol>
       <p class="coverage" id="coverage"></p>
     </section>
 
     <section class="track" aria-labelledby="track-h">
-      <h3 id="track-h" class="lbl">Track it yourself</h3>
+      <h3 id="track-h" class="sub-h">Track it yourself</h3>
       <div class="track-grid">
         <div class="field">
           <label for="container_no">Container number</label>
@@ -187,7 +200,7 @@
     </section>
 
     <section class="changes" id="changes" aria-labelledby="changes-h" hidden>
-      <h3 id="changes-h" class="lbl">What changed since your last check</h3>
+      <h3 id="changes-h" class="sub-h">What changed since your last check</h3>
       <ul id="changes-list"></ul>
     </section>
 
@@ -223,7 +236,7 @@
 
   <section class="book" id="book" aria-labelledby="book-h" hidden>
     <div class="book-head">
-      <h2 id="book-h">Your shipments <span class="muted" id="book-count"></span></h2>
+      <h2 id="book-h" class="section-h">Your shipments <span class="count" id="book-count"></span></h2>
       <div class="book-actions">
         <button type="button" class="btn ghost" id="add">Add another shipment</button>
         <button type="button" class="linkbtn" id="check-all">Check all again</button>
@@ -238,7 +251,7 @@
   </section>
 
   <footer class="foot">
-    <p>Built for Corkathon 2026 with open data from the ECB, Eurostat, the CSO and the GDELT Project. Every answer shows where its data came from and how fresh it is. The route map is a schematic, not for navigation.</p>
+    <p>For Irish importers and the accountants who advise them. Built for Corkathon 2026 with open data from the ECB, Eurostat, the CSO and the GDELT Project. Every answer shows where its data came from and how fresh it is. The route map is a schematic, not for navigation.</p>
   </footer>
 </main>
 <script src="app.js"></script>

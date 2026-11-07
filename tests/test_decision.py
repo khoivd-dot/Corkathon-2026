@@ -132,3 +132,18 @@ class DecisionTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class FxSeriesTests(unittest.TestCase):
+    def test_series_spans_the_window_and_ends_on_rate_now(self):
+        import os
+        from unittest import mock
+        from corkathon import server
+        form = {"importer": "X Ltd", "origin_port": "Santos", "destination_port": "Cork", "currency": "USD",
+                "fixed_rate_share": "none", "stock_days": "21", "lead_time_days": "35",
+                "window_start": "2026-10-24", "window_end": "2026-11-07"}
+        with mock.patch.dict(os.environ, {"SNAPSHOT_ONLY": "1"}):
+            fx = server.answer(form)["fx"]
+        self.assertEqual(fx["series"][0], [fx["date_then"], fx["rate_then"]])
+        self.assertEqual(fx["series"][-1], [fx["date_now"], fx["rate_now"]])
+        self.assertEqual(fx["unfixed_share"], 1.0)

@@ -123,7 +123,17 @@ def _finding(e: Event) -> dict:
             "urls": [e.confirmation_url] if e.confirmation_url else e.source_urls[:3]}
 
 
-def _fx_block(fx: FxExposure) -> dict:
+def _fx_series(currency: str, records: list[dict], date_from: str | None) -> list[list]:
+    """The ECB rate per day from date_from on, as [date, units per EUR], for the page's chart."""
+    from .exposure import ECB_FIELDS
+    key = ECB_FIELDS.get(currency)
+    if not key or not date_from:
+        return []
+    return [[r["reference_period"], r[key]] for r in sorted(records, key=lambda r: r["reference_period"])
+            if r.get(key) is not None and r["reference_period"] >= date_from]
+
+
+def _fx_block(fx: FxExposure, records: list[dict] | None = None) -> dict:
     block = {"status": fx.status, "source": "ECB reference rate",
              "as_of": _day(fx.date_to), "finding": fx.note,
              "reading": "This is not your bank's rate, and exchange rates say nothing about delays.",
@@ -132,7 +142,8 @@ def _fx_block(fx: FxExposure) -> dict:
         block["eur_cost_change_pct"] = fx.eur_cost_change_pct
         # Units of the invoice currency per EUR, so the page can compare a bank's quote.
         block.update(rate_then=fx.rate_from, rate_now=fx.rate_to, date_then=fx.date_from, date_now=fx.date_to,
-                     currency=fx.currency)
+                     currency=fx.currency, unfixed_share=fx.unfixed_share,
+                     series=_fx_series(fx.currency, records or [], fx.date_from))
     return block
 
 
@@ -196,7 +207,7 @@ def decide(inp: ImporterInputs, sources: dict[str, SourceResult], gdelt_records:
                                "buffer_days": stock.buffer_days, "shortfall": stock.shortfall,
                                "sentence": covers, "arithmetic": stock.arithmetic},
                   "reading": reading, "action": action},
-        "fx": _fx_block(fx),
+        "fx": _fx_block(fx, ecb.records if ecb else []),
         "sources": _source_rows(sources),
         "coverage": (cov := coverage(confirmation_enabled())),
         "coverage_line": cov["line"],

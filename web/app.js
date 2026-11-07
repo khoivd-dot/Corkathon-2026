@@ -23,7 +23,7 @@
 
   // ---------- Dates ----------
   function fmtWhen(v) {
-    if (!v || v === "—") return "—";
+    if (!v || v === "—") return "Not stated";
     if (/^\d{4}-\d{2}$/.test(v)) return MONTHS[+v.slice(5, 7) - 1] + " " + v.slice(0, 4);
     if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return new Date(v + "T12:00:00Z").toLocaleDateString("en-IE", { day: "numeric", month: "short", year: "numeric", timeZone: UK });
     var d = new Date(v);
@@ -118,7 +118,7 @@
     var x = (ans.delay && ans.delay.exposure) || {};
     var s = +x.stock_days, l = +x.lead_time_days;
     var buf = x.buffer_days != null ? x.buffer_days : s - l;
-    return { buffer: buf, short: x.shortfall != null ? x.shortfall : buf < 0,
+    return { buffer: buf, short: x.shortfall != null ? x.shortfall : buf < 0, raw: { stock: s, lead: l },
       arithmetic: x.arithmetic || ("Stock lasts " + s + " days. Lead time is " + l + " days. " + (buf < 0 ? "You're " + (-buf) + " days short." : "You have " + buf + " days spare.")) };
   }
   function srcRow(ans, re) { return (ans.sources || []).filter(function (s) { return re.test(s.name); })[0] || null; }
@@ -136,17 +136,17 @@
     var g = srcRow(ans, /GDELT/i);
     var np = ans.news_ports || { checked: [], unknown: [] };
     var r = { key: "route", label: "Your route", findings: finds.slice(0, 3), row: "gdelt",
-      chip: ["News", g ? "to " + fmtWhen(g.source_updated_at || g.reference_period) : "—"] };
+      chip: ["News", g ? "to " + fmtWhen(g.source_updated_at || g.reference_period) : "not checked"] };
     if (conf) {
       r.tone = "warn"; r.verdict = confirmed.length > 1 ? confirmed.length + " confirmed events" : "Confirmed event";
       r.body = d.reading; r.sure = ["Confirmed", "by an official carrier or port page that names your route."];
     } else if (finds.length) {
       r.tone = "unk"; r.verdict = finds.length === 1 ? "1 report, not confirmed" : finds.length + " reports, not confirmed";
-      r.body = "We can’t determine whether your shipment is affected. " + d.reading;
+      r.body = d.reading;
       r.sure = ["News only,", "so we can’t confirm either way."];
     } else {
       r.tone = "unk"; r.verdict = "Nothing reported";
-      r.body = "We can’t determine whether your shipment is affected. " + d.reading;
+      r.body = d.reading;
       r.sure = ["No report", "doesn’t mean on time: quiet delays may never make the news."];
     }
     var notes = [];
@@ -159,7 +159,7 @@
     var fx = ans.fx || {}, pct = fx.eur_cost_change_pct;
     if (pct == null && fx.finding) { var m = /about ([\d.]+)% (higher|lower)/.exec(fx.finding); if (m) pct = (m[2] === "lower" ? -1 : 1) * +m[1]; }
     var c = { key: "cost", label: "Your cost in euro", body: fx.finding, row: "ecb",
-      chip: ["ECB", "rate for " + (fx.date_now ? fmtWhen(fx.date_now) : fx.source_updated_at || fx.as_of || "—")],
+      chip: ["ECB", fx.date_now ? "rate for " + fmtWhen(fx.date_now) : fx.source_updated_at ? "rate for " + fx.source_updated_at : "no rate loaded"],
       sure: ["Official ECB rate,", "not your bank’s rate."] };
     if (fx.status === "not_applicable" || (inputs && inputs.currency === "EUR")) { c.tone = "calm"; c.verdict = "No currency effect"; c.sure = ["Nothing to estimate:", fx.finding || "invoiced in euro."]; c.body = ""; c.chip = ["ECB", "not needed here"]; }
     else if (fx.status === "needs_share") { c.tone = "unk"; c.verdict = "Need your fixed share"; }
@@ -188,63 +188,250 @@
     else panel.scrollIntoView({ block: "start" });
   }
 
-  // ---------- Route map ----------
-  function renderMap(geo) {
-    var fig = $("routemap"), box = $("routemap-svg"); box.replaceChildren();
+  // ---------- Shared bits ----------
+  function link(text, href) { var a = el("a", text); a.href = href; a.target = "_blank"; a.rel = "noopener noreferrer"; a.append(el("span", " (opens in a new tab)", "sr")); return a; }
+  var calmMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function svgText(x, y, txt, cls, anchor) { var t = sv("text", { x: x, y: y, class: cls, "text-anchor": anchor || "start" }); t.textContent = txt; return t; }
+  function fmtDay(iso) { return new Date(iso + "T12:00:00Z").toLocaleDateString("en-IE", { day: "numeric", month: "short", timeZone: "UTC" }); }
+  function stockSentence(s, l) { var b = s - l; return b < 0 ? "Your stock runs out " + (-b) + " days before a new order would arrive." : b === 0 ? "Your stock runs out on the day a new order would arrive." : "Your stock covers your lead time by " + b + " days."; }
+
+  // ---------- Route map: ports you can open, a ship that sails the route once ----------
+  var sailTimer = null;
+  function renderMap(geo, ans) {
+    var fig = $("routemap"), box = $("routemap-svg"); box.replaceChildren(); $("port-card").hidden = true;
     var pts = (geo || []).filter(function (p) { return typeof p.lat === "number" && typeof p.lon === "number"; });
-    if (pts.length < 2) { fig.hidden = true; return; }
+    if (pts.length < 2) { fig.hidden = true; return null; }
     var lons = pts.map(function (p) { return p.lon; }), lats = pts.map(function (p) { return p.lat; });
     var x0 = Math.min.apply(0, lons), x1 = Math.max.apply(0, lons), y0 = Math.min.apply(0, lats), y1 = Math.max.apply(0, lats);
     var kx = Math.cos((y0 + y1) / 2 * Math.PI / 180);
     var spanX = Math.max((x1 - x0) * kx, 10), spanY = Math.max(y1 - y0, 10);
-    var W = 560, pad = 70, H = Math.round(Math.max(300, Math.min(560, (W - 2 * pad) * spanY / spanX + 2 * pad)));
+    var W = 640, pad = 80, H = Math.round(Math.max(340, Math.min(560, (W - 2 * pad) * spanY / spanX + 2 * pad)));
     var k = Math.min((W - 2 * pad) / spanX, (H - 2 * pad) / spanY);
     var cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
     var P = function (p) { return [W / 2 + (p.lon - cx) * kx * k, H / 2 - (p.lat - cy) * k]; };
-    var svg = sv("svg", { viewBox: "0 0 " + W + " " + H, role: "img", "aria-labelledby": "routemap-title", class: "rm" });
-    var t = sv("title", { id: "routemap-title" }); t.textContent = "Route sketch: " + pts.map(function (p) { return p.port; }).join(", then ") + "."; svg.append(t);
-    for (var gl = -180; gl <= 180; gl += 10) { var gx = W / 2 + (gl - cx) * kx * k; if (gx > 0 && gx < W) svg.append(sv("line", { x1: gx, y1: 0, x2: gx, y2: H, class: "rm-grat" })); }
-    for (var gt = -80; gt <= 80; gt += 10) { var gy = H / 2 - (gt - cy) * k; if (gy > 0 && gy < H) svg.append(sv("line", { x1: 0, y1: gy, x2: W, y2: gy, class: "rm-grat" })); }
+    var svg = sv("svg", { viewBox: "0 0 " + W + " " + H, role: "group", "aria-labelledby": "routemap-title", class: "rm route-map" });
+    var t = sv("title", { id: "routemap-title" }); t.textContent = "Route map: " + pts.map(function (p) { return p.port; }).join(", then ") + ". Each port is a button that shows its details."; svg.append(t);
+    var grat = sv("g", { "aria-hidden": "true" });
+    for (var gl = -180; gl <= 180; gl += 10) { var gx = W / 2 + (gl - cx) * kx * k; if (gx > 0 && gx < W) grat.append(sv("line", { x1: gx, y1: 0, x2: gx, y2: H, class: "rm-grat" })); }
+    for (var gt = -80; gt <= 80; gt += 10) { var gy = H / 2 - (gt - cy) * k; if (gy > 0 && gy < H) grat.append(sv("line", { x1: 0, y1: gy, x2: W, y2: gy, class: "rm-grat" })); }
+    svg.append(grat);
     var d = "";
     pts.forEach(function (p, i) {
       var c = P(p); if (!i) { d = "M" + c[0].toFixed(1) + " " + c[1].toFixed(1); return; }
       var pr = P(pts[i - 1]), dx = c[0] - pr[0], dy = c[1] - pr[1];
       d += " Q" + ((pr[0] + c[0]) / 2 - dy * 0.18).toFixed(1) + " " + ((pr[1] + c[1]) / 2 + dx * 0.18).toFixed(1) + " " + c[0].toFixed(1) + " " + c[1].toFixed(1);
     });
-    var route = sv("path", { d: d, class: "rm-route" });
-    svg.append(sv("path", { d: d, class: "rm-route-halo" }), route);
+    var route = sv("path", { d: d, class: "rm-route", "aria-hidden": "true" });
+    svg.append(sv("path", { d: d, class: "rm-route-halo", "aria-hidden": "true" }), route);
+    var ship = sv("g", { class: "rm-ship", "aria-hidden": "true" });
+    ship.append(sv("circle", { r: 9, class: "rm-ship-wake" }), sv("path", { d: "M-7 3 L7 3 L4 -3 L-4 -3 Z", class: "rm-ship-hull" }));
     var placed = [];
-    pts.forEach(function (p) {
+    pts.forEach(function (p, i) {
       var c = P(p), ev = p.event === "confirmed" || p.event === "unconfirmed";
-      svg.append(sv("circle", { cx: c[0], cy: c[1], r: ev ? 8 : 5.5, class: "rm-port" + (p.event === "confirmed" ? " rm-confirmed" : ev ? " rm-unconfirmed" : "") }));
-      // Labels sit beside the dot, away from the map edge; a port close to one already
-      // labelled gets its label on the far side and below, so names never overlap.
-      var near = placed.filter(function (q) { return Math.abs(q[0] - c[0]) < 150 && Math.abs(q[1] - c[1]) < 48; })[0];
+      var role = p.role === "origin" ? "From " : p.role === "destination" ? "To " : "Via ";
+      var g = sv("g", { class: "rm-pt", tabindex: "0", role: "button", "aria-label": role + p.port + (p.event ? ", " + (p.event === "confirmed" ? "confirmed event" : "news report") : "") + ". Show details." });
+      g.append(sv("circle", { cx: c[0], cy: c[1], r: 22, class: "rm-hit" }));
+      g.append(sv("circle", { cx: c[0], cy: c[1], r: ev ? 9 : 7, class: "rm-port" + (p.event === "confirmed" ? " rm-confirmed" : ev ? " rm-unconfirmed" : "") }));
+      var near = placed.filter(function (q) { return Math.abs(q[0] - c[0]) < 160 && Math.abs(q[1] - c[1]) < 50; })[0];
       var right = near ? c[0] < near[0] : c[0] > W * 0.6;
-      if (near && !right && c[0] > W - 150) right = true;
-      var lx = c[0] + (right ? -14 : 14), ly = c[1] + (near ? 40 : -8);
-      var role = sv("text", { x: lx, y: ly - 18, class: "rm-role", "text-anchor": right ? "end" : "start" });
-      role.textContent = p.role === "origin" ? "From" : p.role === "destination" ? "To" : "Via";
-      var lab = sv("text", { x: lx, y: ly, class: "rm-label", "text-anchor": right ? "end" : "start" });
-      lab.textContent = p.port + (p.event === "confirmed" ? " · confirmed" : p.event === "unconfirmed" ? " · reported" : "");
-      svg.append(role, lab); placed.push(c);
+      if (near && !right && c[0] > W - 160) right = true;
+      g.append(svgText(c[0] + (right ? -16 : 16), c[1] + (near ? 32 : -14), role + p.port + (p.event === "confirmed" ? " (confirmed)" : p.event === "unconfirmed" ? " (reported)" : ""), "rm-label", right ? "end" : "start"));
+      function open() { svg.querySelectorAll(".rm-pt").forEach(function (n) { n.classList.toggle("on", n === g); }); showPort(p, ans, c, W, H); }
+      g.addEventListener("click", open);
+      g.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } });
+      svg.append(g); placed.push(c);
     });
-    var note = sv("text", { x: W - 10, y: H - 10, class: "rm-note", "text-anchor": "end" }); note.textContent = "Schematic, not for navigation"; svg.append(note);
+    svg.append(ship);
     box.append(svg);
-    if (route.getTotalLength) route.style.setProperty("--len", Math.ceil(route.getTotalLength()));
+    var len = route.getTotalLength ? route.getTotalLength() : 0;
+    route.style.setProperty("--len", Math.ceil(len || 2000));
+    function sail() {
+      cancelAnimationFrame(sailTimer);
+      if (!len) return;
+      if (calmMotion) { var e0 = route.getPointAtLength(len); ship.setAttribute("transform", "translate(" + e0.x + " " + e0.y + ")"); return; }
+      var t0 = null, dur = 3600;
+      function step(ts) {
+        if (t0 === null) t0 = ts;
+        var f = Math.min(1, (ts - t0) / dur), e = f < .5 ? 2 * f * f : 1 - Math.pow(-2 * f + 2, 2) / 2;
+        var pt = route.getPointAtLength(len * e), pt2 = route.getPointAtLength(Math.min(len, len * e + 1));
+        var ang = Math.atan2(pt2.y - pt.y, pt2.x - pt.x) * 180 / Math.PI;
+        ship.setAttribute("transform", "translate(" + pt.x.toFixed(1) + " " + pt.y.toFixed(1) + ") rotate(" + ang.toFixed(0) + ")");
+        if (f < 1) sailTimer = requestAnimationFrame(step);
+      }
+      sailTimer = requestAnimationFrame(step);
+    }
+    $("sail").onclick = sail;
     var missing = (geo || []).filter(function (p) { return pts.indexOf(p) < 0; }).map(function (p) { return p.port; });
-    $("routemap-cap").textContent = "Port positions are approximate. A dashed ring marks a news report, a filled dot a confirmed event." + (missing.length ? " We couldn’t place " + missing.join(", ") + " on the map." : "");
+    $("routemap-cap").textContent = "A schematic, not for navigation. Port positions are approximate. Open a port for its news and notices." + (missing.length ? " We couldn’t place " + missing.join(", ") + " on the map." : "");
     fig.hidden = false;
+    return { sail: sail };
   }
 
-  // ---------- Tiles ----------
-  function link(text, href) { var a = el("a", text); a.href = href; a.target = "_blank"; a.rel = "noopener noreferrer"; a.append(el("span", " (opens in a new tab)", "sr")); return a; }
+  function showPort(p, ans, c, W, H) {
+    var card = $("port-card"); card.replaceChildren();
+    var np = ans.news_ports || { checked: [], unknown: [] }, low = p.port.toLowerCase().replace(/\s*\(.*\)$/, "");
+    var checked = (np.checked || []).filter(function (x) { return x.port.toLowerCase() === low; })[0];
+    var unknown = (np.unknown || []).some(function (x) { return x.toLowerCase() === p.port.toLowerCase(); });
+    var notice = ((ans.coverage || {}).ports || []).filter(function (x) { return x.port.toLowerCase() === low; })[0];
+    var h = el("h4", p.port); card.append(h);
+    var dl = el("dl");
+    function row(a, b) { var d = el("div"); d.append(el("dt", a), el("dd", b)); dl.append(d); }
+    row("Role", p.role === "origin" ? "Your goods leave from here" : p.role === "destination" ? "Your goods arrive here" : "Your goods change ship here");
+    if (p.locode) row("Port code", p.locode);
+    row("News", p.event === "confirmed" ? "A confirmed event names this port" : p.event === "unconfirmed" ? "A news report names this port, not confirmed" : unknown ? "Not searched: we don’t know this port name yet" : "No report names this port in your dates");
+    if (checked) row("Checked", fmtWhen(checked.checked_at) + (checked.mode === "fallback" ? " (saved copy)" : ""));
+    card.append(dl);
+    if (notice) { var pn = el("p"); pn.append(link(p.port + "’s own notices", notice.url)); card.append(pn); }
+    var close = el("button", "Close", "linkbtn"); close.type = "button";
+    close.addEventListener("click", function () { card.hidden = true; document.querySelectorAll(".rm-pt.on").forEach(function (n) { n.classList.remove("on"); n.focus(); }); });
+    card.append(close);
+    card.style.setProperty("--x", (c[0] / W * 100).toFixed(1) + "%");
+    card.style.setProperty("--y", (c[1] / H * 100).toFixed(1) + "%");
+    card.classList.toggle("flip", c[0] / W > 0.55); card.classList.toggle("up", c[1] / H > 0.5);
+    card.hidden = false;
+  }
 
-  function renderTile(v) {
-    var art = el("article", null, "tile"); art.setAttribute("aria-labelledby", "t-" + v.key);
-    var h = el("h3", v.label); h.id = "t-" + v.key; art.append(h);
-    var tone = el("p", null, "tone"); tone.setAttribute("data-tone", v.tone); tone.append(icon(v.tone), document.createTextNode(v.verdict)); art.append(tone);
-    if (v.body) art.append(el("p", v.body, "body"));
+  // ---------- Stock runway: drag your own numbers ----------
+  function runway(ex) {
+    var wrap = el("div", null, "viz runway");
+    var s0 = ex.stock, l0 = ex.lead, s = s0, l = l0;
+    var svgBox = el("div", null, "rw-box");
+    var out = el("p", null, "rw-out"); out.setAttribute("aria-live", "polite");
+    var plan = el("p", null, "rw-plan");
+    function draw() {
+      svgBox.replaceChildren();
+      var W = 640, H = 176, L = 16, R = 16, max = Math.max(14, Math.ceil(Math.max(s, l) / 7) * 7 + 7);
+      var X = function (dd) { return L + (W - L - R) * dd / max; };
+      var g = sv("svg", { viewBox: "0 0 " + W + " " + H, class: "rw", role: "img", "aria-label": "Your stock lasts " + s + " days; a new order placed today arrives on day " + l + "." });
+      for (var dd = 0; dd <= max; dd += 7) { g.append(sv("line", { x1: X(dd), y1: 24, x2: X(dd), y2: 132, class: "rw-tick" })); g.append(svgText(X(dd), 160, dd === 0 ? "Today" : "Day " + dd, "rw-axis", dd === 0 ? "start" : dd === max ? "end" : "middle")); }
+      var lo = Math.min(s, l), hi = Math.max(s, l);
+      if (hi > lo) g.append(sv("rect", { x: X(lo), y: 18, width: X(hi) - X(lo), height: 120, class: s < l ? "rw-gap short" : "rw-gap spare" }));
+      g.append(svgText(L, 16, "Your stock", "rw-name"));
+      g.append(sv("rect", { x: X(0), y: 26, width: Math.max(4, X(s) - X(0)), height: 28, rx: 2, class: "rw-stock" }));
+      g.append(svgText(L, 86, "A new order placed today", "rw-name"));
+      g.append(sv("line", { x1: X(0), y1: 110, x2: X(l), y2: 110, class: "rw-transit" }));
+      var boat = sv("path", { d: "M" + (X(l) - 11) + " 104 L" + (X(l) + 11) + " 104 L" + (X(l) + 7) + " 116 L" + (X(l) - 7) + " 116 Z", class: "rw-boat" });
+      g.append(boat);
+      var mid = (X(lo) + X(hi)) / 2;
+      if (hi > lo && X(hi) - X(lo) > 70) g.append(svgText(mid, 76, (s < l ? (l - s) + " days short" : (s - l) + " days spare"), "rw-gaplab", "middle"));
+      svgBox.append(g);
+      out.textContent = stockSentence(s, l);
+      plan.textContent = s < l ? "Order today and you’d be without stock for " + (l - s) + " days, unless a quicker route or an earlier shipment closes the gap." : s === l ? "Order today and the new stock lands as the old runs out: no margin for a delay." : "Order within the next " + (s - l) + " days and the new stock lands before you run out.";
+      use.hidden = s === s0 && l === l0;
+    }
+    function slider(label, val, min, maxv, on) {
+      var id = "rw-" + label.replace(/\W+/g, "").toLowerCase();
+      var f = el("div", null, "rw-ctl");
+      var lab = el("label", label); lab.htmlFor = id;
+      var r = el("input"); r.type = "range"; r.id = id; r.min = min; r.max = maxv; r.step = 1; r.value = val;
+      var o = el("output", val + " days"); o.htmlFor = id;
+      r.addEventListener("input", function () { o.textContent = r.value + " days"; on(+r.value); draw(); });
+      f.append(lab, r, o); return f;
+    }
+    var ctl = el("div", null, "rw-ctls");
+    ctl.append(slider("Stock lasts", s, 0, Math.max(120, s0), function (v) { s = v; }), slider("New order takes", l, 1, Math.max(120, l0), function (v) { l = v; }));
+    var use = el("button", "Check again with these numbers", "btn ghost"); use.type = "button";
+    use.addEventListener("click", function () { form.stock_days.value = s; form.lead_time_days.value = l; if (form.requestSubmit) form.requestSubmit(); else form.dispatchEvent(new Event("submit", { cancelable: true })); });
+    var note = el("p", "Try other numbers here. The answer above uses the ones you typed until you check again.", "small");
+    wrap.append(svgBox, ctl, out, plan, note, use);
+    draw();
+    return wrap;
+  }
+
+  // ---------- Exchange rate: a chart you can scrub, a share you can slide ----------
+  function fxViz(fx) {
+    var ser = fx.series || [];
+    var wrap = el("div", null, "viz fxviz");
+    if (ser.length < 2) return null;
+    var r0 = ser[0][1], cur = fx.currency;
+    var pts = ser.map(function (x) { return { d: x[0], r: x[1], pct: (r0 / x[1] - 1) * 100 }; });
+    var W = 640, H = 230, L = 52, R = 18, T = 18, B = 36;
+    var lo = Math.min(0, Math.min.apply(0, pts.map(function (p) { return p.pct; }))), hi = Math.max(0, Math.max.apply(0, pts.map(function (p) { return p.pct; })));
+    var padv = Math.max(0.5, (hi - lo) * 0.15); lo -= padv; hi += padv;
+    var X = function (i) { return L + (W - L - R) * i / (pts.length - 1); }, Y = function (v) { return T + (H - T - B) * (hi - v) / (hi - lo); };
+    var svg = sv("svg", { viewBox: "0 0 " + W + " " + H, class: "fxc", tabindex: "0", role: "img",
+      "aria-label": "Euro cost of a " + cur + " invoice since " + fmtDay(pts[0].d) + ", " + pts.length + " ECB working days. Use the left and right arrow keys to read each day." });
+    var step = (hi - lo) > 4 ? 1 : 0.5;
+    for (var v = Math.ceil(lo / step) * step; v <= hi; v += step) {
+      svg.append(sv("line", { x1: L, y1: Y(v), x2: W - R, y2: Y(v), class: Math.abs(v) < 1e-9 ? "fxc-zero" : "fxc-grid" }));
+      svg.append(svgText(L - 8, Y(v) + 4, (v > 0 ? "+" : "") + v.toFixed(step < 1 ? 1 : 0) + "%", "fxc-axis", "end"));
+    }
+    [0, pts.length - 1].forEach(function (i) { svg.append(svgText(X(i), H - 10, fmtDay(pts[i].d), "fxc-axis", i ? "end" : "start")); });
+    var d = pts.map(function (p, i) { return (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(p.pct).toFixed(1); }).join(" ");
+    var area = d + " L" + X(pts.length - 1).toFixed(1) + " " + Y(0).toFixed(1) + " L" + X(0).toFixed(1) + " " + Y(0).toFixed(1) + " Z";
+    svg.append(sv("path", { d: area, class: "fxc-area" }), sv("path", { d: d, class: "fxc-line" }));
+    var last = pts[pts.length - 1];
+    svg.append(sv("circle", { cx: X(pts.length - 1), cy: Y(last.pct), r: 5, class: "fxc-end" }));
+    var cross = sv("g", { class: "fxc-cross", visibility: "hidden" });
+    var vl = sv("line", { y1: T, y2: H - B, class: "fxc-vline" }), dot = sv("circle", { r: 5, class: "fxc-dot" });
+    cross.append(vl, dot); svg.append(cross);
+    var hit = sv("rect", { x: L, y: 0, width: W - L - R, height: H, class: "fxc-hit" }); svg.append(hit);
+    var read = el("p", null, "fxc-read"); read.setAttribute("aria-live", "polite");
+    var idx = pts.length - 1;
+    function say(i) {
+      idx = Math.max(0, Math.min(pts.length - 1, i)); var p = pts[idx];
+      cross.setAttribute("visibility", "visible"); vl.setAttribute("x1", X(idx)); vl.setAttribute("x2", X(idx)); dot.setAttribute("cx", X(idx)); dot.setAttribute("cy", Y(p.pct));
+      read.textContent = fmtDay(p.d) + ": €1 = " + p.r + " " + cur + ". A " + cur + " invoice cost about " + Math.abs(p.pct).toFixed(1) + "% " + (p.pct >= 0 ? "more" : "less") + " in euro than on " + fmtDay(pts[0].d) + ".";
+    }
+    function fromEvent(e) { var bb = svg.getBoundingClientRect(); var x = (e.clientX - bb.left) / bb.width * W; say(Math.round((x - L) / (W - L - R) * (pts.length - 1))); }
+    hit.addEventListener("pointermove", fromEvent); hit.addEventListener("pointerdown", fromEvent);
+    svg.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "Home" || e.key === "End") { e.preventDefault(); say(e.key === "Home" ? 0 : e.key === "End" ? pts.length - 1 : idx + (e.key === "ArrowRight" ? 1 : -1)); }
+    });
+    svg.addEventListener("focus", function () { say(idx); });
+    read.textContent = "Move along the line, or focus it and use the arrow keys, to read any day.";
+    var title = el("p", "Euro cost of a " + cur + " invoice, change since " + fmtDay(pts[0].d), "viz-title");
+    wrap.append(title, svg, read);
+
+    // What if: the share you've fixed, and the invoice in euro
+    var full = (r0 / last.r - 1) * 100;
+    var startShare = Math.round((1 - (fx.unfixed_share == null ? 1 : fx.unfixed_share)) * 100);
+    var ctl = el("div", null, "fx-ctls");
+    var f1 = el("div", null, "rw-ctl");
+    var l1 = el("label", "What if you’d fixed"); l1.htmlFor = "fx-share";
+    var s1 = el("input"); s1.type = "range"; s1.id = "fx-share"; s1.min = 0; s1.max = 100; s1.step = 5; s1.value = startShare;
+    var o1 = el("output", startShare + "%"); o1.htmlFor = "fx-share";
+    f1.append(l1, s1, o1);
+    var f2 = el("div", null, "rw-ctl amt");
+    var l2 = el("label", "Invoice amount (" + cur + ")"); l2.htmlFor = "fx-amt";
+    var a2 = el("input"); a2.id = "fx-amt"; a2.inputMode = "decimal"; a2.autocomplete = "off"; a2.placeholder = "12000";
+    f2.append(l2, a2);
+    ctl.append(f1, f2);
+    var res = el("p", null, "fx-out"); res.setAttribute("aria-live", "polite");
+    function whatIf() {
+      var share = +s1.value / 100; o1.textContent = s1.value + "%";
+      var pct = full * (1 - share);
+      var txt = share >= 1 ? "With the whole invoice fixed, exchange rates don’t move its euro cost." :
+        "With " + s1.value + "% fixed, the whole invoice would cost about " + Math.abs(pct).toFixed(1) + "% " + (pct >= 0 ? "more" : "less") + " in euro than on " + fmtDay(pts[0].d) + " (ECB rate as of " + fmtDay(last.d) + ").";
+      var amt = parseFloat((a2.value || "").replace(/[, ]/g, ""));
+      if (amt > 0 && share < 1) {
+        var unf = amt * (1 - share), then = unf / r0, now = unf / last.r;
+        txt += " The part you haven’t fixed: about " + eur(then) + " then, " + eur(now) + " now, a difference of " + eur(Math.abs(now - then)) + ".";
+      }
+      res.textContent = txt + " Not your bank’s rate.";
+    }
+    s1.addEventListener("input", whatIf); a2.addEventListener("input", whatIf);
+    wrap.append(ctl, res);
+    whatIf();
+    var tbl = el("details", null, "fx-table");
+    tbl.append(el("summary", "The rates as a table"));
+    var t = el("table"); var th = el("thead"); var hr = el("tr");
+    ["ECB date", cur + " per €1", "Euro cost vs " + fmtDay(pts[0].d)].forEach(function (h) { var c = el("th", h); c.scope = "col"; hr.append(c); }); th.append(hr); t.append(th);
+    var tb = el("tbody");
+    pts.forEach(function (p) { var tr = el("tr"); var c0 = el("th", fmtDay(p.d)); c0.scope = "row"; tr.append(c0); var a = el("td", String(p.r)); a.setAttribute("data-label", cur + " per €1"); var b = el("td", (p.pct >= 0 ? "+" : "") + p.pct.toFixed(2) + "%"); b.setAttribute("data-label", "Euro cost"); tr.append(a, b); tb.append(tr); });
+    t.append(tb); tbl.append(t); wrap.append(tbl);
+    return wrap;
+  }
+  var eurFmt = new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+  function eur(v) { return eurFmt.format(v); }
+
+  // ---------- The three answers, each with something to try ----------
+  function renderPart(v, ans, inputs) {
+    var sec = el("section", null, "part part-" + v.key); sec.id = "part-" + v.key; sec.setAttribute("aria-labelledby", "t-" + v.key);
+    var text = el("div", null, "part-text");
+    var h = el("h3", v.label); h.id = "t-" + v.key; text.append(h);
+    var tone = el("p", null, "tone"); tone.setAttribute("data-tone", v.tone); tone.append(icon(v.tone), document.createTextNode(v.verdict)); text.append(tone);
+    if (v.body) text.append(el("p", v.body, "body"));
     if (v.findings && v.findings.length) {
       var ul = el("ul", null, "findings");
       v.findings.forEach(function (f) {
@@ -252,27 +439,36 @@
         var title = f.text.replace(/^News reports \(not confirmed\): |^An official notice confirms: /, "");
         var url = (f.urls || [])[0];
         li.append(url ? link(title, url) : document.createTextNode(title));
-        li.append(el("span", f.source + ", " + (f.source_updated_at || f.as_of) + (f.note ? " · " + f.note : ""), "meta"));
+        li.append(el("span", f.source + ", " + (f.source_updated_at || f.as_of) + (f.note ? ". " + f.note : ""), "meta"));
         ul.append(li);
       });
-      art.append(ul);
+      text.append(ul);
     }
-    (v.notes || []).forEach(function (n) { art.append(el("p", n, "sure")); });
-    if (v.ais) art.append(v.ais);
-    var sure = el("p", null, "sure"); sure.append(el("strong", "How sure: "), document.createTextNode(v.sure[0] + (v.sure[1] ? " " + v.sure[1] : ""))); art.append(sure);
-    if (v.quote) art.append(quoteBox(v.quote));
+    (v.notes || []).forEach(function (n) { text.append(el("p", n, "sure")); });
+    if (v.ais) text.append(v.ais);
+    var sure = el("p", null, "sure"); sure.append(el("strong", "How sure: "), document.createTextNode(v.sure[0] + (v.sure[1] ? " " + v.sure[1] : ""))); text.append(sure);
     var chip = el("button", null, "srcchip"); chip.type = "button";
     chip.append(el("b", v.chip[0]), document.createTextNode(v.chip[1]));
     chip.setAttribute("aria-label", "Where this comes from: " + v.chip[0] + ", " + v.chip[1]);
     chip.addEventListener("click", function () { openSource(v.row); });
-    art.append(chip);
-    return art;
+    text.append(chip);
+    var viz = el("div", null, "part-viz");
+    if (v.key === "stock") viz.append(runway(exposureOf(ans).raw));
+    if (v.key === "route") { var fig = $("routemap"); viz.append(fig); }
+    if (v.key === "cost") {
+      var fv = (ans.fx && ans.fx.status === "computed") ? fxViz(ans.fx) : null;
+      if (fv) viz.append(fv);
+      if (v.quote) viz.append(quoteBox(v.quote));
+      if (!viz.childNodes.length) viz.append(el("p", v.tone === "calm" ? "Nothing to chart: exchange rates don’t move a euro invoice." : "The chart appears once we have an ECB rate and the share you’ve fixed.", "viz-empty"));
+    }
+    sec.append(text, viz);
+    return sec;
   }
 
   // Compare the user's own bank quote with the ECB reference rate. Stays on this page.
   function quoteBox(qt) {
     var wrap = el("div", null, "quote"), id = "bankq";
-    var lab = el("label", "Your bank’s rate (" + qt.cur + " per €1)"); lab.htmlFor = id; lab.style.margin = "0";
+    var lab = el("label", "Your bank’s rate (" + qt.cur + " per €1)"); lab.htmlFor = id;
     var inp = el("input"); inp.id = id; inp.inputMode = "decimal"; inp.autocomplete = "off";
     var out = el("output"); out.htmlFor = id; out.setAttribute("aria-live", "polite");
     var base = "ECB reference: " + qt.rate + ".";
@@ -311,8 +507,21 @@
 
     var v = verdicts(ans, inputs);
     v.route.ais = aisBlock(ans.ais);
+    var res = $("result"); res.hidden = false; res.removeAttribute("aria-busy");
+    document.body.classList.add("answered");
+    // The map is the route answer's picture: park it in the result before the parts are rebuilt.
+    res.insertBefore($("routemap"), $("tiles"));
+    var map = renderMap(ans.route_geo, ans);
     var tiles = $("tiles"); tiles.replaceChildren();
-    intent(q).forEach(function (k) { tiles.append(renderTile(v[k])); });
+    var glance = $("glance"); glance.replaceChildren();
+    intent(q).forEach(function (k) {
+      tiles.append(renderPart(v[k], ans, inputs));
+      var a = el("a", null, "glance-item"); a.href = "#part-" + k; a.setAttribute("data-tone", v[k].tone);
+      a.append(el("span", v[k].label, "g-label"), el("span", null, "g-v"));
+      a.lastChild.append(icon(v[k].tone), document.createTextNode(v[k].verdict));
+      glance.append(a);
+    });
+    if (map) map.sail();
 
     var todo = $("todo"); todo.replaceChildren();
     var acts = [ans.delay && ans.delay.action];
@@ -323,7 +532,7 @@
     var c = ans.coverage || {};
     if (c.line) {
       cov.append(c.line + " ");
-      (c.ports || []).forEach(function (p, i) { if (i) cov.append(" · "); cov.append(link(p.port, p.url)); });
+      (c.ports || []).forEach(function (p, i, all) { if (i) cov.append(i === all.length - 1 ? " and " : ", "); cov.append(link(p.port, p.url)); });
     }
 
     var tb = $("sources"); tb.replaceChildren();
@@ -337,10 +546,6 @@
       tb.append(tr);
     });
     $("working-summary").textContent = "Where this comes from (" + rows.length + " sources)";
-
-    var res = $("result"); res.hidden = false; res.removeAttribute("aria-busy");
-    document.body.classList.add("answered");
-    renderMap(ans.route_geo);
   }
 
   // ---------- Shipments (this page only) ----------
@@ -355,8 +560,10 @@
   function shipLine(o) {
     var line = $("ship-line"); line.replaceChildren();
     var share = { none: "none fixed", some: (o.fixed_rate_pct ? o.fixed_rate_pct + "% fixed" : "some fixed"), all: "all fixed" }[o.fixed_rate_share] || "";
-    var bits = [o.importer, routeOf(o), "Invoiced in " + curName(o.currency) + (o.currency !== "EUR" && share ? ", " + share : ""), "Stock lasts " + o.stock_days + " days", "New order takes " + o.lead_time_days + " days"];
-    bits.forEach(function (b, i) { if (i) line.append(el("span", "·", "sep")); line.append(el("span", b)); });
+    [["For", o.importer], ["Route", routeOf(o)], ["Invoice", curName(o.currency) + (o.currency !== "EUR" && share ? ", " + share : "")],
+     ["Stock lasts", o.stock_days + " days"], ["New order takes", o.lead_time_days + " days"]].forEach(function (x) {
+      var d = el("div"); d.append(el("dt", x[0]), el("dd", x[1])); line.append(d);
+    });
     $("ship-summary").hidden = false;
   }
 
