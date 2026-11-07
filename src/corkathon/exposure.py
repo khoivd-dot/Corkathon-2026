@@ -1,0 +1,72 @@
+"""Exposure calculation (PR D).
+
+Stock buffer comes only from the user's inputs. FX exposure comes only from
+the ECB reference rate on the share of the invoice without a fixed rate. The
+two are separate answers: FX never confirms or implies a delay.
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass
+from datetime import date, timedelta
+
+# ECB series we load, keyed by invoice currency -> record field (foreign per EUR).
+ECB_FIELDS = {"USD": "usd_per_eur"}
+
+
+@dataclass(frozen=True)
+class StockExposure:
+    stock_days: int
+    lead_time_days: int
+    buffer_days: int  # stock_days - lead_time_days; negative = shortfall
+    shortfall: bool
+    arithmetic: str
+
+
+@dataclass(frozen=True)
+class FxExposure:
+    currency: str
+    status: str  # "computed" | "not_applicable" | "unavailable"
+    unfixed_share: float
+    rate_from: float | None = None
+    rate_to: float | None = None
+    date_from: str | None = None
+    date_to: str | None = None
+    eur_cost_change_pct: float | None = None  # on the unfixed share of the invoice
+    note: str = ""
+
+
+def stock_exposure(stock_days: int, lead_time_days: int) -> StockExposure:
+    b = stock_days - lead_time_days
+    return StockExposure(stock_days, lead_time_days, b, b < 0,
+                         f"stock lasts {stock_days} days, lead time is {lead_time_days} days, "
+                         f"{stock_days} \u2212 {lead_time_days} = {b}")
+
+
+def stock_sentence(s: StockExposure) -> str:
+    if s.shortfall:
+        return f"Your stock runs out {-s.buffer_days} days before a new order would arrive."
+    if s.buffer_days == 0:
+        return "Your stock runs out on the day a new order would arrive."
+    return f"Your stock covers your lead time by {s.buffer_days} days."
+
+
+def fx_exposure(currency: str, fixed_rate_share: float, ecb_records: list[dict],
+                lookback_days: int = 30) -> FxExposure:
+    unfixed = round(1.0 - fixed_rate_share, 4)
+    if currency == "EUR":
+        return FxExposure(currency, "not_applicable", unfixed, note="Invoice is in euro, so there is no exchange-rate exposure.")
+    if unfixed == 0:
+        return FxExposure(currency, "not_applicable", 0.0, note="You have fixed the rate for the whole invoice.")
+    key = ECB_FIELDS.get(currency)
+    rows = sorted((r for r in ecb_records if key and r.get(key) is not None),
+                  key=lambda r: r["reference_period"])
+    if not rows:
+        return FxExposure(currency, "unavailable", unfixed, note=f"No ECB rate loaded for {currency}.")
+    last = rows[-1]
+    cutoff = (date.fromisoformat(last["reference_period"]) - timedelta(days=lookback_days)).isoformat()
+    first = next((r for r in rows if r["reference_period"] >= cutoff), rows[0])
+    a, b = float(first[key]), float(last[key])
+    # Foreign currency per EUR: a lower rate means each foreign unit costs more euro.
+    pct = round((a / b - 1.0) * 100.0 * unfixed, 2)
+    return FxExposure(currency, "computed", unfixed, a, b, first["reference_period"], last["reference_period"], pct,
+                      note="ECB reference rate, not your bank's rate. Exchange rates say nothing about delays.")
