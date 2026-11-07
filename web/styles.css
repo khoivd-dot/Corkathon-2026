@@ -701,3 +701,51 @@ h1 em,.section-h em{font-style:normal;color:var(--brand)}
 .ticket .actions .btn{width:100%;margin:0;min-height:52px}
 .t-try{margin:0;font-size:var(--text-sm);line-height:1.6}
 .t-try .linkbtn{font-size:var(--text-sm);min-height:24px;padding:0}
+
+/* ---------- Answer page, report layout (Khoa: "so rigid", 7 Nov) ----------
+   Summary first: headline on the left, a scorecard of the three answers on the right, then today's
+   step in a tinted band. The parts lose their boxes and become an open report: text that stays in view
+   on the left while the picture scrolls on the right, hairlines between them. */
+@media(min-width:1000px){
+  .verdict{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);column-gap:var(--s-8);align-items:start}
+  .verdict>*{grid-column:1}
+  .verdict .glance{grid-column:2;grid-row:1/span 6;margin-top:0}
+}
+.verdict .glance{grid-template-columns:1fr;gap:var(--s-2)}
+.glance-item{flex-direction:row;align-items:center;justify-content:space-between;gap:var(--s-4);padding:var(--s-4) var(--s-5);min-height:72px;border-radius:var(--r-card)}
+.glance-item .g-label{flex:none;min-width:7.5rem}
+.glance-item .g-v{flex:1;font-size:var(--text-xl)}
+.glance-item::after{content:"";flex:none;width:9px;height:9px;border-right:2px solid var(--muted-foreground);border-bottom:2px solid var(--muted-foreground);transform:rotate(-45deg);transition:transform var(--dur-2) var(--ease)}
+.glance-item:hover::after{transform:translateX(3px) rotate(-45deg)}
+.glance-item{transform:translateX(calc(var(--lift,0) * -6px)) scale(calc(1 + var(--lift,0) * .02))}
+@media(max-width:520px){.glance-item{flex-wrap:wrap}.glance-item .g-label{min-width:0;width:100%}}
+
+/* Today's step: the one thing to do, in the brand tint, straight under the summary */
+.todo{margin-top:var(--s-4);background:var(--brand-soft);border:0;box-shadow:none}
+.todo .sub-h{color:var(--brand-ink)}
+.todo li{background:var(--card);font-weight:500}
+.todo .coverage{color:var(--brand-ink)}
+
+/* Parts: an open report instead of stacked boxes */
+.parts{gap:0;margin-top:var(--s-8)}
+.part{background:transparent;border:0;border-top:1px solid var(--border);border-radius:0;box-shadow:none;padding:var(--s-8) 0}
+.part:first-child{border-top:0;padding-top:0}
+@media(min-width:1000px){.part-text{position:sticky;top:96px;align-self:start}}
+.part-text h3{display:flex;align-items:center;gap:var(--s-2);font-size:var(--text-lg);color:var(--muted-foreground)}
+.part-text h3::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--muted-foreground)}
+.part[data-tone=warn] .part-text h3::before{background:var(--warn)}
+.part[data-tone=calm] .part-text h3::before{background:var(--calm)}
+.part[data-tone=unk] .part-text h3::before{background:var(--unk)}
+.part .tone{font-size:var(--text-5xl);line-height:1}
+.part .tone svg{width:32px;height:32px}
+.viz,.viz-empty{border-radius:var(--r-card-lg)}
+.rm{max-height:420px}
+.rm-grat{opacity:.55}
+
+/* Tools: one quiet area, not three more boxes */
+.track{margin-top:var(--s-8);background:var(--secondary);border:0;box-shadow:none}
+.track input{background:var(--card)}
+.watch{background:transparent;border:0;padding:var(--s-4) 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);border-radius:0;margin-top:var(--s-6)}
+.panel{background:transparent;border:0;border-bottom:1px solid var(--border);border-radius:0;padding:0;margin-top:0}
+.track .btn.ghost{background:var(--card);box-shadow:0 0 0 1px var(--border)}
+.track .btn.ghost:hover{background:var(--background)}

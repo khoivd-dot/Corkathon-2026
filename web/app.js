@@ -987,7 +987,8 @@
     function dock(row, sel) {
       if (!row || calm || !fine) return; sel = sel || ".glance-item";
       row.addEventListener("pointermove", function (e) {
-        row.querySelectorAll(sel).forEach(function (c) { var b = c.getBoundingClientRect(), d = Math.abs(e.clientX - (b.left + b.width / 2)); c.style.setProperty("--lift", Math.max(0, 1 - d / (b.width * 1.4)).toFixed(3)); });
+        var items = row.querySelectorAll(sel), stacked = items.length > 1 && items[1].getBoundingClientRect().top > items[0].getBoundingClientRect().bottom - 2;
+        items.forEach(function (c) { var b = c.getBoundingClientRect(), d = stacked ? Math.abs(e.clientY - (b.top + b.height / 2)) : Math.abs(e.clientX - (b.left + b.width / 2)), span = stacked ? b.height : b.width; c.style.setProperty("--lift", Math.max(0, 1 - d / (span * 1.4)).toFixed(3)); });
       });
       row.addEventListener("pointerleave", function () { row.querySelectorAll(sel).forEach(function (c) { c.style.setProperty("--lift", "0"); }); });
     }
