@@ -15,14 +15,19 @@
 <header class="bar">
   <div class="wrap bar-in">
     <span class="brand"><svg viewBox="0 0 28 16" aria-hidden="true" class="brand-mark"><path d="M2 12 C 9 2, 18 2, 26 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="2" cy="12" r="2.5"/><circle cx="26" cy="8" r="2.5"/></svg>In Time</span>
+    <nav class="bar-nav" aria-label="Page">
+      <a href="#how">How it works</a>
+      <a href="#data">Where the data comes from</a>
+    </nav>
     <span class="pill" id="mode-pill" data-tone="idle"><span class="dot" aria-hidden="true"></span><span id="mode" role="status">Public data, checked when you ask</span></span>
+    <a class="btn btn-sm bar-cta" href="#inputs">Check a shipment<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
   </div>
 </header>
 
 <main id="main" class="wrap">
   <section class="hero" aria-labelledby="page-title">
     <div class="hero-text">
-      <h1 id="page-title">Will my imports be late or dearer?</h1>
+      <h1 id="page-title">Will my imports be <em>late</em> or <em>dearer</em>?</h1>
       <p class="lede">We check your shipment’s route and currency against dated public data.</p>
       <div class="ask" role="group" aria-label="Ask about your imports">
         <label for="q" class="sr">Your question</label>
@@ -35,21 +40,87 @@
         <li><button class="chip" type="button" data-q="Is anything happening on my route?">Is anything happening on my route?</button></li>
       </ul>
     </div>
-    <figure class="hero-shot tilt">
-      <div class="shot-frame" id="shot">
-      <picture>
-        <source srcset="img/answer-light.webp" media="(prefers-color-scheme: light)" type="image/webp">
-        <img src="img/answer-dark.webp" width="1792" height="764" fetchpriority="high" alt="A real answer from this page for Santos to Rotterdam to Cork: the headline says we can’t determine whether the shipment is affected, the stock is 14 days short, nothing is reported on the route, and the euro cost is about the same.">
-      </picture>
+    <figure class="hero-stack tilt">
+      <div class="stack" id="shot">
+        <div class="stack-head">
+          <p class="stack-title"><span class="stack-num">1</span> thing to act on today</p>
+          <p class="stack-sub">Coffee from Santos to Cork, via Rotterdam</p>
+        </div>
+        <ul class="stack-cards">
+          <li class="scard" data-tone="warn"><span class="g-label">Stock</span><span class="s-v"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M10 2.5 1.5 17.5h17L10 2.5Z"/><path d="M10 8v4"/><path d="M10 14.6v.2"/></svg>14 days short</span><span class="s-b">Your stock runs out 14 days before a new order would arrive.</span></li>
+          <li class="scard" data-tone="unk"><span class="g-label">Route</span><span class="s-v"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8"/><path d="M7.8 7.6a2.3 2.3 0 1 1 3.2 2.1c-.7.3-1 .8-1 1.5v.3"/><path d="M10 14.5v.2"/></svg>Nothing reported</span><span class="s-b">No news report names Santos, Rotterdam or Cork in your dates.</span></li>
+          <li class="scard" data-tone="calm"><span class="g-label">Cost in euro</span><span class="s-v"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8"/><path d="m6.2 10.2 2.6 2.6 5-5.4"/></svg>About the same</span><span class="s-b">A dollar invoice costs about 0.1% more than on 7 October.</span></li>
+        </ul>
       </div>
-      <figcaption>A real answer, Santos to Cork, from the team’s saved data of 7 November 2026.</figcaption>
+      <figcaption>Based on a real answer from this page, using the team’s saved data of 7 November 2026 (ECB rate of 6 November, GDELT news checked 7 November).</figcaption>
     </figure>
   </section>
+
+
+  <div class="landing">
+    <section class="value" aria-labelledby="value-h">
+      <h2 id="value-h" class="section-h">You shouldn’t have to watch every <em>port</em> yourself.</h2>
+      <p class="lede">Tell us about one shipment. We read the public data for you and say what’s worth checking today.</p>
+      <p class="strip-label" id="data">Checked against open data from</p>
+      <ul class="wordmarks" aria-labelledby="data">
+        <li>European Central Bank</li>
+        <li>Eurostat</li>
+        <li>Central Statistics Office</li>
+        <li>GDELT Project</li>
+      </ul>
+    </section>
+
+    <section class="features" id="how" aria-labelledby="how-h">
+      <h2 id="how-h" class="section-h">Everything your next order <em>depends</em> on.</h2>
+      <ul class="fgrid">
+        <li class="fcard fcard-wide"><svg class="f-ico" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><rect x="6" y="26" width="8" height="16" rx="2"/><rect x="20" y="18" width="8" height="24" rx="2"/><rect x="34" y="8" width="8" height="34" rx="2"/></svg><h3>Stock against lead time</h3><p>The days of stock you hold, against how long a new order takes to arrive.</p></li>
+        <li class="fcard fcard-wide"><svg class="f-ico" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path d="M8 36C16 14 30 14 40 22"/><circle cx="8" cy="36" r="4"/><circle cx="24" cy="17" r="4"/><circle cx="40" cy="22" r="4"/></svg><h3>Every port on the route</h3><p>Where it leaves, where it changes ship and where it lands, each checked against news that names it.</p></li>
+        <li class="fcard"><svg class="f-ico" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path d="M6 34l10-10 8 6 16-16"/><path d="M30 14h10v10"/></svg><h3>Your invoice currency</h3><p>The ECB reference rate now, against 30 days ago.</p></li>
+        <li class="fcard"><svg class="f-ico" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><rect x="8" y="10" width="32" height="28" rx="4"/><path d="M8 18h32M16 26h8M16 32h14"/></svg><h3>Import prices</h3><p>Eurostat figures for your goods, shown as background only.</p></li>
+        <li class="fcard"><svg class="f-ico" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><rect x="8" y="10" width="32" height="8" rx="3"/><rect x="8" y="22" width="32" height="8" rx="3"/><rect x="8" y="34" width="20" height="8" rx="3"/></svg><h3>Several clients at once</h3><p>Accountants can check each client’s shipment and see them in one table.</p></li>
+      </ul>
+    </section>
+
+    <section class="row" aria-labelledby="row1-h">
+      <div class="row-text">
+        <h2 id="row1-h" class="section-h">We read the <em>dated</em> data.</h2>
+        <p class="lede">Every answer says where its data came from and how fresh it is, so an old answer never passes for today’s.</p>
+      </div>
+      <div class="row-visual">
+        <ul class="srclist" aria-label="Sources behind the example answer">
+          <li><span class="sl-name">ECB reference rates</span><span class="sl-when">Rate of 6 Nov 2026</span></li>
+          <li><span class="sl-name">GDELT news</span><span class="sl-when">Checked 7 Nov 2026</span></li>
+          <li><span class="sl-name">Eurostat import prices</span><span class="sl-when">August 2026, published 16 Oct</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="row row-flip" aria-labelledby="row2-h">
+      <div class="row-text">
+        <h2 id="row2-h" class="section-h">We tell you what to check <em>today</em>.</h2>
+        <p class="lede">Plain words and one next step each. When the data can’t say, we say so.</p>
+      </div>
+      <div class="row-visual">
+        <div class="darkpanel">
+          <p class="dp-title">Worth checking today</p>
+          <ol class="dp-list">
+            <li><span class="dp-tag" data-tone="warn"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M10 2.5 1.5 17.5h17L10 2.5Z"/><path d="M10 8v4"/><path d="M10 14.6v.2"/></svg>Stock</span>Check your forwarder’s ETA today: your stock runs out 14 days before a new order would arrive.</li>
+          </ol>
+          <p class="dp-foot">From the example above: ECB, GDELT and Eurostat data, checked 7 Nov 2026.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta" aria-labelledby="cta-h">
+      <h2 id="cta-h" class="section-h">Check your next shipment.</h2>
+      <p>No account needed. What you type stays on this page.</p>
+      <a class="btn btn-invert" href="#inputs">Check a shipment<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+    </section>
+  </div>
 
   <div class="error-summary" id="errors" role="alert" tabindex="-1" hidden>
     <h2 class="err-h">There is a problem</h2><ul id="error-list"></ul>
   </div>
-
   <form id="inputs" class="ship-form" novalidate aria-labelledby="ship-title">
     <h2 id="ship-title" class="section-h">Your shipment</h2>
     <div class="ship" id="ship-summary" hidden>

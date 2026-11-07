@@ -877,14 +877,21 @@
     // ---- Magnetic headline: letters near the pointer lean in and take the brand colour, then spring back.
     function magnetic(h) {
       if (!h || calm || !fine) return;
+      // Keep <em> emphasis: each word remembers whether it sat inside an <em>.
+      var words = [];
+      Array.prototype.forEach.call(h.childNodes, function (n) {
+        var em = n.nodeName === "EM";
+        n.textContent.split(/(\s+)/).forEach(function (w) { if (w) words.push({ w: w, em: em }); });
+      });
       var text = h.textContent; h.textContent = "";
       h.append(el("span", text, "sr"));
       var vis = el("span", null, "mag"); vis.setAttribute("aria-hidden", "true");
       var letters = [];
-      text.split(" ").forEach(function (w, i, all) {
-        var ws = el("span", null, "mag-w");
-        Array.from(w).forEach(function (ch) { var l = el("span", ch, "mag-l"); ws.append(l); letters.push(l); });
-        vis.append(ws); if (i < all.length - 1) vis.append(document.createTextNode(" "));
+      words.forEach(function (o) {
+        if (/^\s+$/.test(o.w)) { vis.append(document.createTextNode(" ")); return; }
+        var ws = el(o.em ? "em" : "span", null, "mag-w");
+        Array.from(o.w).forEach(function (ch) { var l = el("span", ch, "mag-l"); ws.append(l); letters.push(l); });
+        vis.append(ws);
       });
       h.append(vis);
       var raf = 0, px = 0, py = 0, on = false;
@@ -893,7 +900,7 @@
         letters.forEach(function (l) {
           var b = l.getBoundingClientRect(), dx = px - (b.left + b.width / 2), dy = py - (b.top + b.height / 2), k = on ? Math.max(0, 1 - Math.hypot(dx, dy) / 140) : 0;
           l.style.transform = k ? "translate(" + (dx * k * .12).toFixed(1) + "px," + (dy * k * .12 - k * 6).toFixed(1) + "px) rotate(" + (dx / 140 * 10 * k).toFixed(1) + "deg)" : "";
-          l.style.color = k > .45 ? "var(--brand)" : "";
+          l.style.color = k > .45 ? (l.parentNode.nodeName === "EM" ? "var(--foreground)" : "var(--brand)") : "";
         });
       }
       h.parentNode.addEventListener("pointermove", function (e) { px = e.clientX; py = e.clientY; on = true; if (!raf) raf = requestAnimationFrame(frame); });
@@ -926,12 +933,12 @@
     }
 
     // ---- Magnifying dock falloff (bencho): scale falls off with distance from the pointer, nearest card most.
-    function dock(row) {
-      if (!row || calm || !fine) return;
+    function dock(row, sel) {
+      if (!row || calm || !fine) return; sel = sel || ".glance-item";
       row.addEventListener("pointermove", function (e) {
-        row.querySelectorAll(".glance-item").forEach(function (c) { var b = c.getBoundingClientRect(), d = Math.abs(e.clientX - (b.left + b.width / 2)); c.style.setProperty("--lift", Math.max(0, 1 - d / (b.width * 1.4)).toFixed(3)); });
+        row.querySelectorAll(sel).forEach(function (c) { var b = c.getBoundingClientRect(), d = Math.abs(e.clientX - (b.left + b.width / 2)); c.style.setProperty("--lift", Math.max(0, 1 - d / (b.width * 1.4)).toFixed(3)); });
       });
-      row.addEventListener("pointerleave", function () { row.querySelectorAll(".glance-item").forEach(function (c) { c.style.setProperty("--lift", "0"); }); });
+      row.addEventListener("pointerleave", function () { row.querySelectorAll(sel).forEach(function (c) { c.style.setProperty("--lift", "0"); }); });
     }
 
     magnetic($("page-title")); tilt($("shot")); dock($("glance"));

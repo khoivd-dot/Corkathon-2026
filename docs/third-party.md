@@ -12,6 +12,8 @@ The page uses no third-party packages. Some of its interface ideas and numbers a
 | Border beam while a check runs (conic stroke, colourful palette, mask, 1.96 s spin, 12 s hue drift) | libraries.dev, `packages/border-beam` ("md" size, stroke layer only) | `src/styles.ts`, `src/BorderBeam.tsx` |
 | Shapes and type scale (pill controls, superellipse corner, Inter, warm neutrals and pure black) | morphin-ui (design tokens as documented; no code copied) | README and docs |
 
+The landing page's section order follows useorigin.com, at Khoa's request: a hero with a fanned stack of answer cards, a value line with a strip of names, a feature grid, two text-and-picture rows (one with a dark panel) and a dark call to action. Only the structure is borrowed. No code, copy, images, fonts, colours or logos come from that site. The page could only be read as text from the build environment, so its exact look was not copied.
+
 The libraries.dev machine-learning models (`Magnet.mfxl`, `VoicePosition.mfxl`) have a separate model licence. We do not use them.
 
 ## bencho
