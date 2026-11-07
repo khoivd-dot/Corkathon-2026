@@ -93,8 +93,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: var(--foreground);
-  color: var(--background);
+  background: var(--primary);
+  color: var(--primary-foreground);
   border: none;
   border-radius: 9999px;
   padding: 0.625rem 1.25rem;
@@ -105,7 +105,22 @@
 }
 
 .btn-calendar:hover {
-  opacity: 0.9;
+  background: color-mix(in oklch, var(--primary) 88%, var(--primary-foreground));
+}
+
+.btn-calendar svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.btn-calendar span {
+  white-space: nowrap;
 }
 
 .btn-calendar:focus-visible {

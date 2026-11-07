@@ -256,9 +256,9 @@
     var xOrder = xOf(orderD);
     var effArrTime = orderD.getTime() + (timing.effective_lead_days || timing.base_lead_days) * 864e5;
     var xArr = xOf(effArrTime);
-    var leadBar = sv("rect", { x: xOrder, y: 56, width: Math.max(2, xArr - xOrder), height: 12, rx: "4", fill: "var(--brand)", opacity: "0.8" });
+    var leadBar = sv("rect", { x: xOrder, y: 62, width: Math.max(2, xArr - xOrder), height: 12, rx: "4", fill: "var(--brand)", opacity: "0.8" });
     svg.append(leadBar);
-    var leadTxt = sv("text", { x: xOrder + 4, y: 52, fill: "var(--brand)", "font-size": "10", "font-weight": "500" });
+    var leadTxt = sv("text", { x: xOrder + 4, y: 58, fill: "var(--brand)", "font-size": "10", "font-weight": "500" });
     leadTxt.textContent = "Lead time: " + (timing.effective_lead_days || timing.base_lead_days) + "d";
     svg.append(leadTxt);
 
