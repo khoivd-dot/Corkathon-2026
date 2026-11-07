@@ -92,6 +92,16 @@ class DecisionTests(unittest.TestCase):
                                       "automatically. Check their notices directly.")
         self.assertEqual(len(cov["ports"]), 5)
         self.assertTrue(all(p["url"].startswith("https://") for p in cov["ports"]))
+        out = self.run_([])
+        self.assertEqual(out["coverage_gaps"], cov["ports"])
+        self.assertIn("Check their notices directly", out["coverage_line"])
+        self.assertNotIn("\u2212", out["delay"]["exposure"]["arithmetic"])
+        self.assertNotIn("= -", out["delay"]["exposure"]["arithmetic"])
+        self.assertIn("14 days short", out["delay"]["exposure"]["arithmetic"])
+
+    def test_no_last_order_claim_in_examples(self):
+        for f in Path("web/examples").glob("*.json"):
+            self.assertNotIn("last order", f.read_text())
 
     def test_dates_line(self):
         self.assertEqual(dates_line("2026-11-07T11:05:00+00:00", SOURCES),

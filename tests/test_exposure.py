@@ -11,7 +11,7 @@ class StockTests(unittest.TestCase):
     def test_shortfall(self):
         s = stock_exposure(21, 35)
         self.assertEqual((s.buffer_days, s.shortfall), (-14, True))
-        self.assertIn("21 \u2212 35 = -14", s.arithmetic)
+        self.assertIn("so you're 14 days short", s.arithmetic)
         self.assertEqual(stock_sentence(s), "Your stock runs out 14 days before a new order would arrive.")
 
     def test_covers(self):

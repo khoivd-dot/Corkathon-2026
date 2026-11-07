@@ -22,7 +22,7 @@
     "action": "Your stock shortfall below still applies. Ask your forwarder for a current ETA."
   },
   "fx": {
-    "finding": "EUR/USD moved from 1.090 to 1.069 since your last order.",
+    "finding": "Since 7 Oct, the euro cost of the part you haven't fixed would be about 1.9% higher (ECB rate as of 6 Nov). This isn't your bank's rate. Ask for a current quote.",
     "source": "ECB reference rate",
     "as_of": "6 Nov 2026",
     "invoice_usd": 12000,
