@@ -867,6 +867,8 @@
             c.el.style.filter = smear > 0.15 ? "blur(" + smear.toFixed(2) + "px)" : "";
           });
           if (busy) requestAnimationFrame(tick);
+          // Settled: put the plain text back, so copy, find-in-page and textContent read the real value.
+          else if (wrap.parentNode) wrap.parentNode.replaceChild(document.createTextNode(before + m[1] + after), wrap);
         }
         requestAnimationFrame(tick);
       });
