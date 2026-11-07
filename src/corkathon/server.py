@@ -18,6 +18,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from .decision import decide
+from .ports import lookup
 from .inputs import InputError, parse_inputs
 from .sources.base import REPO_ROOT
 from .sources.gdelt import PortGdeltLoader
@@ -29,17 +30,35 @@ LANE_PORTS = tuple(p.strip() for p in os.environ.get(
     "LANE_PORTS", "Rotterdam,Antwerp,Felixstowe,Dublin,Cork").split(",") if p.strip())
 MAX_BODY = 8 * 1024
 TYPES = {".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript",
-         ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png"}
+         ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png",
+         ".ttf": "font/ttf", ".woff2": "font/woff2", ".txt": "text/plain; charset=utf-8"}
 HEADERS = {"Content-Security-Policy": "default-src 'self'; img-src 'self' data:; frame-ancestors 'none'",
            "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer",
            "Cache-Control": "no-store"}
 
 
+REQUEST_GATE_WAIT_S = float(os.environ.get("REQUEST_GATE_WAIT_S", "6"))
+_RANK = {"ok": 0, "snapshot": 1, "stale": 2, "unavailable": 3}
+
+
 def refresh_once() -> None:
-    for i, port in enumerate(LANE_PORTS):
-        if i:
-            time.sleep(6)  # GDELT asks for <= 1 request / 5 s
+    for port in LANE_PORTS:  # GATE in sources/gdelt.py spaces the calls >= 5 s apart
         PortGdeltLoader(port).load()
+
+
+def news_ports(typed: list[str]) -> tuple[list[str], list[str]]:
+    """Split typed ports into ones we search news for (canonical names, deduplicated)
+    and ones we don't recognise. Only known public port names ever reach GDELT or
+    the cache, so a typo or free text never becomes a live query or a cache file."""
+    known: list[str] = []
+    unknown: list[str] = []
+    for name in typed:
+        hit = lookup(name)
+        if hit and hit[0] not in known:
+            known.append(hit[0])
+        elif not hit and name not in unknown:
+            unknown.append(name)
+    return known, unknown
 
 
 def _refresher() -> None:
@@ -53,17 +72,23 @@ def _refresher() -> None:
 
 def answer(form: dict) -> dict:
     inp = parse_inputs(form)
-    ports = [inp.origin_port, *inp.transshipment_ports, inp.destination_port]
+    known, unknown = news_ports([inp.origin_port, *inp.transshipment_ports, inp.destination_port])
     records: list[dict] = []
+    per_port = []
     gdelt = None
-    for p in ports:  # each port read separately; cache key = port name only
-        r = PortGdeltLoader(p).load()
+    for p in known:  # each port read separately; cache key = port name only
+        r = PortGdeltLoader(p, gate_wait_s=REQUEST_GATE_WAIT_S).load()
         records += r.records
-        gdelt = gdelt or r
-    sources = {"gdelt": gdelt}
+        per_port.append({"port": p, "status": r.status, "mode": r.mode, "checked_at": r.checked_at})
+        # The news row reports the least fresh port, so a fallback is never hidden.
+        if gdelt is None or _RANK.get(r.status, 9) > _RANK.get(gdelt.status, 9):
+            gdelt = r
+    sources = {"gdelt": gdelt or PortGdeltLoader(inp.destination_port).load_snapshot("no known port")}
     for sid in ("ecb_fx", "cso_trade", "comext"):
         sources[sid] = LOADERS[sid]().load()
-    return decide(inp, sources, records)
+    out = decide(inp, sources, records)
+    out["news_ports"] = {"checked": per_port, "unknown": unknown}
+    return out
 
 
 class Handler(BaseHTTPRequestHandler):

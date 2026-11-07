@@ -70,6 +70,18 @@ def _event_type(text: str) -> str | None:
     return next((w for w in EVENT_TERMS if re.search(r"\b" + re.escape(w), t)), None)
 
 
+# Headlines that name a port but are about something else. "Santos" is also a
+# football club, "Cork" a county team and a material. A match needs a disruption
+# word in the headline itself, and none of these off-topic words.
+OFF_TOPIC = ("fc", "football", "soccer", "hurling", "gaa", "league", "cup final", "goal",
+             "transfer window", "wine", "stopper", "election", "festival")
+
+
+def relevant(title: str) -> bool:
+    t = title.lower()
+    return _event_type(t) is not None and not any(re.search(r"\b" + re.escape(w) + r"\b", t) for w in OFF_TOPIC)
+
+
 def _dt(s: str) -> datetime:
     return datetime.strptime(s[:10], "%Y-%m-%d")
 
@@ -117,7 +129,7 @@ def filter_events(records: list[dict], lane: Lane, window_start: date, window_en
         if _dt(r["last_seen"]) < lo or _dt(r["first_seen"]) > hi:
             continue
         hits = [p for p in places if _mentions(r.get("title", ""), p)]
-        if hits:
+        if hits and relevant(r.get("title", "")):
             kept.append((r, hits))
     # Merge incidents from different queries that describe the same story.
     groups: list[list[tuple[dict, list[str]]]] = []
@@ -147,7 +159,8 @@ def filter_events(records: list[dict], lane: Lane, window_start: date, window_en
             first_seen=min(r["first_seen"] for r, _ in g), last_seen=max(r["last_seen"] for r, _ in g),
             report_count=sum(r.get("article_count", 1) for r, _ in g), source_urls=urls[:5],
             status="confirmed" if confirmed else "reported",
-            match_reason="names " + ", ".join(matched) + " on your confirmed route",
+            match_reason="names " + ", ".join(matched) + " on your confirmed route and mentions "
+                         + (_event_type(g[0][0].get("title", "")) or "a disruption"),
             domains=sorted({d for r, _ in g for d in r.get("domains", [])}),
             confirmation_url=conf,
         ))

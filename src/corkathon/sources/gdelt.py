@@ -8,6 +8,7 @@ Route matching and time-window filtering are deliberately out of scope here.
 from __future__ import annotations
 
 import re
+import threading
 import time
 from datetime import datetime
 from typing import Any
@@ -69,6 +70,34 @@ def _iso(seendate: str) -> str:
     return datetime.strptime(seendate, "%Y%m%dT%H%M%SZ").strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+class RateGate:
+    """Process-wide spacing for GDELT calls (GDELT asks for <= 1 request / 5 s).
+
+    Every live GDELT request, from the background refresher or from a user's
+    answer, reserves a slot here first. A caller that would have to wait longer
+    than its budget gets False and falls back to the cache or the snapshot,
+    so a burst of answers with unusual ports can't hammer GDELT or stall a page."""
+
+    def __init__(self, interval_s: float = 5.5, clock=time.monotonic, sleep=time.sleep):
+        self.interval_s, self._clock, self._sleep = interval_s, clock, sleep
+        self._lock = threading.Lock()
+        self._next = 0.0
+
+    def acquire(self, wait_s: float) -> bool:
+        with self._lock:
+            now = self._clock()
+            slot = max(now, self._next)
+            if slot - now > wait_s:
+                return False
+            self._next = slot + self.interval_s
+        if slot > now:
+            self._sleep(slot - now)
+        return True
+
+
+GATE = RateGate()
+
+
 class GdeltLoader(Loader):
     source_id = "gdelt"
     endpoint = API
@@ -80,9 +109,10 @@ class GdeltLoader(Loader):
     )
 
     def __init__(self, queries: dict[str, str] | None = None, timespan: str = "14d",
-                 max_records: int = 75, pause_s: float = 6.0):
+                 max_records: int = 75, pause_s: float = 6.0, gate_wait_s: float = 60.0):
         self.queries = queries or DEFAULT_QUERIES
         self.timespan, self.max_records, self.pause_s = timespan, max_records, pause_s
+        self.gate_wait_s = gate_wait_s
 
     def cache_key(self) -> str:
         import hashlib
@@ -96,9 +126,9 @@ class GdeltLoader(Loader):
 
     def fetch(self) -> Any:
         out = {}
-        for i, (name, q) in enumerate(self.queries.items()):
-            if i:
-                time.sleep(self.pause_s)  # GDELT asks for <= 1 request / 5 s
+        for name, q in self.queries.items():
+            if not GATE.acquire(self.gate_wait_s):
+                raise FetchError("GDELT busy: waiting for a free slot (1 request / 5 s)")
             raw = http_get(self.url(q))
             if raw.lstrip().startswith(b"Please limit"):
                 raise FetchError("GDELT rate limit (1 request / 5 s)")

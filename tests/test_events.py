@@ -77,9 +77,23 @@ class EventTests(unittest.TestCase):
     def test_matching_domain_alone_is_reported(self):
         recs = [inc("Rotterdam welcomes new container terminal", "2026-11-05",
                     urls=("https://www.portofrotterdam.com/en/news/terminal",))]
+        ev = filter_events(recs, LANE, *W, confirm=True)
+        # Not a disruption, so it isn't an event at all, and never a confirmation.
+        self.assertFalse([e for e in ev if e.status == "confirmed"])
+        self.assertEqual(ev, [])
+
+    def test_headline_needs_a_disruption_word(self):
+        recs = [inc("Rotterdam hosts shipping conference", "2026-11-05"),
+                inc("Strike halts cranes at Rotterdam", "2026-11-05")]
         ev = filter_events(recs, LANE, *W)
-        self.assertEqual(ev[0].status, "reported")
-        self.assertIsNone(ev[0].confirmation_url)
+        self.assertEqual([e.title for e in ev], ["Strike halts cranes at Rotterdam"])
+        self.assertIn("strike", ev[0].match_reason)
+
+    def test_off_topic_port_name_is_dropped(self):
+        recs = [inc("Santos FC delay stadium move", "2026-11-05"),
+                inc("Cork hurling final delayed by storm", "2026-11-05")]
+        lane = Lane("Santos", "Cork")
+        self.assertEqual(filter_events(recs, lane, *W), [])
 
 
 if __name__ == "__main__":
