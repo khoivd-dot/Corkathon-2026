@@ -7,8 +7,10 @@ if the user gave no ports, nothing matches.
 
 Status rules:
 - "reported": only news reports (GDELT). Never treated as confirmation.
-- "confirmed": at least one source URL is on a carrier/port domain in
-  CONFIRMING_DOMAINS. GDELT alone can never produce this.
+- "confirmed": an advisory on a carrier/port domain (CONFIRMING_DOMAINS)
+  that itself names a place on the user's confirmed lane, inside the window.
+  A news story that merely links or is merged with such a page is not enough.
+  The advisory URL is kept in confirmation_url.
 An alert still needs the decision engine's stock-exposure check on top.
 """
 from __future__ import annotations
@@ -55,6 +57,7 @@ class Event:
     status: str  # "reported" | "confirmed"
     match_reason: str
     domains: list[str] = field(default_factory=list)
+    confirmation_url: str | None = None
 
 
 def _dt(s: str) -> datetime:
@@ -107,7 +110,11 @@ def filter_events(records: list[dict], lane: Lane, window_start: date, window_en
     for g in groups:
         urls = list(dict.fromkeys(u for r, _ in g for u in r.get("urls", [])))
         matched = sorted({p for _, h in g for p in h})
-        confirmed = any(_domain_confirms(u) for u in urls)
+        # Confirmed only if an incident sourced *solely* from carrier/port pages
+        # itself names a place on the lane inside the window (checked above).
+        conf = next((r["urls"][0] for r, _ in g
+                     if r.get("urls") and all(_domain_confirms(u) for u in r["urls"])), None)
+        confirmed = conf is not None
         events.append(Event(
             title=g[0][0].get("title", "").strip(), matched_places=matched,
             first_seen=min(r["first_seen"] for r, _ in g), last_seen=max(r["last_seen"] for r, _ in g),
@@ -115,6 +122,7 @@ def filter_events(records: list[dict], lane: Lane, window_start: date, window_en
             status="confirmed" if confirmed else "reported",
             match_reason="names " + ", ".join(matched) + " on your confirmed route",
             domains=sorted({d for r, _ in g for d in r.get("domains", [])}),
+            confirmation_url=conf,
         ))
     events.sort(key=lambda e: e.last_seen, reverse=True)
     return events

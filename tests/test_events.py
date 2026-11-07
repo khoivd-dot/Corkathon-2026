@@ -41,7 +41,9 @@ class EventTests(unittest.TestCase):
     def test_confirmed_only_from_carrier_or_port(self):
         recs = [inc("Rotterdam terminal closure notice", "2026-11-05",
                     urls=("https://www.portofrotterdam.com/en/news/closure",))]
-        self.assertEqual(filter_events(recs, LANE, *W)[0].status, "confirmed")
+        ev = filter_events(recs, LANE, *W)[0]
+        self.assertEqual(ev.status, "confirmed")
+        self.assertTrue(ev.confirmation_url.startswith("https://www.portofrotterdam.com/"))
         spoof = [inc("Rotterdam terminal closure notice", "2026-11-05",
                      urls=("https://portofrotterdam.com.evil.example/x",))]
         self.assertEqual(filter_events(spoof, LANE, *W)[0].status, "reported")
@@ -58,6 +60,18 @@ class EventTests(unittest.TestCase):
         q = lane_query(LANE)
         for p in ("Santos", "Rotterdam", "Cork", "port strike"):
             self.assertIn(p, q)
+
+    def test_news_merged_with_port_page_stays_reported(self):
+        recs = [inc("Rotterdam port strike halts container cargo", "2026-11-05",
+                    urls=("https://news.example.com/a", "https://www.portofrotterdam.com/en/news"))]
+        ev = filter_events(recs, LANE, *W)
+        self.assertEqual(ev[0].status, "reported")
+        self.assertIsNone(ev[0].confirmation_url)
+
+    def test_port_page_off_lane_not_confirmed(self):
+        recs = [inc("Durban terminal closure notice", "2026-11-05",
+                    urls=("https://www.portofrotterdam.com/en/news/x",))]
+        self.assertEqual(filter_events(recs, LANE, *W), [])
 
 
 if __name__ == "__main__":
