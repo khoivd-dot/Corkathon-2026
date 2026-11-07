@@ -9,8 +9,7 @@
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <main id="main">
-<p class="preview-banner" role="note">Example data, for preview only</p>
-<span class="tag" id="mode">Example data, not live</span>
+<span class="tag" id="mode">Live public data</span>
 <h1 id="page-title">Will my imports be late or dearer this month?</h1>
 <p class="q">Tell us about one shipment route. We check dated public sources and give you one next step. We never guess your route.</p>
 
@@ -22,32 +21,50 @@
   <h2 class="lbl">Your shipment</h2>
   <div class="field"><label for="importer">Who imports it?</label><span class="hint" id="importer-hint">The company named on the invoice.</span>
     <span class="field-error" id="importer-error" hidden></span>
-    <input id="importer" name="importer" autocomplete="organization" aria-describedby="importer-hint importer-error" value="Example Coffee Ltd"></div>
-  <div class="field"><label for="route">Route, including any transshipment port</label><span class="hint" id="route-hint">For example: Santos, then Rotterdam, then Cork.</span>
-    <span class="field-error" id="route-error" hidden></span>
-    <input id="route" name="route" aria-describedby="route-hint route-error" value="Santos → Rotterdam → Cork (Ringaskiddy)"></div>
-  <fieldset class="radios"><legend>Invoice currency</legend>
-    <label><input type="radio" name="currency" value="USD" checked> US dollars</label>
-    <label><input type="radio" name="currency" value="EUR"> Euro</label></fieldset>
-  <fieldset class="radios"><legend>Is the currency hedged?</legend>
-    <label><input type="radio" name="hedged" value="no" checked> No</label>
-    <label><input type="radio" name="hedged" value="yes"> Yes</label></fieldset>
+    <input id="importer" name="importer" autocomplete="organization" aria-describedby="importer-hint importer-error" ></div>
+  <div class="field"><label for="origin_port">Port your goods leave from</label><span class="hint" id="origin_port-hint">For example: Santos.</span>
+    <span class="field-error" id="origin_port-error" hidden></span>
+    <input id="origin_port" name="origin_port" aria-describedby="origin_port-hint origin_port-error" autocomplete="off"></div>
+  <div class="field"><label for="transshipment_ports">Ports your goods change ship at, if any</label><span class="hint" id="transshipment_ports-hint">Separate ports with commas. Leave blank if none.</span>
+    <span class="field-error" id="transshipment_ports-error" hidden></span>
+    <input id="transshipment_ports" name="transshipment_ports" aria-describedby="transshipment_ports-hint transshipment_ports-error" autocomplete="off"></div>
+  <div class="field"><label for="destination_port">Port your goods arrive at</label><span class="hint" id="destination_port-hint">For example: Cork.</span>
+    <span class="field-error" id="destination_port-error" hidden></span>
+    <input id="destination_port" name="destination_port" aria-describedby="destination_port-hint destination_port-error" autocomplete="off"></div>
+  <div class="field"><label for="currency">Invoice currency</label>
+    <span class="field-error" id="currency-error" hidden></span>
+    <select id="currency" name="currency" aria-describedby="currency-error"><option value="">Choose a currency</option><option value="USD">US dollars (USD)</option><option value="GBP">Pounds sterling (GBP)</option><option value="CNY">Chinese yuan (CNY)</option><option value="JPY">Japanese yen (JPY)</option><option value="CHF">Swiss francs (CHF)</option><option value="EUR">Euro (EUR)</option></select></div>
+  <fieldset class="radios" id="fixed_rate_share" aria-describedby="fixed_rate_share-error"><legend>How much of this invoice have you already fixed an exchange rate for?</legend>
+    <span class="field-error" id="fixed_rate_share-error" hidden></span>
+    <label><input type="radio" name="fixed_rate_share" value="none"> None</label>
+    <label><input type="radio" name="fixed_rate_share" value="some"> Some</label>
+    <label><input type="radio" name="fixed_rate_share" value="all"> All</label></fieldset>
+  <div class="field" id="pct-field" hidden><label for="fixed_rate_pct">Roughly what share have you fixed? (for example 50%)</label><span class="hint" id="fixed_rate_pct-hint">Optional. Without it we can't work out your euro cost.</span>
+    <span class="field-error" id="fixed_rate_pct-error" hidden></span>
+    <input id="fixed_rate_pct" name="fixed_rate_pct" inputmode="decimal" aria-describedby="fixed_rate_pct-hint fixed_rate_pct-error"></div>
   <div class="field"><label for="stock_days">How many days will your current stock last?</label>
     <span class="field-error" id="stock_days-error" hidden></span>
-    <input id="stock_days" name="stock_days" type="number" inputmode="numeric" min="0" aria-describedby="stock_days-error" value="21"></div>
+    <input id="stock_days" name="stock_days" type="number" inputmode="numeric" min="0" aria-describedby="stock_days-error"></div>
   <div class="field"><label for="lead_time_days">How many days does a new order take to arrive?</label>
     <span class="field-error" id="lead_time_days-error" hidden></span>
-    <input id="lead_time_days" name="lead_time_days" type="number" inputmode="numeric" min="0" aria-describedby="lead_time_days-error" value="35"></div>
-  <div class="field"><label for="scenario">Demo snapshot</label>
-    <select id="scenario" name="scenario"><option value="alert">7 Nov 2026: confirmed event on route</option><option value="insufficient">7 Nov 2026: unconfirmed report only</option></select></div>
+    <input id="lead_time_days" name="lead_time_days" type="number" inputmode="numeric" min="0" aria-describedby="lead_time_days-error"></div>
+  <div class="field"><label for="window_start">Earliest date your next shipment travels</label>
+    <span class="field-error" id="window_start-error" hidden></span>
+    <input id="window_start" name="window_start" aria-describedby="window_start-error" type="date"></div>
+  <div class="field"><label for="window_end">Latest date it travels</label>
+    <span class="field-error" id="window_end-error" hidden></span>
+    <input id="window_end" name="window_end" aria-describedby="window_end-error" type="date"></div>
+  <div class="field"><label for="scenario">What to check</label>
+    <select id="scenario" name="scenario"><option value="">Live answer for my route</option><option value="alert">Example: confirmed event on route (example data)</option><option value="insufficient">Example: unconfirmed report only (example data)</option></select></div>
   <p class="hint" id="expect-note">Most weeks there’s no confirmed event on your route. We’ll tell you when we can’t tell.</p>
   <p class="hint" id="privacy-note">Your route and stock figures stay in this session only. We don’t store them.</p>
-  <button type="submit">Check my route</button>
+  <button type="submit" id="submit">Check my route</button>
+  <p class="src" id="status" role="status" aria-live="polite"></p>
 </form>
 
 <section id="result" aria-labelledby="answer" tabindex="-1" hidden>
   <p class="q" id="answer-q"></p>
-  <p class="src" id="freshness"></p><p class="src" id="staleness" hidden></p>
+  <p class="src" id="freshness"></p><ul class="src" id="gaps" hidden></ul><p class="src" id="staleness" hidden></p>
   <h2 id="answer" style="font:600 clamp(24px,3.4vw,34px)/1.2 var(--serif);margin:0 0 var(--s4)"></h2>
   <div class="two">
     <section class="card stack" aria-labelledby="delay-h">

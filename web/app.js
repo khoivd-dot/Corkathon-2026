@@ -15,15 +15,27 @@
     return { text: sum + "Your stock covers your lead time.", short: false };
   }
 
+  var LABELS = { importer: "Enter who imports the goods", origin_port: "Enter the port your goods leave from",
+    destination_port: "Enter the port your goods arrive at", currency: "Choose the invoice currency",
+    fixed_rate_share: "Choose none, some or all", window_start: "Enter the earliest travel date", window_end: "Enter the latest travel date" };
+  var ORDER = ["importer", "origin_port", "transshipment_ports", "destination_port", "currency", "fixed_rate_share", "fixed_rate_pct", "stock_days", "lead_time_days", "window_start", "window_end", "_"];
+
   function validate(f) {
     var errs = [];
-    if (!f.importer.value.trim()) errs.push(["importer", "Enter who imports the goods"]);
-    if (!f.route.value.trim()) errs.push(["route", "Enter the route, including any transshipment port"]);
+    ["importer", "origin_port", "destination_port", "currency", "window_start", "window_end"].forEach(function (k) { if (!f[k].value.trim()) errs.push([k, LABELS[k]]); });
+    if (!f.querySelector("input[name=fixed_rate_share]:checked")) errs.push(["fixed_rate_share", LABELS.fixed_rate_share]);
     ["stock_days", "lead_time_days"].forEach(function (k) {
       var v = f[k].value;
       if (v === "" || !/^\d+$/.test(v)) errs.push([k, k === "stock_days" ? "Enter how many days your stock will last, as a whole number" : "Enter how many days a new order takes, as a whole number"]);
     });
     return errs;
+  }
+
+  function formBody(f) {
+    var share = f.querySelector("input[name=fixed_rate_share]:checked");
+    var o = { fixed_rate_share: share ? share.value : "" };
+    ["importer", "origin_port", "transshipment_ports", "destination_port", "currency", "fixed_rate_pct", "stock_days", "lead_time_days", "window_start", "window_end"].forEach(function (k) { o[k] = f[k].value; });
+    return JSON.stringify(o);
   }
 
   function showErrors(errs) {
@@ -33,16 +45,19 @@
     if (!errs.length) { $("errors").hidden = true; return; }
     errs.forEach(function (e) {
       var li = el("li"); var a = el("a", e[1]); a.href = "#" + e[0]; li.append(a); list.append(li);
-      var fe = $(e[0] + "-error"); fe.textContent = e[1]; fe.hidden = false; $(e[0]).setAttribute("aria-invalid", "true");
+      var fe = $(e[0] + "-error"); if (fe) { fe.textContent = e[1]; fe.hidden = false; } var tgt = $(e[0]); if (tgt && tgt.tagName !== "FIELDSET") tgt.setAttribute("aria-invalid", "true"); if (!tgt) a.href = "#importer";
     });
     document.title = "Error: " + document.title.replace(/^Error: /, "");
     $("errors").hidden = false; $("errors").focus();
   }
 
   function render(ans, stock, lead) {
-    $("mode").textContent = ans.example ? "Example data, not live" : "Snapshot data";
+    $("mode").textContent = ans.example ? "Example data, not live" : (ans.mode === "fallback" || (ans.sources || []).some(function (x) { return x.mode === "fallback"; }) ? "Live sources unavailable: using saved data" : "Live public data");
     $("answer-q").textContent = "Your question: \u201c" + ans.question + "\u201d";
-    $("freshness").textContent = ans.freshness || "";
+    $("freshness").textContent = ans.dates_line || ans.freshness || "";
+    var gl = $("gaps"); gl.replaceChildren(); var gaps = ans.coverage_gaps || ans.uncovered_ports || [];
+    gaps.forEach(function (g) { var li = el("li"); if (g.url && /^https:\/\//.test(g.url)) { var a = el("a", g.port || g.name || g.url); a.href = g.url; li.append(a); } else li.textContent = g.port || g.name || String(g); gl.append(li); });
+    if (ans.coverage_line) gl.prepend(el("li", ans.coverage_line)); gl.hidden = !gl.children.length;
     $("staleness").textContent = ans.staleness || ""; $("staleness").hidden = !(ans.mode === "fallback" && ans.staleness);
     var exp = exposureText(stock, lead);
     var headline = ans.state === "alert"
@@ -74,19 +89,35 @@
     var fx = ans.fx;
     $("fx-finding").textContent = fx.finding;
     $("fx-src").textContent = fx.source + " as of " + (fx.source_updated_at || fx.as_of) + (fx.checked_at ? ", checked " + fx.checked_at : "");
-    $("fx-calc").textContent = usd.format(fx.invoice_usd) + " invoice: " + eur.format(fx.eur_before) + " then, about " + eur.format(fx.eur_now) + " now (illustrative).";
+    $("fx-calc").textContent = (fx.eur_before != null && fx.eur_now != null) ? "Unfixed part: " + eur.format(fx.eur_before) + " then, about " + eur.format(fx.eur_now) + " now (illustrative)." : "";
+    $("fx-calc").hidden = !$("fx-calc").textContent;
     $("fx-reading").textContent = fx.reading;
     $("fx-action").textContent = fx.action;
     $("result").hidden = false; $("result").focus();
   }
 
+  document.querySelectorAll("input[name=fixed_rate_share]").forEach(function (r) {
+    r.addEventListener("change", function () { $("pct-field").hidden = r.value !== "some" || !r.checked; });
+  });
+
+  function busy(on, msg) { $("inputs").setAttribute("aria-busy", on ? "true" : "false"); $("submit").disabled = on; $("status").textContent = msg || ""; }
+
   $("inputs").addEventListener("submit", function (ev) {
     ev.preventDefault();
-    var f = ev.target, errs = validate(f);
+    var f = ev.target, example = f.scenario.value;
+    var errs = example ? [] : validate(f);
     showErrors(errs); if (errs.length) return;
     document.title = document.title.replace(/^Error: /, "");
-    fetch("examples/" + f.scenario.value + ".json").then(function (r) { return r.json(); })
-      .then(function (ans) { render(ans, +f.stock_days.value, +f.lead_time_days.value); })
-      .catch(function () { $("answer").textContent = "We couldn\u2019t load the answer. Your details are kept; try again."; $("result").hidden = false; });
+    var stock = +f.stock_days.value || 21, lead = +f.lead_time_days.value || 35;
+    busy(true, "Checking sources\u2026");
+    var req = example
+      ? fetch("examples/" + example + ".json").then(function (r) { return r.json(); })
+      : fetch("/api/answer", { method: "POST", headers: { "Content-Type": "application/json" }, body: formBody(f) })
+          .then(function (r) { return r.json().then(function (j) { if (r.status === 400 && j.errors) throw { fields: j.errors }; if (!r.ok) throw new Error("server"); return j; }); });
+    req.then(function (ans) { busy(false, ""); render(ans, stock, lead); })
+      .catch(function (e) {
+        if (e && e.fields) { busy(false, ""); showErrors(Object.keys(e.fields).sort(function (x, y) { return ORDER.indexOf(x) - ORDER.indexOf(y); }).map(function (k) { return [k, e.fields[k]]; })); return; }
+        busy(false, "We couldn\u2019t reach our data sources. Your answers are still here; try again.");
+      });
   });
 })();
