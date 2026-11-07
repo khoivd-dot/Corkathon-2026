@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="For Irish importers and the accountants who advise them: check one shipment's route and currency against dated public data, and see what to check today.">
 <title>In Time: will my imports be late or dearer?</title>
-<link rel="preload" href="fonts/display.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="fonts/inter-display-semibold.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="timing.css">
 </head>
@@ -37,8 +37,8 @@
       </ul>
       <div id="mount-understood"></div>
     </div>
-    <figure class="hero-shot">
-      <div class="shot-frame beam" id="shot">
+    <figure class="hero-shot tilt">
+      <div class="shot-frame" id="shot">
       <picture>
         <source srcset="img/answer-light.webp" media="(prefers-color-scheme: light)" type="image/webp">
         <img src="img/answer-dark.webp" width="1792" height="764" fetchpriority="high" alt="A real answer from this page for Santos to Rotterdam to Cork: the headline says to order today because stock runs out 14 days before a new order arrives, nothing is reported on the route, and the euro cost is about the same.">
@@ -226,7 +226,7 @@
         <thead><tr><th scope="col">Source</th><th scope="col">Data for</th><th scope="col">Published</th><th scope="col">We fetched it</th><th scope="col">How we used it</th></tr></thead>
         <tbody id="sources"></tbody>
       </table></div>
-      <p class="small">Licences: Eurostat and CSO, CC BY 4.0. ECB statistics, free reuse with the source quoted. GDELT, free with citation. Port positions on the map are approximate.</p>
+      <p class="small">Licences: Eurostat and CSO, CC BY 4.0. ECB statistics, free reuse with the source quoted. GDELT, free with citation. <span id="lic-weather">Weather data by Open-Meteo.com, CC BY 4.0, forecasts only.</span> Port positions on the map are approximate.</p>
     </details>
 
     <details class="panel">

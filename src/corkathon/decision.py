@@ -14,7 +14,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
-from .events import Event, confirmation_enabled, filter_events
+from .events import Event, confirmation_enabled, filter_events, news_window
 from .exposure import FxExposure, fx_exposure, stock_exposure, stock_sentence
 from .inputs import ImporterInputs, to_lane
 from .ports import lookup
@@ -176,7 +176,8 @@ def decide(inp: ImporterInputs, sources: dict[str, SourceResult], gdelt_records:
            now: datetime | None = None) -> dict:
     now = now or datetime.now(timezone.utc)
     lane = to_lane(inp)
-    events = filter_events(gdelt_records, lane, inp.window_start, inp.window_end)
+    news_from, _ = news_window(inp.window_start, inp.window_end, now.date())
+    events = filter_events(gdelt_records, lane, inp.window_start, inp.window_end, news_from=news_from)
     confirmed = [e for e in events if e.status == "confirmed"]
     stock = stock_exposure(inp.stock_days, inp.lead_time_days)
     ecb = sources.get("ecb_fx")

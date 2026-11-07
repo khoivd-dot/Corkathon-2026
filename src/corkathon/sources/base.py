@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 import os
+import threading
 import urllib.error
 import urllib.request
 from dataclasses import asdict, dataclass, field
@@ -160,11 +161,20 @@ class Loader:
         return res, (datetime.now(timezone.utc) - checked).total_seconds()
 
     def write_cache(self, res: SourceResult) -> None:
+        """Atomic, and safe when the refresher and a user's request write the same
+        entry at once: each writer has its own temp file. A failed write (disk full,
+        read-only) is skipped, because loaders never raise."""
         p = self._cache_path()
-        p.parent.mkdir(parents=True, exist_ok=True)
-        tmp = p.with_suffix(".tmp")
-        tmp.write_text(json.dumps(res.to_dict(), ensure_ascii=False))
-        tmp.replace(p)
+        tmp = p.with_name(f"{p.name}.{os.getpid()}.{threading.get_ident()}.tmp")
+        try:
+            p.parent.mkdir(parents=True, exist_ok=True)
+            tmp.write_text(json.dumps(res.to_dict(), ensure_ascii=False))
+            tmp.replace(p)
+        except OSError:
+            try:
+                tmp.unlink(missing_ok=True)
+            except OSError:
+                pass
 
     def load(self) -> SourceResult:
         if os.environ.get("SNAPSHOT_ONLY") == "1" or os.environ.get("SNAPSHOT") == "1":

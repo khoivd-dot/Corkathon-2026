@@ -104,6 +104,7 @@ flowchart TD
 | ECB reference rates (24 currencies per EUR; the saved snapshot holds USD, GBP, CNY, JPY, CHF only) | `sources/ecb_fx.py` | `https://data-api.ecb.europa.eu/service/data/EXR/D.<24 codes>.EUR.SP00.A` | ESCB free reuse, unmodified, source quoted | 1 day |
 | GDELT news (one query per port) | `sources/gdelt.py` | `https://api.gdeltproject.org/api/v2/doc/doc` | GDELT terms: reuse with citation; articles themselves not licensed | 30 min |
 | Official carrier and port headlines (confirmation) | `events.py` (`CONFIRMING_DOMAINS`, via GDELT) | GDELT, limited to 18 official domains | **Reuse terms not recorded**, so `CONFIRMATION_ENABLED` is off | 30 min |
+| Open-Meteo port weather (next 7 days: wind gusts, wave height) | `sources/open_meteo.py` | `https://api.open-meteo.com/v1/forecast` and `https://marine-api.open-meteo.com/v1/marine`, one call per known port | CC BY 4.0, free for non-commercial use, credit Open-Meteo.com with a link | 3 hours |
 | AISHub ship counts (behind `AIS_ENABLED`) | `sources/ais.py` | `https://data.aishub.net/ws.php` | Members-only, non-commercial: **terms to confirm** before public display; counts only, never names or positions | 15 min (one call a minute at most) |
 
 Exact licence text lives in each loader and in [docs/sources.md](docs/sources.md).
@@ -195,6 +196,7 @@ CI runs the tests and osv-scanner on every pull request.
 | `SNAPSHOT_ONLY` | off | `1` reads saved snapshots only, no network (`SNAPSHOT=1` still works) |
 | `SNAPSHOT_DATE` | newest | Pin a snapshot day, e.g. `2026-11-07` |
 | `CONFIRMATION_ENABLED` | off | Official carrier and port headlines can confirm an event |
+| `WEATHER_ENABLED` | on | `0` turns off the Open-Meteo port forecast |
 | `AIS_ENABLED` + `AISHUB_USERNAME` | off | Ship counts near each port |
 
 **Render:** `render.yaml` defines a Starter web service in Frankfurt with health check `/healthz` and a 1 GB disk at `/var/data`. It sets `CACHE_DIR=/var/data/cache`, `REFRESH_S=1800`, `LANE_PORTS`, `CONFIRMATION_ENABLED=0` and `AIS_ENABLED=0`, and contains no secrets (`AISHUB_USERNAME` would go in the dashboard, not the file). It has not been deployed. Auto-deploy is off. **A deploy needs Tran's explicit approval.**
@@ -226,6 +228,7 @@ CI runs the tests and osv-scanner on every pull request.
 - **Ship positions are counts, not tracks.** With `AIS_ENABLED=1` and an AISHub account, the route answer shows how many ships are at anchor or moving near each port. We never show names or positions; for a single ship we link public trackers.
 - **31 ports known.** News is only searched for ports in our table; we say so when you type another.
 - **Watching needs the page open.** "Check again every 30 minutes" runs in your browser tab, because we never store your shipment.
+- **Weather is a forecast for the next 7 days only.** Rough days are gusts of 75 km/h or more (gale force) or waves of 4 m or more. We say ships there *may* be delayed; weather never changes the answer state. Some harbours have no wave forecast, and we say so rather than calling them calm.
 - **Trade statistics lag** about 2–3 months, so they're shown as background only.
 
 ### What more time would add

@@ -29,6 +29,7 @@ from .sources.base import REPO_ROOT, SourceResult, now_iso
 from .sources.gdelt import PortGdeltLoader
 from .sources.holidays import HolidaysLoader, country_for_port, load_holidays_for_country
 from .sources.met_warnings import warnings_for_port
+from .sources.open_meteo import PortWeatherLoader, port_sentence, rough_days, weather_enabled
 from .sources.registry import LOADERS
 from .timing import compute_timing
 
@@ -48,9 +49,22 @@ REQUEST_GATE_WAIT_S = float(os.environ.get("REQUEST_GATE_WAIT_S", "6"))
 _RANK = {"ok": 0, "snapshot": 1, "stale": 2, "unavailable": 3}
 
 
+CONTEXT_SOURCES = ("ecb_fx", "cso_trade", "comext")
+
+
 def refresh_once() -> None:
-    for port in LANE_PORTS:
+    """Keep every shared source warm, so a user's answer reads the cache instead of
+    waiting on a live fetch when a TTL runs out (ECB daily, CSO and Comext monthly).
+    Each load() returns the cached copy while it's fresh, so this costs nothing then."""
+    for sid in CONTEXT_SOURCES:
+        LOADERS[sid]().load()
+    for port in LANE_PORTS:  # GATE in sources/gdelt.py spaces the calls >= 5 s apart
         PortGdeltLoader(port).load()
+    if weather_enabled():
+        for port in LANE_PORTS:
+            hit = lookup(port)
+            if hit:
+                PortWeatherLoader(hit[0], hit[2], hit[3]).load()
 
 
 def news_ports(typed: list[str]) -> tuple[list[str], list[str]]:
@@ -87,7 +101,7 @@ def answer(form: dict) -> dict:
         if gdelt is None or _RANK.get(r.status, 9) > _RANK.get(gdelt.status, 9):
             gdelt = r
     sources = {"gdelt": gdelt or PortGdeltLoader(inp.destination_port).load_snapshot("no known port")}
-    for sid in ("ecb_fx", "cso_trade", "comext", "met_warnings"):
+    for sid in (*CONTEXT_SOURCES, "met_warnings"):
         if sid in LOADERS:
             sources[sid] = LOADERS[sid]().load()
 
@@ -106,6 +120,15 @@ def answer(form: dict) -> dict:
 
     out = decide(inp, sources, records)
     out["news_ports"] = {"checked": per_port, "unknown": unknown}
+    if weather_enabled():
+        out["weather"] = weather_block(known)
+        w = out["weather"]
+        if w["checked_at"]:
+            out["sources"].append({"name": "Open-Meteo weather forecast", "reference_period": w["reference_period"],
+                                   "published_at": "\u2014", "retrieved_at": w["checked_at"],
+                                   "checked_at": w["checked_at"], "source_updated_at": w["checked_at"],
+                                   "mode": w["mode"], "use": "Signal only: forecast wind and waves at each port",
+                                   "status": w["status"], "attribution": PortWeatherLoader.licence.attribution})
     if ais_enabled():
         out["ais"] = ais_counts(known)
         if out["ais"]["ports"]:
@@ -166,6 +189,46 @@ def timing_only(body: dict) -> tuple[dict, int]:
     return timing, 200
 
 
+def weather_block(ports: list[str], today=None) -> dict:
+    """Next-7-day wind and waves at each known port on the route, one call and one
+    cache entry per public port. Only rough days are put into words; a port with no
+    forecast is named as unchecked, never described as calm."""
+    from datetime import datetime, timezone
+    today = today or datetime.now(timezone.utc).date()
+    lines, rough_ports, calm, missing = [], [], [], []
+    checked, mode, status, ref = None, "live", "ok", None
+    for p in ports:
+        hit = lookup(p)
+        if not hit:
+            continue
+        r = PortWeatherLoader(hit[0], hit[2], hit[3]).load()
+        future = [x for x in r.records if x.get("date", "") >= today.isoformat()]
+        if r.status == "unavailable" or not future:
+            missing.append(hit[0])
+            continue
+        checked = max(checked or r.checked_at, r.checked_at)
+        ref = min(ref or future[0]["date"], future[0]["date"])
+        if r.mode == "fallback":
+            mode, status = "fallback", r.status
+        bad = rough_days(future, today)
+        if bad:
+            rough_ports.append(hit[0]); lines.append(port_sentence(hit[0], bad))
+        else:
+            calm.append(hit[0])
+    if calm:
+        lines.append(f"No gale-force gusts or very rough seas forecast at {_join(calm)} in the next 7 days. "
+                     "Forecasts change, and they say nothing about delays further ahead.")
+    if missing:
+        lines.append(f"We have no weather forecast for {_join(missing)} right now.")
+    return {"lines": lines, "rough_ports": rough_ports, "checked_at": checked, "mode": mode, "status": status,
+            "reference_period": f"Next 7 days from {ref}" if ref else None,
+            "attribution": PortWeatherLoader.licence.attribution, "url": "https://open-meteo.com/"}
+
+
+def _join(xs: list[str]) -> str:
+    return xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + " and " + xs[-1]
+
+
 def ais_counts(ports: list[str]) -> dict:
     rows, checked, mode, status = [], None, "live", "ok"
     for p in ports:
@@ -211,13 +274,20 @@ class Handler(BaseHTTPRequestHandler):
         path = self.path.split("?")[0]
         if path not in ("/api/answer", "/api/parse", "/api/timing"):
             return self._send(404, b"not found", "text/plain")
-        n = int(self.headers.get("Content-Length") or 0)
+        try:
+            n = int(self.headers.get("Content-Length") or 0)
+        except ValueError:
+            n = -1
+        if n < 0:
+            return self._send(400, b"bad length", "text/plain")
         if n > MAX_BODY:
             return self._send(413, b"too large", "text/plain")
         try:
             body = json.loads(self.rfile.read(n) or b"{}")
+            if not isinstance(body, dict):
+                raise ValueError("not an object")
         except ValueError:
-            return self._send(400, b'{"errors": {"_": "Send valid JSON."}}', "application/json")
+            return self._send(400, b'{"errors": {"_": "Send the form as JSON."}}', "application/json")
 
         if path == "/api/parse":
             q = str(body.get("q", ""))
@@ -235,6 +305,9 @@ class Handler(BaseHTTPRequestHandler):
             out, code = {"errors": e.errors}, 400
         except ValueError:
             out, code = {"errors": {"_": "Send the form as JSON."}}, 400
+        except Exception as e:  # noqa: BLE001 - answer with JSON, never drop the connection
+            print(f"answer failed: {type(e).__name__}", flush=True)  # type only: no user input in logs
+            out, code = {"errors": {"_": "Something went wrong on our side. Try again in a minute."}}, 500
         self._send(code, json.dumps(out, ensure_ascii=False).encode(), "application/json")
 
 
