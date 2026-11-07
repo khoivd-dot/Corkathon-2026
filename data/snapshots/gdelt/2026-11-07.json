@@ -1,0 +1,153 @@
+{
+ "source_id": "gdelt",
+ "endpoint": "https://api.gdeltproject.org/api/v2/doc/doc",
+ "licence": {
+  "name": "GDELT open data, free for any use with citation (terms to confirm)",
+  "url": "https://www.gdeltproject.org/about.html#termsofuse",
+  "attribution": "Source: The GDELT Project (gdeltproject.org)."
+ },
+ "status": "ok",
+ "retrieved_at": "2026-11-07T10:51:16+00:00",
+ "reference_period": "2026-11-07T09:30:00Z",
+ "published_at": null,
+ "reason": null,
+ "records": [
+  {
+   "kind": "query_summary",
+   "query_id": "shipping_disruption",
+   "query": "(\"port strike\" OR \"shipping disruption\" OR \"Red Sea shipping\" OR \"port congestion\")",
+   "timespan": "14d",
+   "article_count": 9,
+   "incident_count": 7,
+   "retrieved_at": "2026-11-07T10:51:16+00:00"
+  },
+  {
+   "kind": "incident",
+   "query_id": "shipping_disruption",
+   "title": "Goods delayed , banks demanding repayment â€  GUTA President details tradersâ€™ pressures – Ghanamma . com",
+   "article_count": 1,
+   "domains": [
+    "ghanamma.com"
+   ],
+   "countries": [
+    "Ghana"
+   ],
+   "first_seen": "2026-11-07T09:30:00Z",
+   "last_seen": "2026-11-07T09:30:00Z",
+   "urls": [
+    "https://www.ghanamma.com/2026/11/07/goods-delayed-banks-demanding-repayment-guta-president-details-traders-pressures/"
+   ],
+   "retrieved_at": "2026-11-07T10:51:16+00:00"
+  },
+  {
+   "kind": "incident",
+   "query_id": "shipping_disruption",
+   "title": "GUTA President calls for loan repayment moratorium as shipment delays hit traders – Ghanamma . com",
+   "article_count": 1,
+   "domains": [
+    "ghanamma.com"
+   ],
+   "countries": [
+    "Ghana"
+   ],
+   "first_seen": "2026-11-07T07:00:00Z",
+   "last_seen": "2026-11-07T07:00:00Z",
+   "urls": [
+    "https://www.ghanamma.com/2026/11/07/guta-president-calls-for-loan-repayment-moratorium-as-shipment-delays-hit-traders/"
+   ],
+   "retrieved_at": "2026-11-07T10:51:16+00:00"
+  },
+  {
+   "kind": "incident",
+   "query_id": "shipping_disruption",
+   "title": "德魯里WCI連兩周下跌 、 估下周續跌 SCFI下跌1 . 46 % | ETtoday財經雲",
+   "article_count": 1,
+   "domains": [
+    "finance.ettoday.net"
+   ],
+   "countries": [
+    "Taiwan"
+   ],
+   "first_seen": "2026-11-06T08:00:00Z",
+   "last_seen": "2026-11-06T08:00:00Z",
+   "urls": [
+    "https://finance.ettoday.net/news/3267607"
+   ],
+   "retrieved_at": "2026-11-07T10:51:16+00:00"
+  },
+  {
+   "kind": "incident",
+   "query_id": "shipping_disruption",
+   "title": "Why the world needs a more diverse energy mix",
+   "article_count": 1,
+   "domains": [
+    "thenationalnews.com"
+   ],
+   "countries": [],
+   "first_seen": "2026-11-06T04:30:00Z",
+   "last_seen": "2026-11-06T04:30:00Z",
+   "urls": [
+    "https://www.thenationalnews.com/opinion/editorial/2026/11/06/energy-adipec-ai-gulf-renewables-politics-society-oil-fuel-gas-solar-wind-nuclear/"
+   ],
+   "retrieved_at": "2026-11-07T10:51:16+00:00"
+  },
+  {
+   "kind": "incident",
+   "query_id": "shipping_disruption",
+   "title": "Iran says wont allow US warships to get close as Trump ponders new attacks - Dominican Republic Post – Caribbean News , Business , Travel & Culture",
+   "article_count": 3,
+   "domains": [
+    "aljazeera.com",
+    "dominicanrepublicpost.com",
+    "grenadachronicle.com"
+   ],
+   "countries": [
+    "United States"
+   ],
+   "first_seen": "2026-10-24T14:45:00Z",
+   "last_seen": "2026-10-24T17:15:00Z",
+   "urls": [
+    "https://dominicanrepublicpost.com/iran-says-wont-allow-us-warships-to-get-close-as-trump-ponders-new-attacks/",
+    "https://grenadachronicle.com/iran-says-wont-allow-us-warships-to-get-close-as-trump-ponders-new-attacks/",
+    "https://www.aljazeera.com/news/2026/10/24/iran-says-wont-allow-us-warships-to-get-close-as-trump-ponders-new-attacks"
+   ],
+   "retrieved_at": "2026-11-07T10:51:16+00:00"
+  },
+  {
+   "kind": "incident",
+   "query_id": "shipping_disruption",
+   "title": "Ethiopia Calls for Shared Red Sea Security",
+   "article_count": 1,
+   "domains": [
+    "riotimesonline.com"
+   ],
+   "countries": [
+    "Brazil"
+   ],
+   "first_seen": "2026-10-24T15:00:00Z",
+   "last_seen": "2026-10-24T15:00:00Z",
+   "urls": [
+    "https://www.riotimesonline.com/ethiopia-calls-for-shared-red-sea-security-2026/"
+   ],
+   "retrieved_at": "2026-11-07T10:51:16+00:00"
+  },
+  {
+   "kind": "incident",
+   "query_id": "shipping_disruption",
+   "title": "Realignment and the Realities of the Middle East",
+   "article_count": 1,
+   "domains": [
+    "freebeacon.com"
+   ],
+   "countries": [
+    "United States"
+   ],
+   "first_seen": "2026-10-24T11:30:00Z",
+   "last_seen": "2026-10-24T11:30:00Z",
+   "urls": [
+    "https://freebeacon.com/columns/realignment-and-the-realities-of-the-middle-east/"
+   ],
+   "retrieved_at": "2026-11-07T10:51:16+00:00"
+  }
+ ]
+}
