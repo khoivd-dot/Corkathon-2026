@@ -91,6 +91,16 @@
     $("fx-src").textContent = fx.source + " as of " + (fx.source_updated_at || fx.as_of) + (fx.checked_at ? ", checked " + fx.checked_at : "");
     $("fx-calc").textContent = (fx.eur_before != null && fx.eur_now != null) ? "Unfixed part: " + eur.format(fx.eur_before) + " then, about " + eur.format(fx.eur_now) + " now (illustrative)." : "";
     $("fx-calc").hidden = !$("fx-calc").textContent;
+    var cov = $("coverage");
+    if (!cov) { cov = el("p"); cov.id = "coverage"; $("delay-reading").after(cov); }
+    cov.replaceChildren();
+    if (ans.coverage && ans.coverage.line) {
+      cov.append(ans.coverage.line + " ");
+      ans.coverage.ports.forEach(function (p, i) {
+        var a = el("a", p.port + " notices"); a.href = p.url; a.rel = "noopener"; a.target = "_blank";
+        if (i) cov.append(", "); cov.append(a);
+      });
+    }
     $("fx-reading").textContent = fx.reading;
     $("fx-action").textContent = fx.action;
     $("result").hidden = false; $("result").focus();
