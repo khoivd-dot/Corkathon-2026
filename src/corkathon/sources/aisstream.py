@@ -228,7 +228,7 @@ class VesselLoader(Loader):
     endpoint = ENDPOINT
     cache_ttl_s = 300
     licence = Licence(
-        name="aisstream.io free API (beta, no SLA); terms to confirm before public display",
+        name="aisstream.io free API (beta, no SLA, no formal terms); AIS is a public broadcast",
         url="https://aisstream.io",
         attribution="Ship position: aisstream.io (terrestrial AIS)",
     )
