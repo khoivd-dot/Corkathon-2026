@@ -248,27 +248,20 @@
   var sailTimer = null;
   function renderMap(geo, ans) {
     var fig = $("routemap"), box = $("routemap-svg"); box.replaceChildren(); $("port-card").hidden = true;
-    var pts = (geo || []).filter(function (p) { return typeof p.lat === "number" && typeof p.lon === "number"; });
+    // A schematic in route order, left to right, not to scale: every stop gets the same room, so short legs
+    // (Rotterdam to Cork) are as readable as long ones (Santos to Rotterdam), and nothing is left empty.
+    var pts = (geo || []).filter(function (p) { return p && p.port; });
     if (pts.length < 2) { fig.hidden = true; return null; }
-    var lons = pts.map(function (p) { return p.lon; }), lats = pts.map(function (p) { return p.lat; });
-    var x0 = Math.min.apply(0, lons), x1 = Math.max.apply(0, lons), y0 = Math.min.apply(0, lats), y1 = Math.max.apply(0, lats);
-    var kx = Math.cos((y0 + y1) / 2 * Math.PI / 180);
-    var spanX = Math.max((x1 - x0) * kx, 10), spanY = Math.max(y1 - y0, 10);
-    var W = 640, pad = 80, H = Math.round(Math.max(340, Math.min(560, (W - 2 * pad) * spanY / spanX + 2 * pad)));
-    var k = Math.min((W - 2 * pad) / spanX, (H - 2 * pad) / spanY);
-    var cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
-    var P = function (p) { return [W / 2 + (p.lon - cx) * kx * k, H / 2 - (p.lat - cy) * k]; };
+    var W = 640, H = 210, padX = 70, baseY = 96;
+    var P = function (p) { var i = pts.indexOf(p); return [padX + (W - 2 * padX) * i / (pts.length - 1), baseY]; };
     var svg = sv("svg", { viewBox: "0 0 " + W + " " + H, role: "group", "aria-labelledby": "routemap-title", class: "rm route-map" });
-    var t = sv("title", { id: "routemap-title" }); t.textContent = "Route map: " + pts.map(function (p) { return p.port; }).join(", then ") + ". Each port is a button that shows its details."; svg.append(t);
-    var grat = sv("g", { "aria-hidden": "true" });
-    for (var gl = -180; gl <= 180; gl += 10) { var gx = W / 2 + (gl - cx) * kx * k; if (gx > 0 && gx < W) grat.append(sv("line", { x1: gx, y1: 0, x2: gx, y2: H, class: "rm-grat" })); }
-    for (var gt = -80; gt <= 80; gt += 10) { var gy = H / 2 - (gt - cy) * k; if (gy > 0 && gy < H) grat.append(sv("line", { x1: 0, y1: gy, x2: W, y2: gy, class: "rm-grat" })); }
-    svg.append(grat);
+    var t = sv("title", { id: "routemap-title" }); t.textContent = "Route: " + pts.map(function (p) { return p.port; }).join(", then ") + ". Each port is a button that shows its details."; svg.append(t);
+    svg.append(sv("line", { x1: 24, y1: baseY + 52, x2: W - 24, y2: baseY + 52, class: "rm-sea", "aria-hidden": "true" }));
     var d = "";
     pts.forEach(function (p, i) {
       var c = P(p); if (!i) { d = "M" + c[0].toFixed(1) + " " + c[1].toFixed(1); return; }
-      var pr = P(pts[i - 1]), dx = c[0] - pr[0], dy = c[1] - pr[1];
-      d += " Q" + ((pr[0] + c[0]) / 2 - dy * 0.18).toFixed(1) + " " + ((pr[1] + c[1]) / 2 + dx * 0.18).toFixed(1) + " " + c[0].toFixed(1) + " " + c[1].toFixed(1);
+      var pr = P(pts[i - 1]);
+      d += " Q" + ((pr[0] + c[0]) / 2).toFixed(1) + " " + (baseY - 64) + " " + c[0].toFixed(1) + " " + c[1].toFixed(1);
     });
     var route = sv("path", { d: d, class: "rm-route", "aria-hidden": "true" });
     svg.append(sv("path", { d: d, class: "rm-route-halo", "aria-hidden": "true" }), route);
@@ -281,10 +274,8 @@
       var g = sv("g", { class: "rm-pt", tabindex: "0", role: "button", "aria-label": role + p.port + (p.event ? ", " + (p.event === "confirmed" ? "confirmed event" : "news report") : "") + ". Show details." });
       g.append(sv("circle", { cx: c[0], cy: c[1], r: 22, class: "rm-hit" }));
       g.append(sv("circle", { cx: c[0], cy: c[1], r: ev ? 9 : 7, class: "rm-port" + (p.event === "confirmed" ? " rm-confirmed" : ev ? " rm-unconfirmed" : "") }));
-      var near = placed.filter(function (q) { return Math.abs(q[0] - c[0]) < 160 && Math.abs(q[1] - c[1]) < 50; })[0];
-      var right = near ? c[0] < near[0] : c[0] > W * 0.6;
-      if (near && !right && c[0] > W - 160) right = true;
-      g.append(svgText(c[0] + (right ? -16 : 16), c[1] + (near ? 32 : -14), role + p.port + (p.event === "confirmed" ? " (confirmed)" : p.event === "unconfirmed" ? " (reported)" : ""), "rm-label", right ? "end" : "start"));
+      g.append(svgText(c[0], c[1] + 36, role.trim() + (p.event === "confirmed" ? ", confirmed event" : p.event === "unconfirmed" ? ", reported" : ""), "rm-role" + (p.event === "confirmed" ? " rm-role-ev" : ""), "middle"));
+      g.append(svgText(c[0], c[1] + 58, p.port, "rm-label", "middle"));
       function open() { svg.querySelectorAll(".rm-pt").forEach(function (n) { n.classList.toggle("on", n === g); }); showPort(p, ans, c, W, H); }
       g.addEventListener("click", open);
       g.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } });
@@ -310,8 +301,7 @@
       sailTimer = requestAnimationFrame(step);
     }
     $("sail").onclick = sail;
-    var missing = (geo || []).filter(function (p) { return pts.indexOf(p) < 0; }).map(function (p) { return p.port; });
-    $("routemap-cap").textContent = "A schematic, not for navigation. Port positions are approximate. Open a port for its news and notices." + (missing.length ? " We couldn’t place " + missing.join(", ") + " on the map." : "");
+    $("routemap-cap").textContent = "A schematic, not for navigation: your stops in order, not to scale. Open a port for its news, weather and notices.";
     fig.hidden = false;
     return { sail: sail };
   }
@@ -349,20 +339,20 @@
     var plan = el("p", null, "rw-plan");
     function draw() {
       svgBox.replaceChildren();
-      var W = 640, H = 176, L = 16, R = 16, max = Math.max(14, Math.ceil(Math.max(s, l) / 7) * 7 + 7);
+      var W = 640, H = 168, L = 8, R = 8, max = Math.max(14, Math.ceil(Math.max(s, l) / 7) * 7 + 7);
       var X = function (dd) { return L + (W - L - R) * dd / max; };
       var g = sv("svg", { viewBox: "0 0 " + W + " " + H, class: "rw", role: "img", "aria-label": "Your stock lasts " + s + " days; a new order placed today arrives on day " + l + "." });
-      for (var dd = 0; dd <= max; dd += 7) { g.append(sv("line", { x1: X(dd), y1: 24, x2: X(dd), y2: 132, class: "rw-tick" })); g.append(svgText(X(dd), 160, dd === 0 ? "Today" : "Day " + dd, "rw-axis", dd === 0 ? "start" : dd === max ? "end" : "middle")); }
       var lo = Math.min(s, l), hi = Math.max(s, l);
-      if (hi > lo) g.append(sv("rect", { x: X(lo), y: 18, width: X(hi) - X(lo), height: 120, class: s < l ? "rw-gap short" : "rw-gap spare" }));
-      g.append(svgText(L, 16, "Your stock", "rw-name"));
-      g.append(sv("rect", { x: X(0), y: 26, width: Math.max(4, X(s) - X(0)), height: 28, rx: 2, class: "rw-stock" }));
-      g.append(svgText(L, 86, "A new order placed today", "rw-name"));
-      g.append(sv("line", { x1: X(0), y1: 110, x2: X(l), y2: 110, class: "rw-transit" }));
-      var boat = sv("path", { d: "M" + (X(l) - 11) + " 104 L" + (X(l) + 11) + " 104 L" + (X(l) + 7) + " 116 L" + (X(l) - 7) + " 116 Z", class: "rw-boat" });
-      g.append(boat);
-      var mid = (X(lo) + X(hi)) / 2;
-      if (hi > lo && X(hi) - X(lo) > 70) g.append(svgText(mid, 76, (s < l ? (l - s) + " days short" : (s - l) + " days spare"), "rw-gaplab", "middle"));
+      // The gap between the two ends: a soft band, amber when short, green when there is room.
+      if (hi > lo) g.append(sv("rect", { x: X(lo), y: 8, width: X(hi) - X(lo), height: 116, rx: 10, class: s < l ? "rw-gap short" : "rw-gap spare" }));
+      [[30, "Your stock", s, "rw-stock"], [88, "A new order placed today", l, "rw-order"]].forEach(function (ln) {
+        g.append(svgText(L, ln[0] - 8, ln[1], "rw-name"));
+        g.append(sv("rect", { x: X(0), y: ln[0], width: X(max) - X(0), height: 12, rx: 6, class: "rw-track" }));
+        g.append(sv("rect", { x: X(0), y: ln[0], width: Math.max(12, X(ln[2]) - X(0)), height: 12, rx: 6, class: ln[3] }));
+        g.append(sv("circle", { cx: X(ln[2]), cy: ln[0] + 6, r: 8, class: ln[3] + "-end" }));
+      });
+      if (hi > lo && X(hi) - X(lo) > 90) g.append(svgText((X(lo) + X(hi)) / 2, 70, (s < l ? (l - s) + " days without stock" : (s - l) + " days to spare"), "rw-gaplab" + (s < l ? " short" : ""), "middle"));
+      for (var dd = 0; dd <= max; dd += 7) g.append(svgText(X(dd), 156, dd === 0 ? "Today" : "Day " + dd, "rw-axis", dd === 0 ? "start" : dd === max ? "end" : "middle"));
       svgBox.append(g);
       out.textContent = stockSentence(s, l);
       plan.textContent = s < l ? "Order today and you’d be without stock for " + (l - s) + " days, unless a quicker route or an earlier shipment closes the gap." : s === l ? "Order today and the new stock lands as the old runs out: no margin for a delay." : "Order within the next " + (s - l) + " days and the new stock lands before you run out.";

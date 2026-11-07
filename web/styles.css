@@ -749,3 +749,40 @@ h1 em,.section-h em{font-style:normal;color:var(--brand)}
 .panel{background:transparent;border:0;border-bottom:1px solid var(--border);border-radius:0;padding:0;margin-top:0}
 .track .btn.ghost{background:var(--card);box-shadow:0 0 0 1px var(--border)}
 .track .btn.ghost:hover{background:var(--background)}
+
+/* ---------- Stock runway, event cards, route schematic (Khoa: "fix all of these", 7 Nov) ---------- */
+.rw-name{font:600 14px var(--font-sans);fill:var(--foreground)}
+.rw-axis{font:500 13px var(--font-sans)}
+.rw-track{fill:var(--secondary-2)}
+.rw-stock{fill:var(--data)}
+.rw-order{fill:var(--brand)}
+.rw-stock-end{fill:var(--card);stroke:var(--data);stroke-width:3}
+.rw-order-end{fill:var(--card);stroke:var(--brand);stroke-width:3}
+.rw-gap{stroke:none;stroke-dasharray:none}
+.rw-gap.short{fill:var(--warn-soft)}
+.rw-gap.spare{fill:var(--calm-soft)}
+.rw-gaplab{font:600 14px var(--font-sans);fill:var(--foreground);stroke:none}
+.rw-gaplab.short{fill:var(--warn-ink)}
+@media (prefers-color-scheme:dark){.rw-stock{fill:color-mix(in oklch,var(--data) 80%,var(--secondary))}}
+.wks-bar{height:16px;width:2px;background:color-mix(in oklch,var(--foreground) 22%,var(--secondary))}
+
+/* Event cards: the status leads, amber for a confirmed event, grey-blue for a news report */
+.findings{gap:var(--s-3)}
+.findings li{display:grid;gap:var(--s-2);padding:var(--s-4) var(--s-5);background:var(--card);border:1px solid var(--border);border-left:4px solid var(--unk);border-radius:var(--r-inner);font-size:var(--text-base);line-height:1.45}
+.findings li:has(.conf){border-left-color:var(--warn);background:color-mix(in oklch,var(--warn-soft) 55%,var(--card))}
+.findings .badge{justify-self:start;display:inline-flex;align-items:center;gap:var(--s-1);font:600 var(--text-xs)/1 var(--font-sans);padding:6px 10px;border-radius:var(--pill)}
+.findings .badge.conf{background:var(--warn-soft);color:var(--warn-ink)}
+.findings .badge.rep{background:var(--unk-soft);color:var(--foreground)}
+.findings .badge.conf::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--warn)}
+.findings .badge.rep::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--unk)}
+.findings a{font-weight:500}
+.findings .meta{margin-top:0}
+
+/* Route: stops in order on one line, not to scale */
+.rm{max-height:none}
+.rm-sea{stroke:var(--border);stroke-width:1.5;stroke-dasharray:2 8;stroke-linecap:round}
+.rm-label{font:600 16px var(--font-sans);stroke:none}
+.rm-role{fill:var(--muted-foreground);font:500 13px var(--font-sans)}
+.rm-role-ev{fill:var(--warn-ink);font-weight:600}
+.rm-port{stroke-width:3}
+.rw-gap.short,.rw-gap.spare{stroke:none}
