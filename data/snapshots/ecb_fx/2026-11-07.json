@@ -1,0 +1,196 @@
+{
+ "source_id": "ecb_fx",
+ "endpoint": "https://data-api.ecb.europa.eu/service/data/EXR/D.USD.EUR.SP00.A?lastNObservations=30&format=jsondata",
+ "licence": {
+  "name": "ESCB statistics free reuse policy (unmodified, source quoted)",
+  "url": "https://www.ecb.europa.eu/stats/ecb_statistics/governance_and_quality_framework/html/usage_policy.en.html",
+  "attribution": "Source: ECB statistics."
+ },
+ "status": "ok",
+ "retrieved_at": "2026-11-07T10:47:24+00:00",
+ "reference_period": "2026-11-06",
+ "published_at": null,
+ "reason": null,
+ "records": [
+  {
+   "reference_period": "2026-09-28",
+   "usd_per_eur": 1.1378,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-09-29",
+   "usd_per_eur": 1.1355,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-09-30",
+   "usd_per_eur": 1.1355,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-01",
+   "usd_per_eur": 1.1298,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-02",
+   "usd_per_eur": 1.1225,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-05",
+   "usd_per_eur": 1.1204,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-06",
+   "usd_per_eur": 1.1269,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-07",
+   "usd_per_eur": 1.1177,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-08",
+   "usd_per_eur": 1.1186,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-09",
+   "usd_per_eur": 1.1206,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-12",
+   "usd_per_eur": 1.1181,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-13",
+   "usd_per_eur": 1.1188,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-14",
+   "usd_per_eur": 1.1195,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-15",
+   "usd_per_eur": 1.1208,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-16",
+   "usd_per_eur": 1.1253,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-19",
+   "usd_per_eur": 1.1225,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-20",
+   "usd_per_eur": 1.1215,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-21",
+   "usd_per_eur": 1.1234,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-22",
+   "usd_per_eur": 1.1205,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-23",
+   "usd_per_eur": 1.1193,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-26",
+   "usd_per_eur": 1.1188,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-27",
+   "usd_per_eur": 1.115,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-28",
+   "usd_per_eur": 1.1133,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-29",
+   "usd_per_eur": 1.113,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-10-30",
+   "usd_per_eur": 1.1172,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-11-02",
+   "usd_per_eur": 1.1216,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-11-03",
+   "usd_per_eur": 1.1179,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-11-04",
+   "usd_per_eur": 1.1267,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-11-05",
+   "usd_per_eur": 1.1224,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  },
+  {
+   "reference_period": "2026-11-06",
+   "usd_per_eur": 1.1165,
+   "published_at": null,
+   "retrieved_at": "2026-11-07T10:47:24+00:00"
+  }
+ ]
+}
