@@ -66,7 +66,51 @@
     FIELDS.forEach(function (k) { form[k].value = o[k] || ""; });
     form.querySelectorAll("input[name=fixed_rate_share]").forEach(function (r) { r.checked = r.value === o.fixed_rate_share; });
     $("pct-field").hidden = o.fixed_rate_share !== "some";
+    ticket();
   }
+
+  // ---------- The live shipment ticket beside the form (display only; the form stays the source of truth) ----------
+  var CUR_NAMES = { USD: "US dollars", GBP: "Sterling", CNY: "Yuan", EUR: "Euro", JPY: "Yen", CHF: "Swiss francs" };
+  function shortDate(v) { return v ? new Date(v + "T12:00:00Z").toLocaleDateString("en-IE", { day: "numeric", month: "short", timeZone: UK }) : ""; }
+  function ticket() {
+    if (!$("t-route")) return;
+    $("t-route").querySelectorAll("li").forEach(function (li) {
+      var k = li.getAttribute("data-k"), v = (form[k].value || "").trim(), port = li.querySelector(".t-port");
+      var was = li.classList.contains("set");
+      li.classList.toggle("set", !!v);
+      port.textContent = v || port.getAttribute("data-empty");
+      if (v && !was) { li.classList.add("pop"); setTimeout(function () { li.classList.remove("pop"); }, 260); }
+    });
+    var cur = form.currency.value, share = (form.querySelector("input[name=fixed_rate_share]:checked") || {}).value;
+    var shareTxt = { none: "none fixed", some: "some fixed", all: "all fixed" }[share];
+    $("t-money").textContent = cur ? (CUR_NAMES[cur] || cur) + (shareTxt ? ", " + shareTxt : "") : "Not chosen yet";
+    document.querySelectorAll(".cchip").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-cur") === cur ? "true" : "false"); });
+    var a = shortDate(form.window_start.value), b2 = shortDate(form.window_end.value);
+    $("t-dates").textContent = a && b2 ? a + " to " + b2 : a || b2 || "Not set yet";
+    var sd = parseInt(form.stock_days.value, 10), ld = parseInt(form.lead_time_days.value, 10), top = Math.max(sd || 0, ld || 0, 1);
+    [["t-stock", sd], ["t-lead", ld]].forEach(function (x) {
+      var ok = isFinite(x[1]) && x[1] >= 0;
+      $(x[0]).style.setProperty("--w", ok ? Math.round(x[1] / top * 100) + "%" : "0%");
+      $(x[0] + "-v").textContent = ok ? x[1] + (x[1] === 1 ? " day" : " days") : "?";
+    });
+    ["g-route", "g-money", "g-time"].forEach(function (id, i) {
+      var done = i === 0 ? !!(form.origin_port.value.trim() && form.destination_port.value.trim())
+        : i === 1 ? !!(cur && share) : !!(form.stock_days.value && form.lead_time_days.value && form.window_start.value && form.window_end.value);
+      $(id).classList.toggle("done", done);
+    });
+  }
+  form.addEventListener("input", ticket);
+  form.addEventListener("change", ticket);
+  document.querySelectorAll(".cchip").forEach(function (b) {
+    b.addEventListener("click", function () { form.currency.value = b.getAttribute("data-cur"); form.currency.dispatchEvent(new Event("change", { bubbles: true })); });
+  });
+  document.querySelectorAll(".stp").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var f = form[b.getAttribute("data-for")], v = parseInt(f.value, 10);
+      f.value = String(Math.max(0, (isFinite(v) ? v : 0) + parseInt(b.getAttribute("data-step"), 10)));
+      f.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+  });
 
   function showErrors(errs) {
     var list = $("error-list"); list.replaceChildren();
@@ -93,6 +137,7 @@
     if (!form.window_start.value) form.window_start.value = iso(t);
     if (!form.window_end.value) form.window_end.value = iso(new Date(t.getTime() + 21 * 864e5));
   })();
+  ticket();
 
   // ---------- Question ----------
   // Keyword match only: it picks which answer leads. It is not a chatbot.
