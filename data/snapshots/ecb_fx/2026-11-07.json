@@ -1,6 +1,6 @@
 {
  "source_id": "ecb_fx",
- "endpoint": "https://data-api.ecb.europa.eu/service/data/EXR/D.USD.EUR.SP00.A?lastNObservations=30&format=jsondata",
+ "endpoint": "https://data-api.ecb.europa.eu/service/data/EXR/D.USD+GBP+CNY+JPY+CHF.EUR.SP00.A?lastNObservations=30&format=jsondata",
  "licence": {
   "name": "ESCB statistics free reuse policy (unmodified, source quoted)",
   "url": "https://www.ecb.europa.eu/stats/ecb_statistics/governance_and_quality_framework/html/usage_policy.en.html",
@@ -14,183 +14,303 @@
  "records": [
   {
    "reference_period": "2026-09-28",
-   "usd_per_eur": 1.1378,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9464,
+   "cny_per_eur": 7.6352,
+   "gbp_per_eur": 0.85785,
+   "jpy_per_eur": 178.5,
+   "usd_per_eur": 1.1378
   },
   {
    "reference_period": "2026-09-29",
-   "usd_per_eur": 1.1355,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9461,
+   "cny_per_eur": 7.6117,
+   "gbp_per_eur": 0.85718,
+   "jpy_per_eur": 178.41,
+   "usd_per_eur": 1.1355
   },
   {
    "reference_period": "2026-09-30",
-   "usd_per_eur": 1.1355,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9478,
+   "cny_per_eur": 7.613,
+   "gbp_per_eur": 0.85463,
+   "jpy_per_eur": 178.27,
+   "usd_per_eur": 1.1355
   },
   {
    "reference_period": "2026-10-01",
-   "usd_per_eur": 1.1298,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9437,
+   "cny_per_eur": 7.5748,
+   "gbp_per_eur": 0.85373,
+   "jpy_per_eur": 178.49,
+   "usd_per_eur": 1.1298
   },
   {
    "reference_period": "2026-10-02",
-   "usd_per_eur": 1.1225,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9279,
+   "cny_per_eur": 7.5259,
+   "gbp_per_eur": 0.85033,
+   "jpy_per_eur": 176.99,
+   "usd_per_eur": 1.1225
   },
   {
    "reference_period": "2026-10-05",
-   "usd_per_eur": 1.1204,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9311,
+   "cny_per_eur": 7.5118,
+   "gbp_per_eur": 0.8472,
+   "jpy_per_eur": 177.28,
+   "usd_per_eur": 1.1204
   },
   {
    "reference_period": "2026-10-06",
-   "usd_per_eur": 1.1269,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9359,
+   "cny_per_eur": 7.5554,
+   "gbp_per_eur": 0.8488,
+   "jpy_per_eur": 178.15,
+   "usd_per_eur": 1.1269
   },
   {
    "reference_period": "2026-10-07",
-   "usd_per_eur": 1.1177,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9309,
+   "cny_per_eur": 7.4937,
+   "gbp_per_eur": 0.84645,
+   "jpy_per_eur": 176.85,
+   "usd_per_eur": 1.1177
   },
   {
    "reference_period": "2026-10-08",
-   "usd_per_eur": 1.1186,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9326,
+   "cny_per_eur": 7.4972,
+   "gbp_per_eur": 0.84698,
+   "jpy_per_eur": 177.05,
+   "usd_per_eur": 1.1186
   },
   {
    "reference_period": "2026-10-09",
-   "usd_per_eur": 1.1206,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9313,
+   "cny_per_eur": 7.4992,
+   "gbp_per_eur": 0.84763,
+   "jpy_per_eur": 177.34,
+   "usd_per_eur": 1.1206
   },
   {
    "reference_period": "2026-10-12",
-   "usd_per_eur": 1.1181,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9312,
+   "cny_per_eur": 7.4832,
+   "gbp_per_eur": 0.84478,
+   "jpy_per_eur": 177.33,
+   "usd_per_eur": 1.1181
   },
   {
    "reference_period": "2026-10-13",
-   "usd_per_eur": 1.1188,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9312,
+   "cny_per_eur": 7.489,
+   "gbp_per_eur": 0.8446,
+   "jpy_per_eur": 176.91,
+   "usd_per_eur": 1.1188
   },
   {
    "reference_period": "2026-10-14",
-   "usd_per_eur": 1.1195,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.933,
+   "cny_per_eur": 7.4925,
+   "gbp_per_eur": 0.84385,
+   "jpy_per_eur": 177.39,
+   "usd_per_eur": 1.1195
   },
   {
    "reference_period": "2026-10-15",
-   "usd_per_eur": 1.1208,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9305,
+   "cny_per_eur": 7.4993,
+   "gbp_per_eur": 0.8461,
+   "jpy_per_eur": 177.06,
+   "usd_per_eur": 1.1208
   },
   {
    "reference_period": "2026-10-16",
-   "usd_per_eur": 1.1253,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9272,
+   "cny_per_eur": 7.524,
+   "gbp_per_eur": 0.84385,
+   "jpy_per_eur": 177.82,
+   "usd_per_eur": 1.1253
   },
   {
    "reference_period": "2026-10-19",
-   "usd_per_eur": 1.1225,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9261,
+   "cny_per_eur": 7.4991,
+   "gbp_per_eur": 0.84205,
+   "jpy_per_eur": 177.63,
+   "usd_per_eur": 1.1225
   },
   {
    "reference_period": "2026-10-20",
-   "usd_per_eur": 1.1215,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9237,
+   "cny_per_eur": 7.4894,
+   "gbp_per_eur": 0.84028,
+   "jpy_per_eur": 177.34,
+   "usd_per_eur": 1.1215
   },
   {
    "reference_period": "2026-10-21",
-   "usd_per_eur": 1.1234,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9256,
+   "cny_per_eur": 7.4999,
+   "gbp_per_eur": 0.83825,
+   "jpy_per_eur": 177.36,
+   "usd_per_eur": 1.1234
   },
   {
    "reference_period": "2026-10-22",
-   "usd_per_eur": 1.1205,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9211,
+   "cny_per_eur": 7.4786,
+   "gbp_per_eur": 0.8377,
+   "jpy_per_eur": 175.97,
+   "usd_per_eur": 1.1205
   },
   {
    "reference_period": "2026-10-23",
-   "usd_per_eur": 1.1193,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9227,
+   "cny_per_eur": 7.466,
+   "gbp_per_eur": 0.83728,
+   "jpy_per_eur": 175.51,
+   "usd_per_eur": 1.1193
   },
   {
    "reference_period": "2026-10-26",
-   "usd_per_eur": 1.1188,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9243,
+   "cny_per_eur": 7.4603,
+   "gbp_per_eur": 0.8382,
+   "jpy_per_eur": 176.15,
+   "usd_per_eur": 1.1188
   },
   {
    "reference_period": "2026-10-27",
-   "usd_per_eur": 1.115,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9239,
+   "cny_per_eur": 7.4343,
+   "gbp_per_eur": 0.83658,
+   "jpy_per_eur": 175.97,
+   "usd_per_eur": 1.115
   },
   {
    "reference_period": "2026-10-28",
-   "usd_per_eur": 1.1133,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9247,
+   "cny_per_eur": 7.4217,
+   "gbp_per_eur": 0.83785,
+   "jpy_per_eur": 175.86,
+   "usd_per_eur": 1.1133
   },
   {
    "reference_period": "2026-10-29",
-   "usd_per_eur": 1.113,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9222,
+   "cny_per_eur": 7.4144,
+   "gbp_per_eur": 0.83578,
+   "jpy_per_eur": 175.92,
+   "usd_per_eur": 1.113
   },
   {
    "reference_period": "2026-10-30",
-   "usd_per_eur": 1.1172,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9194,
+   "cny_per_eur": 7.4326,
+   "gbp_per_eur": 0.8338,
+   "jpy_per_eur": 175.68,
+   "usd_per_eur": 1.1172
   },
   {
    "reference_period": "2026-11-02",
-   "usd_per_eur": 1.1216,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9193,
+   "cny_per_eur": 7.4567,
+   "gbp_per_eur": 0.8358,
+   "jpy_per_eur": 177.1,
+   "usd_per_eur": 1.1216
   },
   {
    "reference_period": "2026-11-03",
-   "usd_per_eur": 1.1179,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9166,
+   "cny_per_eur": 7.459,
+   "gbp_per_eur": 0.83358,
+   "jpy_per_eur": 176.95,
+   "usd_per_eur": 1.1179
   },
   {
    "reference_period": "2026-11-04",
-   "usd_per_eur": 1.1267,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9188,
+   "cny_per_eur": 7.5177,
+   "gbp_per_eur": 0.8346,
+   "jpy_per_eur": 178.3,
+   "usd_per_eur": 1.1267
   },
   {
    "reference_period": "2026-11-05",
-   "usd_per_eur": 1.1224,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.918,
+   "cny_per_eur": 7.4846,
+   "gbp_per_eur": 0.83393,
+   "jpy_per_eur": 177.85,
+   "usd_per_eur": 1.1224
   },
   {
    "reference_period": "2026-11-06",
-   "usd_per_eur": 1.1165,
    "published_at": null,
-   "retrieved_at": "2026-11-07T10:47:24+00:00"
+   "retrieved_at": "2026-11-07T11:27:38+00:00",
+   "chf_per_eur": 0.9143,
+   "cny_per_eur": 7.4485,
+   "gbp_per_eur": 0.83415,
+   "jpy_per_eur": 176.77,
+   "usd_per_eur": 1.1165
   }
  ]
 }

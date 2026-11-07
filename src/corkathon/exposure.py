@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from datetime import date, timedelta
 
 # ECB series we load, keyed by invoice currency -> record field (foreign per EUR).
-ECB_FIELDS = {"USD": "usd_per_eur"}
+ECB_FIELDS = {c: f"{c.lower()}_per_eur" for c in ("USD", "GBP", "CNY", "JPY", "CHF")}
 
 
 @dataclass(frozen=True)

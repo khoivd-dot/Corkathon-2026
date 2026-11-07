@@ -65,6 +65,12 @@ class FxTests(unittest.TestCase):
         from corkathon.inputs import FIXED_SHARE
         self.assertNotIn(0.5, FIXED_SHARE.values())
 
+    def test_gbp_and_cny_computed_from_snapshot(self):
+        import json
+        recs = next(v for v in json.load(open("data/snapshots/ecb_fx/2026-11-07.json")).values() if isinstance(v, list))
+        for cur in ("GBP", "CNY", "JPY", "CHF", "USD"):
+            self.assertEqual(fx_exposure(cur, 0.0, recs).status, "computed", cur)
+
 
 if __name__ == "__main__":
     unittest.main()

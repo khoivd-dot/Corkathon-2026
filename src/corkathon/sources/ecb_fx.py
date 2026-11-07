@@ -1,4 +1,5 @@
-"""ECB euro foreign exchange reference rate, USD per EUR (EXR D.USD.EUR.SP00.A).
+"""ECB euro foreign exchange reference rates per EUR for USD, GBP, CNY, JPY, CHF
+(EXR D.<CUR>.EUR.SP00.A), fetched in one request and merged by date.
 
 Returns the rate series only. No interpretation or advice wording here.
 """
@@ -8,7 +9,8 @@ from typing import Any
 
 from .base import Licence, Loader, http_json, now_iso, DAY
 
-SERIES = "EXR/D.USD.EUR.SP00.A"
+CURRENCIES = ("USD", "GBP", "CNY", "JPY", "CHF")
+SERIES = "EXR/D." + "+".join(CURRENCIES) + ".EUR.SP00.A"
 
 
 class EcbFxLoader(Loader):
@@ -27,18 +29,24 @@ class EcbFxLoader(Loader):
         return http_json(self.endpoint)
 
     def parse(self, payload: Any):
-        dims = payload["structure"]["dimensions"]["observation"][0]["values"]
-        series = next(iter(payload["dataSets"][0]["series"].values()))
+        obs_dims = payload["structure"]["dimensions"]["observation"][0]["values"]
+        sdims = payload["structure"]["dimensions"]["series"]
+        cur_pos = next(i for i, d in enumerate(sdims) if d["id"] == "CURRENCY")
+        cur_vals = [v["id"] for v in sdims[cur_pos]["values"]]
         # The API exposes only the response "prepared" time, not a release time, so
         # published_at stays None (ECB publishes reference rates ~16:00 CET each TARGET day).
         published = None
         retrieved = now_iso()
-        records = []
-        for i, obs in sorted(series["observations"].items(), key=lambda kv: int(kv[0])):
-            if obs[0] is None:
-                continue
-            records.append({"reference_period": dims[int(i)]["id"], "usd_per_eur": obs[0],
-                            "published_at": published, "retrieved_at": retrieved})
+        by_date: dict[str, dict] = {}
+        for key, series in payload["dataSets"][0]["series"].items():
+            cur = cur_vals[int(key.split(":")[cur_pos])]
+            for i, obs in series["observations"].items():
+                if obs[0] is None:
+                    continue
+                d = obs_dims[int(i)]["id"]
+                rec = by_date.setdefault(d, {"reference_period": d, "published_at": published, "retrieved_at": retrieved})
+                rec[f"{cur.lower()}_per_eur"] = obs[0]
+        records = [by_date[d] for d in sorted(by_date)]
         if not records:
             raise ValueError("no observations")
         return records, records[-1]["reference_period"], published
