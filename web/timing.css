@@ -506,3 +506,5 @@
     scroll-behavior: auto !important;
   }
 }
+
+.notice-header svg { width: 18px; height: 18px; flex: none; color: var(--warn); }
