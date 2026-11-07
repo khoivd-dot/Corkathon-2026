@@ -6,7 +6,7 @@ How to get a change in, whether you write code or not. The full team rules are i
 
 - **Every change is a small pull request (PR).** Never commit straight to `main`.
 - **CI must pass:** tests and the osv-scanner security check run on every PR.
-- **The Engineering Lead reviews; Tran approves the merge.**
+- **The Engineering Lead reviews; Tran approves the merge.** Don't click Merge on a PR, including your own, until Tran has said yes.
 - **Nothing public, deployed, or sent outside the team without Tran's explicit yes.**
 - **No secrets in the repo.** Keys go in `.env`, which git ignores. Document new settings in `.env.example`.
 - **Open data only**, licence recorded in `docs/sources.md`. **No personal data.**
@@ -46,6 +46,7 @@ PowerShell has no `make` and doesn't accept `&&`. Use these instead:
 |---|---|
 | `make test` | `$env:PYTHONPATH = "src"` then `python -m unittest discover -s tests -t . -v` |
 | `make snapshot` | `$env:PYTHONPATH = "src"` then `python -m corkathon.snapshot` |
+| Run the app | `$env:PYTHONPATH = "src"` then `python -m corkathon.server`, and open http://localhost:8000 |
 | `git checkout main && git pull` | `git checkout main; git pull` |
 
 If `python` isn't recognised, use `py`. `$env:PYTHONPATH` lasts only for that terminal window.
