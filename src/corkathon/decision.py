@@ -1,0 +1,163 @@
+"""F: the decision engine. Turns in-memory inputs plus loaded sources into the
+answer-card JSON that the #8 UI reads (web/examples/*.json shape).
+
+Rules (agreed in the Corkathon room):
+- An alert needs a route-matched, deduplicated CONFIRMED event plus a stock shortfall.
+- Confirmation is behind CONFIRMATION_ENABLED (off), so today every event is "reported".
+- We never say "No action needed". When we can't tell, we abstain with ABSTAIN and
+  still show any stock shortfall.
+- Every source carries mode, source_updated_at and checked_at.
+- Nothing here is written to disk or logged.
+"""
+from __future__ import annotations
+
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
+
+from .events import Event, filter_events
+from .exposure import FxExposure, fx_exposure, stock_exposure, stock_sentence
+from .inputs import ImporterInputs, to_lane
+from .sources.base import SourceResult
+
+ABSTAIN = "We can't determine whether your shipment is affected."
+QUESTION = "Will my imports be late or dearer this month?"
+UK = ZoneInfo("Europe/London")
+SOURCE_USE = {"gdelt": ("GDELT news", "Signal, duplicates merged"),
+              "ecb_fx": ("ECB reference rates", "Cost answer only"),
+              "cso_trade": ("CSO imports", "Context only"),
+              "comext": ("Eurostat Comext", "Context only")}
+
+
+def _when(iso: str | None) -> datetime | None:
+    if not iso:
+        return None
+    try:
+        d = datetime.fromisoformat(iso.replace("Z", "+00:00"))
+    except ValueError:
+        try:
+            d = datetime.strptime(iso[:7], "%Y-%m")
+        except ValueError:
+            return None
+    return d if d.tzinfo else d.replace(tzinfo=timezone.utc)
+
+
+def _day(iso: str | None) -> str:
+    d = _when(iso)
+    return f"{d.day} {d.strftime('%b %Y')}" if d else "\u2014"
+
+
+def _month(iso: str | None) -> str:
+    d = _when(iso)
+    return d.strftime("%B") if d else "unknown"
+
+
+def _hm(iso: str | None) -> str:
+    d = _when(iso)
+    return d.astimezone(UK).strftime("%H:%M") if d else "unknown"
+
+
+def dates_line(checked_at: str, sources: dict[str, SourceResult]) -> str:
+    """Behavioural Evidence's wording: 'Checked 11:05 UK time. Trade figures are
+    August data, ECB rate as of 6 Nov, port news from 10:40.'"""
+    parts = []
+    trade = sources.get("cso_trade") or sources.get("comext")
+    if trade:
+        parts.append(f"Trade figures are {_month(trade.reference_period)} data")
+    if "ecb_fx" in sources:
+        d = _when(sources["ecb_fx"].reference_period)
+        parts.append(f"ECB rate as of {d.day} {d.strftime('%b')}" if d else "ECB rate date unknown")
+    if "gdelt" in sources:
+        parts.append(f"port news from {_hm(sources['gdelt'].checked_at)}")
+    tail = (" " + ", ".join(parts)[0].upper() + ", ".join(parts)[1:] + ".") if parts else ""
+    return f"Checked {_hm(checked_at)} UK time.{tail}"
+
+
+def _source_rows(sources: dict[str, SourceResult]) -> list[dict]:
+    rows = []
+    for sid, r in sources.items():
+        name, use = SOURCE_USE.get(sid, (sid, "Signal"))
+        rows.append({"name": name, "reference_period": r.reference_period or "\u2014",
+                     "published_at": r.published_at or "\u2014", "retrieved_at": r.checked_at,
+                     "checked_at": r.checked_at, "source_updated_at": r.source_updated_at,
+                     "mode": r.mode, "use": use, "status": r.status,
+                     "attribution": r.licence.attribution})
+    rows.append({"name": "Carrier and port advisories", "reference_period": "\u2014",
+                 "published_at": "\u2014", "retrieved_at": "\u2014", "checked_at": None,
+                 "source_updated_at": None, "mode": "fallback",
+                 "use": "Not used yet: reuse terms not recorded", "status": "unavailable"})
+    return rows
+
+
+def _finding(e: Event) -> dict:
+    verb = "confirms" if e.status == "confirmed" else "reported"
+    if e.status == "confirmed":
+        text = f"An official notice {verb}: {e.title}"
+        src = "Port or carrier notice"
+    else:
+        text = f"News reports (not confirmed): {e.title}"
+        src = "GDELT news"
+    return {"text": text, "status": e.status, "source": src, "as_of": _day(e.last_seen),
+            "note": f"{e.report_count} reports, duplicates merged; {e.match_reason}",
+            "urls": [e.confirmation_url] if e.confirmation_url else e.source_urls[:3]}
+
+
+def _fx_block(fx: FxExposure) -> dict:
+    block = {"status": fx.status, "source": "ECB reference rate",
+             "as_of": _day(fx.date_to), "finding": fx.note,
+             "reading": "This is not your bank's rate, and exchange rates say nothing about delays.",
+             "action": "Request a current quote from your supplier."}
+    if fx.status == "computed":
+        block["eur_cost_change_pct"] = fx.eur_cost_change_pct
+    return block
+
+
+def decide(inp: ImporterInputs, sources: dict[str, SourceResult], gdelt_records: list[dict],
+           now: datetime | None = None) -> dict:
+    now = now or datetime.now(timezone.utc)
+    lane = to_lane(inp)
+    events = filter_events(gdelt_records, lane, inp.window_start, inp.window_end)
+    confirmed = [e for e in events if e.status == "confirmed"]
+    stock = stock_exposure(inp.stock_days, inp.lead_time_days)
+    ecb = sources.get("ecb_fx")
+    fx = fx_exposure(inp.currency, inp.fixed_rate_share, ecb.records if ecb else [])
+    covers = stock_sentence(stock)
+
+    if confirmed and stock.shortfall:
+        state = "alert"
+        headline = f"Check your forwarder's ETA today: {covers[0].lower() + covers[1:]}"
+        heading = f"{len(confirmed)} confirmed event{'s' if len(confirmed) > 1 else ''} and your stock exposure"
+        reading = "This may delay shipments on the route you confirmed. We can't tell yet whether your shipment is affected."
+        action = "Ask your forwarder for a current ETA. Consider ordering earlier."
+    elif confirmed:
+        state = "covered"
+        headline = f"A confirmed event may affect your route. {covers}"
+        heading = "Confirmed event, stock covers lead time"
+        reading = covers
+        action = "Ask your forwarder for a current ETA if the event lasts."
+    else:
+        state = "insufficient"
+        headline = ABSTAIN
+        heading = "Not enough evidence"
+        n_rep = len(events)
+        reading = (f"Checked {len(sources)} sources: {n_rep} unconfirmed report{'s' if n_rep != 1 else ''}, "
+                   "no carrier or port confirmation for your route.")
+        action = (f"{covers} Ask your forwarder for a current ETA." if stock.shortfall
+                  else f"{covers} Ask your forwarder for a current ETA if you're unsure.")
+
+    route = " \u2192 ".join([inp.origin_port, *inp.transshipment_ports, inp.destination_port])
+    checked = now.isoformat(timespec="seconds")
+    return {
+        "state": state, "example": False, "question": QUESTION, "headline": headline,
+        "inputs": {"importer": inp.importer, "route": route, "currency": inp.currency,
+                   "hedged": inp.fixed_rate_share == 1.0, "stock_days": inp.stock_days,
+                   "lead_time_days": inp.lead_time_days},
+        "delay": {"heading": heading, "findings": [_finding(e) for e in (confirmed or events)[:5]],
+                  "exposure": {"stock_days": inp.stock_days, "lead_time_days": inp.lead_time_days,
+                               "buffer_days": stock.buffer_days, "shortfall": stock.shortfall,
+                               "sentence": covers, "arithmetic": stock.arithmetic},
+                  "reading": reading, "action": action},
+        "fx": _fx_block(fx),
+        "sources": _source_rows(sources),
+        "checked_at": checked,
+        "dates_line": dates_line(checked, sources),
+    }

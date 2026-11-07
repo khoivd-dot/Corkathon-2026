@@ -41,7 +41,8 @@ class EventTests(unittest.TestCase):
     def test_confirmed_only_from_carrier_or_port(self):
         recs = [inc("Rotterdam terminal closure notice", "2026-11-05",
                     urls=("https://www.portofrotterdam.com/en/news/closure",))]
-        ev = filter_events(recs, LANE, *W)[0]
+        self.assertEqual(filter_events(recs, LANE, *W)[0].status, "reported")  # flag off by default
+        ev = filter_events(recs, LANE, *W, confirm=True)[0]
         self.assertEqual(ev.status, "confirmed")
         self.assertTrue(ev.confirmation_url.startswith("https://www.portofrotterdam.com/"))
         spoof = [inc("Rotterdam terminal closure notice", "2026-11-05",

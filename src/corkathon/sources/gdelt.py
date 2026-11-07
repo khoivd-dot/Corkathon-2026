@@ -131,3 +131,20 @@ class GdeltLoader(Loader):
                 })
         # News has no publication batch; reference_period = newest article seen.
         return records, latest, None
+
+
+def _slug(port: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", port.lower()).strip("-")
+
+
+class PortGdeltLoader(GdeltLoader):
+    """GDELT signals for a single public port. The cache key is the port name only,
+    so no business's combined route, name, stock or invoice data reaches the cache."""
+
+    def __init__(self, port: str, **kw):
+        from ..events import port_query
+        self.port = port.strip()
+        super().__init__(queries={_slug(self.port): port_query(self.port)}, **kw)
+
+    def cache_key(self) -> str:
+        return f"gdelt-port-{_slug(self.port)}"

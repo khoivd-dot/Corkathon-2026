@@ -83,6 +83,12 @@ def _mentions(text: str, place: str) -> bool:
     return re.search(r"\b" + re.escape(place.lower()) + r"\b", text.lower()) is not None
 
 
+def port_query(port: str) -> str:
+    """GDELT query for ONE public port. Cache entries are per port, never per route."""
+    terms = '("port strike" OR "port closure" OR "port congestion" OR "shipping disruption" OR "vessel diverted" OR "blank sailing")'
+    return f'{terms} "{port}"'
+
+
 def lane_query(lane: Lane) -> str:
     """A tighter GDELT query: disruption terms AND a place on the user's lane."""
     places = " OR ".join(f'"{p}"' for p in lane.places())
@@ -90,8 +96,16 @@ def lane_query(lane: Lane) -> str:
     return f"{terms} ({places})" if places else terms
 
 
+def confirmation_enabled() -> bool:
+    """Off by default. Only turn on once reuse terms for an advisory feed are recorded."""
+    import os
+    return os.environ.get("CONFIRMATION_ENABLED") == "1"
+
+
 def filter_events(records: list[dict], lane: Lane, window_start: date, window_end: date,
-                  merge_threshold: float = 0.5) -> list[Event]:
+                  merge_threshold: float = 0.5, confirm: bool | None = None) -> list[Event]:
+    if confirm is None:
+        confirm = confirmation_enabled()
     places = lane.places()
     if not places:
         return []
@@ -125,6 +139,8 @@ def filter_events(records: list[dict], lane: Lane, window_start: date, window_en
         conf = next((r["urls"][0] for r, _ in g
                      if r.get("urls") and all(_domain_confirms(u) for u in r["urls"])
                      and _event_type(r.get("title", ""))), None)
+        if not confirm:
+            conf = None
         confirmed = conf is not None
         events.append(Event(
             title=g[0][0].get("title", "").strip(), matched_places=matched,
