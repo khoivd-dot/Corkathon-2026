@@ -1,0 +1,299 @@
+{
+ "source_id": "open_meteo",
+ "endpoint": "https://api.open-meteo.com/v1/forecast",
+ "licence": {
+  "name": "Open-Meteo: CC BY 4.0, free for non-commercial use without ads or subscriptions (checked 2026-11-07)",
+  "url": "https://open-meteo.com/en/licence",
+  "attribution": "Weather data by Open-Meteo.com (CC BY 4.0)."
+ },
+ "status": "ok",
+ "checked_at": "2026-11-07T15:36:14+00:00",
+ "mode": "live",
+ "reference_period": "2026-11-07",
+ "published_at": null,
+ "source_updated_at": "2026-11-07",
+ "reason": null,
+ "records": [
+  {
+   "port": "Rotterdam",
+   "date": "2026-11-07",
+   "gust_max_kmh": 18.0,
+   "wind_max_kmh": 9.7,
+   "wave_max_m": 0.18,
+   "retrieved_at": "2026-11-07T15:36:14+00:00"
+  },
+  {
+   "port": "Rotterdam",
+   "date": "2026-11-08",
+   "gust_max_kmh": 28.8,
+   "wind_max_kmh": 15.5,
+   "wave_max_m": 0.26,
+   "retrieved_at": "2026-11-07T15:36:14+00:00"
+  },
+  {
+   "port": "Rotterdam",
+   "date": "2026-11-09",
+   "gust_max_kmh": 23.8,
+   "wind_max_kmh": 14.0,
+   "wave_max_m": 0.2,
+   "retrieved_at": "2026-11-07T15:36:14+00:00"
+  },
+  {
+   "port": "Rotterdam",
+   "date": "2026-11-10",
+   "gust_max_kmh": 32.4,
+   "wind_max_kmh": 17.6,
+   "wave_max_m": 0.26,
+   "retrieved_at": "2026-11-07T15:36:14+00:00"
+  },
+  {
+   "port": "Rotterdam",
+   "date": "2026-11-11",
+   "gust_max_kmh": 30.2,
+   "wind_max_kmh": 15.7,
+   "wave_max_m": 0.64,
+   "retrieved_at": "2026-11-07T15:36:14+00:00"
+  },
+  {
+   "port": "Rotterdam",
+   "date": "2026-11-12",
+   "gust_max_kmh": 36.0,
+   "wind_max_kmh": 16.5,
+   "wave_max_m": 0.7,
+   "retrieved_at": "2026-11-07T15:36:14+00:00"
+  },
+  {
+   "port": "Rotterdam",
+   "date": "2026-11-13",
+   "gust_max_kmh": 46.4,
+   "wind_max_kmh": 19.9,
+   "wave_max_m": 1.04,
+   "retrieved_at": "2026-11-07T15:36:14+00:00"
+  },
+  {
+   "port": "Antwerp",
+   "date": "2026-11-07",
+   "gust_max_kmh": 21.6,
+   "wind_max_kmh": 13.0,
+   "wave_max_m": null,
+   "retrieved_at": "2026-11-07T15:36:15+00:00"
+  },
+  {
+   "port": "Antwerp",
+   "date": "2026-11-08",
+   "gust_max_kmh": 27.0,
+   "wind_max_kmh": 16.9,
+   "wave_max_m": null,
+   "retrieved_at": "2026-11-07T15:36:15+00:00"
+  },
+  {
+   "port": "Antwerp",
+   "date": "2026-11-09",
+   "gust_max_kmh": 20.5,
+   "wind_max_kmh": 13.0,
+   "wave_max_m": null,
+   "retrieved_at": "2026-11-07T15:36:15+00:00"
+  },
+  {
+   "port": "Antwerp",
+   "date": "2026-11-10",
+   "gust_max_kmh": 28.8,
+   "wind_max_kmh": 13.3,
+   "wave_max_m": null,
+   "retrieved_at": "2026-11-07T15:36:15+00:00"
+  },
+  {
+   "port": "Antwerp",
+   "date": "2026-11-11",
+   "gust_max_kmh": 27.0,
+   "wind_max_kmh": 14.1,
+   "wave_max_m": null,
+   "retrieved_at": "2026-11-07T15:36:15+00:00"
+  },
+  {
+   "port": "Antwerp",
+   "date": "2026-11-12",
+   "gust_max_kmh": 34.9,
+   "wind_max_kmh": 15.5,
+   "wave_max_m": null,
+   "retrieved_at": "2026-11-07T15:36:15+00:00"
+  },
+  {
+   "port": "Antwerp",
+   "date": "2026-11-13",
+   "gust_max_kmh": 31.0,
+   "wind_max_kmh": 13.6,
+   "wave_max_m": null,
+   "retrieved_at": "2026-11-07T15:36:15+00:00"
+  },
+  {
+   "port": "Felixstowe",
+   "date": "2026-11-07",
+   "gust_max_kmh": 18.7,
+   "wind_max_kmh": 9.7,
+   "wave_max_m": 0.3,
+   "retrieved_at": "2026-11-07T15:36:16+00:00"
+  },
+  {
+   "port": "Felixstowe",
+   "date": "2026-11-08",
+   "gust_max_kmh": 14.8,
+   "wind_max_kmh": 7.6,
+   "wave_max_m": 0.14,
+   "retrieved_at": "2026-11-07T15:36:16+00:00"
+  },
+  {
+   "port": "Felixstowe",
+   "date": "2026-11-09",
+   "gust_max_kmh": 28.4,
+   "wind_max_kmh": 17.3,
+   "wave_max_m": 0.4,
+   "retrieved_at": "2026-11-07T15:36:16+00:00"
+  },
+  {
+   "port": "Felixstowe",
+   "date": "2026-11-10",
+   "gust_max_kmh": 39.6,
+   "wind_max_kmh": 23.0,
+   "wave_max_m": 0.68,
+   "retrieved_at": "2026-11-07T15:36:16+00:00"
+  },
+  {
+   "port": "Felixstowe",
+   "date": "2026-11-11",
+   "gust_max_kmh": 21.6,
+   "wind_max_kmh": 13.0,
+   "wave_max_m": 0.62,
+   "retrieved_at": "2026-11-07T15:36:16+00:00"
+  },
+  {
+   "port": "Felixstowe",
+   "date": "2026-11-12",
+   "gust_max_kmh": 40.3,
+   "wind_max_kmh": 23.8,
+   "wave_max_m": 0.76,
+   "retrieved_at": "2026-11-07T15:36:16+00:00"
+  },
+  {
+   "port": "Felixstowe",
+   "date": "2026-11-13",
+   "gust_max_kmh": 45.4,
+   "wind_max_kmh": 26.6,
+   "wave_max_m": 0.56,
+   "retrieved_at": "2026-11-07T15:36:16+00:00"
+  },
+  {
+   "port": "Dublin",
+   "date": "2026-11-07",
+   "gust_max_kmh": 17.3,
+   "wind_max_kmh": 8.6,
+   "wave_max_m": 0.32,
+   "retrieved_at": "2026-11-07T15:36:17+00:00"
+  },
+  {
+   "port": "Dublin",
+   "date": "2026-11-08",
+   "gust_max_kmh": 21.2,
+   "wind_max_kmh": 10.4,
+   "wave_max_m": 0.14,
+   "retrieved_at": "2026-11-07T15:36:17+00:00"
+  },
+  {
+   "port": "Dublin",
+   "date": "2026-11-09",
+   "gust_max_kmh": 40.7,
+   "wind_max_kmh": 22.0,
+   "wave_max_m": 0.82,
+   "retrieved_at": "2026-11-07T15:36:17+00:00"
+  },
+  {
+   "port": "Dublin",
+   "date": "2026-11-10",
+   "gust_max_kmh": 38.9,
+   "wind_max_kmh": 23.0,
+   "wave_max_m": 0.94,
+   "retrieved_at": "2026-11-07T15:36:17+00:00"
+  },
+  {
+   "port": "Dublin",
+   "date": "2026-11-11",
+   "gust_max_kmh": 55.1,
+   "wind_max_kmh": 33.1,
+   "wave_max_m": 1.14,
+   "retrieved_at": "2026-11-07T15:36:17+00:00"
+  },
+  {
+   "port": "Dublin",
+   "date": "2026-11-12",
+   "gust_max_kmh": 64.8,
+   "wind_max_kmh": 39.2,
+   "wave_max_m": 1.0,
+   "retrieved_at": "2026-11-07T15:36:17+00:00"
+  },
+  {
+   "port": "Dublin",
+   "date": "2026-11-13",
+   "gust_max_kmh": 49.0,
+   "wind_max_kmh": 29.9,
+   "wave_max_m": 0.8,
+   "retrieved_at": "2026-11-07T15:36:17+00:00"
+  },
+  {
+   "port": "Cork",
+   "date": "2026-11-07",
+   "gust_max_kmh": 16.6,
+   "wind_max_kmh": 9.0,
+   "wave_max_m": 0.32,
+   "retrieved_at": "2026-11-07T15:36:18+00:00"
+  },
+  {
+   "port": "Cork",
+   "date": "2026-11-08",
+   "gust_max_kmh": 29.9,
+   "wind_max_kmh": 15.5,
+   "wave_max_m": 1.26,
+   "retrieved_at": "2026-11-07T15:36:18+00:00"
+  },
+  {
+   "port": "Cork",
+   "date": "2026-11-09",
+   "gust_max_kmh": 56.9,
+   "wind_max_kmh": 31.7,
+   "wave_max_m": 2.2,
+   "retrieved_at": "2026-11-07T15:36:18+00:00"
+  },
+  {
+   "port": "Cork",
+   "date": "2026-11-10",
+   "gust_max_kmh": 51.5,
+   "wind_max_kmh": 28.4,
+   "wave_max_m": 2.34,
+   "retrieved_at": "2026-11-07T15:36:18+00:00"
+  },
+  {
+   "port": "Cork",
+   "date": "2026-11-11",
+   "gust_max_kmh": 32.0,
+   "wind_max_kmh": 17.6,
+   "wave_max_m": 1.96,
+   "retrieved_at": "2026-11-07T15:36:18+00:00"
+  },
+  {
+   "port": "Cork",
+   "date": "2026-11-12",
+   "gust_max_kmh": 54.7,
+   "wind_max_kmh": 29.9,
+   "wave_max_m": 1.76,
+   "retrieved_at": "2026-11-07T15:36:18+00:00"
+  },
+  {
+   "port": "Cork",
+   "date": "2026-11-13",
+   "gust_max_kmh": 43.2,
+   "wind_max_kmh": 23.8,
+   "wave_max_m": 1.26,
+   "retrieved_at": "2026-11-07T15:36:18+00:00"
+  }
+ ],
+ "retrieved_at": "2026-11-07T15:36:14+00:00"
+}

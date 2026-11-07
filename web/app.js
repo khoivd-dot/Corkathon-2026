@@ -153,6 +153,10 @@
     if (np.unknown && np.unknown.length) notes.push("We didn’t search news for " + np.unknown.join(", ") + ": we don’t know that port name yet.");
     var saved = (np.checked || []).filter(function (p) { return p.mode === "fallback"; }).map(function (p) { return p.port; });
     if (saved.length && !ans.example) notes.push("News for " + saved.join(", ") + " is from a saved copy.");
+    var w = ans.weather;
+    if (w && w.lines) w.lines.forEach(function (l) { notes.push(l); });
+    // No news but a gale forecast: say so in the verdict, not just in a note. Weather never confirms anything.
+    if (!finds.length && w && w.rough_ports && w.rough_ports.length) r.verdict = "Nothing reported, rough weather forecast";
     r.notes = notes;
     out.route = r;
 
@@ -177,7 +181,7 @@
 
   // ---------- Source rows ----------
   function rowKey(name) {
-    return /GDELT/i.test(name) ? "gdelt" : /ECB/i.test(name) ? "ecb" : /CSO/i.test(name) ? "cso" : /Eurostat|Comext/i.test(name) ? "comext" : /AIS|ship/i.test(name) ? "ais" : /advisor|Carrier/i.test(name) ? "adv" : "other";
+    return /GDELT/i.test(name) ? "gdelt" : /ECB/i.test(name) ? "ecb" : /CSO/i.test(name) ? "cso" : /Eurostat|Comext/i.test(name) ? "comext" : /AIS|ship/i.test(name) ? "ais" : /Meteo|weather/i.test(name) ? "weather" : /advisor|Carrier/i.test(name) ? "adv" : "other";
   }
   function openSource(key) {
     var panel = $("sources-panel"); panel.open = true;
@@ -550,7 +554,7 @@
       glance.append(a);
     });
     if (map) map.sail();
-    ui.fillAll(); ui.roll(res);
+    ui.fillAll(); ui.wake(res); ui.roll(res);
 
     var todo = $("todo"); todo.replaceChildren();
     var acts = [ans.delay && ans.delay.action];
@@ -574,6 +578,8 @@
       [fmtWhen(s.reference_period), fmtWhen(s.published_at), fetched, s.use].forEach(function (val, i) { var td = el("td", val); td.setAttribute("data-label", heads[i]); tr.append(td); });
       tb.append(tr);
     });
+    var lw = $("lic-weather");
+    if (lw && ans.weather && ans.weather.url) { lw.replaceChildren(link("Weather data by Open-Meteo.com", ans.weather.url), document.createTextNode(", CC BY 4.0, forecasts only.")); }
     $("working-summary").textContent = "Where this comes from (" + rows.length + " sources)";
   }
 
@@ -666,6 +672,8 @@
     if (msg) st.append(document.createTextNode(msg));
     if (on && !$("result").hidden) $("result").setAttribute("aria-busy", "true");
     if (!on) $("result").removeAttribute("aria-busy");
+    ui.beam(document.querySelector(".ask"), on);
+    if (!$("result").hidden) ui.beam(document.querySelector(".verdict"), on);
   }
 
   function run(inputs, q, idx) {
@@ -863,36 +871,101 @@
   ["container_no", "vessel"].forEach(function (id) {
     $(id).addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); $(id === "vessel" ? "vessel-go" : "container-go").click(); } });
   });
-  // ---------- Interaction layer (ideas from bencho.dev and libraries.dev, rebuilt in plain JS) ----------
+  // ---------- Interaction layer ----------
+  // Ported by hand from bencho (MIT, Lorenzo Cabra) and libraries.dev (MIT, Jakub Antalik); see docs/third-party.md.
+  // React and framer-motion are not used: the same maths runs on plain DOM, and every effect is off under reduced motion.
   var ui = (function () {
     var fine = window.matchMedia && window.matchMedia("(pointer: fine)").matches;
     var calm = calmMotion;
-    // Pill sliders: paint the filled part of the track.
+    var clamp = function (v, a, b) { return Math.min(b, Math.max(a, v)); };
+    var mix = function (a, b, t) { return a + (b - a) * t; };
+    // bencho lab/spring: frames not ms, damping raised to dt. tune 0..100 -> stiffness and decay.
+    function springOf(tune) { return { k: 0.08 + tune / 100 * 0.16, d: 0.62 + tune / 100 * 0.2 }; }
+
+    // Fallback fill for the native slider when the wake bars aren't drawn.
     function fill(r) { var lo = +r.min || 0, hi = +r.max || 100; r.style.setProperty("--fill", ((r.value - lo) / (hi - lo) * 100).toFixed(1) + "%"); }
     function fillAll() { document.querySelectorAll("input[type=range]").forEach(fill); }
     document.addEventListener("input", function (e) { if (e.target.type === "range") fill(e.target); });
 
-    // Rolling numbers: the first number in each verdict counts up once. The final text is set first,
-    // so screen readers and copies always see the real value.
-    function roll(root) {
-      if (calm) return;
-      root.querySelectorAll(".tone, .g-v").forEach(function (n) {
-        var t = Array.prototype.filter.call(n.childNodes, function (c) { return c.nodeType === 3; })[0];
-        if (!t) return;
-        var m = /(\d+(?:\.\d+)?)/.exec(t.nodeValue); if (!m) return;
-        var target = parseFloat(m[1]), dp = (m[1].split(".")[1] || "").length, before = t.nodeValue.slice(0, m.index), after = t.nodeValue.slice(m.index + m[1].length);
-        var span = el("span", m[1], "num"); span.setAttribute("aria-hidden", "true");
-        var real = el("span", m[1], "sr");
-        var rest = document.createTextNode(after);
-        t.nodeValue = before; n.insertBefore(real, t.nextSibling); n.insertBefore(span, real.nextSibling); n.insertBefore(rest, span.nextSibling);
-        var t0 = null, dur = 900;
-        function step(ts) { if (t0 === null) t0 = ts; var f = Math.min(1, (ts - t0) / dur), e = 1 - Math.pow(1 - f, 3); span.textContent = (target * e).toFixed(dp); if (f < 1) requestAnimationFrame(step); else { real.remove(); span.removeAttribute("aria-hidden"); span.textContent = m[1]; } }
-        span.textContent = (0).toFixed(dp); requestAnimationFrame(step);
+    // ---- Border beam (libraries.dev): a 1px travelling stroke while a check runs.
+    function beam(node, on) { if (!node) return; node.classList.add("beam"); node.classList.toggle("on", !!on); }
+
+    // ---- Wake slider (bencho): bars fill to the value; bars the value sweeps past take energy from the drag speed.
+    function wake(root) {
+      root.querySelectorAll(".rw-ctl input[type=range]").forEach(function (r) {
+        if (r.parentNode.classList.contains("wks")) return;
+        var n = 36, box = el("div", null, "wks"), bars = [], energy = new Float32Array(n), raf = 0, lastT = 0, at = 0, lastBar = -1;
+        for (var i = 0; i < n; i++) { var b = el("span", null, "wks-bar"); b.setAttribute("aria-hidden", "true"); bars.push(b); box.append(b); }
+        r.parentNode.insertBefore(box, r); box.append(r);
+        function frac() { var lo = +r.min || 0, hi = +r.max || 100; return (r.value - lo) / (hi - lo); }
+        function paint() { var lit = Math.round(at * (n - 1)); bars.forEach(function (b, i) { if (i <= lit) b.setAttribute("data-on", ""); else b.removeAttribute("data-on"); }); }
+        function loop() {
+          if (raf || calm) return;
+          var prev = performance.now();
+          function run(now) {
+            var dt = Math.min(0.05, (now - prev) / 1000); prev = now;
+            var live = false, fall = Math.exp(-dt * 6.5);
+            for (var i = 0; i < n; i++) { energy[i] *= fall; if (energy[i] < 0.002) energy[i] = 0; else live = true; bars[i].style.transform = energy[i] ? "scaleY(" + (1 + energy[i] * 1.6).toFixed(3) + ")" : ""; }
+            raf = live ? requestAnimationFrame(run) : 0;
+          }
+          raf = requestAnimationFrame(run);
+        }
+        at = frac(); paint();
+        r.addEventListener("input", function () {
+          var now = performance.now(), f = frac(), w = box.getBoundingClientRect().width || 300;
+          var speed = lastT ? Math.abs(f - at) * w / Math.max(0.008, (now - lastT) / 1000) : 0; lastT = now;
+          var a = Math.round(at * (n - 1)), b = Math.round(f * (n - 1)), push = (1 - Math.exp(-speed / 900));
+          for (var i = Math.min(a, b); i <= Math.max(a, b); i++) energy[i] = Math.max(energy[i], push);
+          at = f; if (b !== lastBar) { lastBar = b; } paint(); loop();
+        });
       });
     }
 
-    // Magnetic headline: letters near the pointer lean in, tilt its way and take the brand colour,
-    // then spring back. The heading keeps its real text for assistive tech.
+    // ---- Rolling counter (bencho): each digit is a strip 0-9 behind a window. A column's target is the count of
+    // whole tens, hundreds... in the value, so the strips roll forward like an odometer, ones first, then each
+    // column to the left a little later. Real value kept for screen readers.
+    function roll(root) {
+      if (calm) return;
+      root.querySelectorAll(".tone, .g-v").forEach(function (n) {
+        var t = Array.prototype.filter.call(n.childNodes, function (c) { return c.nodeType === 3 && /\d/.test(c.nodeValue); })[0];
+        if (!t) return;
+        var m = /(\d+(?:\.\d+)?)/.exec(t.nodeValue); if (!m) return;
+        var wrap = el("span"), before = t.nodeValue.slice(0, m.index), after = t.nodeValue.slice(m.index + m[1].length);
+        var digits = m[1].replace(".", ""), N = parseInt(digits, 10), odo = el("span", null, "odo"); odo.setAttribute("aria-hidden", "true");
+        var cols = [], place = digits.length;
+        Array.from(m[1]).forEach(function (ch) {
+          if (ch === ".") { odo.append(el("span", ".", "odo-sep")); return; }
+          place--;
+          var col = el("span", null, "odo-col"), strip = el("span", null, "odo-strip");
+          for (var d = 0; d <= 10; d++) strip.append(el("span", String(d % 10)));
+          col.append(strip); odo.append(col);
+          cols.push({ el: strip, p: place, pos: 0, vel: 0, target: Math.floor(N / Math.pow(10, place)), due: 0 });
+        });
+        wrap.append(document.createTextNode(before), el("span", m[1], "sr"), odo, document.createTextNode(after));
+        n.replaceChild(wrap, t);
+        var t0 = performance.now();
+        cols.forEach(function (c) { c.due = t0 + 120 + c.p * 45; });
+        var sp = springOf(45), prev = 0;
+        function tick(ts) {
+          var dt = prev ? clamp((ts - prev) / 16.67, 0, 2.5) : 1; prev = ts;
+          var busy = false;
+          cols.forEach(function (c) {
+            if (ts < c.due) { busy = true; return; }
+            c.vel += (c.target - c.pos) * sp.k * dt; c.vel *= Math.pow(sp.d, dt); c.pos += c.vel * dt;
+            if (Math.abs(c.target - c.pos) < 0.02 && Math.abs(c.vel) < 0.02) { c.pos = c.target; c.vel = 0; } else busy = true;
+            var md = ((c.pos % 10) + 10) % 10, smear = Math.min(3, Math.abs(c.vel) * 2.4);
+            c.el.style.transform = "translateY(" + (-md * 1.1).toFixed(3) + "em)";
+            c.el.style.filter = smear > 0.15 ? "blur(" + smear.toFixed(2) + "px)" : "";
+          });
+          if (busy) requestAnimationFrame(tick);
+          // Settled: put the plain text back, so copy, find-in-page and textContent read the real value.
+          else if (wrap.parentNode) wrap.parentNode.replaceChild(document.createTextNode(before + m[1] + after), wrap);
+        }
+        requestAnimationFrame(tick);
+      });
+    }
+
+    // ---- Magnetic headline: letters near the pointer lean in and take the brand colour, then spring back.
     function magnetic(h) {
       if (!h || calm || !fine) return;
       var text = h.textContent; h.textContent = "";
@@ -909,24 +982,41 @@
       function frame() {
         raf = 0;
         letters.forEach(function (l) {
-          var b = l.getBoundingClientRect(), cx = b.left + b.width / 2, cy = b.top + b.height / 2, dx = px - cx, dy = py - cy, d = Math.hypot(dx, dy), k = on ? Math.max(0, 1 - d / 140) : 0;
+          var b = l.getBoundingClientRect(), dx = px - (b.left + b.width / 2), dy = py - (b.top + b.height / 2), k = on ? Math.max(0, 1 - Math.hypot(dx, dy) / 140) : 0;
           l.style.transform = k ? "translate(" + (dx * k * .12).toFixed(1) + "px," + (dy * k * .12 - k * 6).toFixed(1) + "px) rotate(" + (dx / 140 * 10 * k).toFixed(1) + "deg)" : "";
           l.style.color = k > .45 ? "var(--brand)" : "";
         });
       }
-      function move(e) { px = e.clientX; py = e.clientY; on = true; if (!raf) raf = requestAnimationFrame(frame); }
-      h.parentNode.addEventListener("pointermove", move);
+      h.parentNode.addEventListener("pointermove", function (e) { px = e.clientX; py = e.clientY; on = true; if (!raf) raf = requestAnimationFrame(frame); });
       h.parentNode.addEventListener("pointerleave", function () { on = false; if (!raf) raf = requestAnimationFrame(frame); });
     }
 
-    // Tilt card for the hero picture.
+    // ---- Tilt (bencho): the card SINKS under the pointer (the point you're over goes away), a dent of shadow
+    // pools under it and the opposite rim catches light; the shadow tightens. One spring pair holds the state.
     function tilt(card) {
       if (!card || calm || !fine) return;
-      card.addEventListener("pointermove", function (e) { var b = card.getBoundingClientRect(), x = (e.clientX - b.left) / b.width - .5, y = (e.clientY - b.top) / b.height - .5; card.style.setProperty("--ry", (x * 6).toFixed(2) + "deg"); card.style.setProperty("--rx", (-y * 6).toFixed(2) + "deg"); });
-      card.addEventListener("pointerleave", function () { card.style.setProperty("--ry", "0deg"); card.style.setProperty("--rx", "0deg"); });
+      var sheen = el("span", null, "tlt-sheen"); sheen.setAttribute("aria-hidden", "true"); card.append(sheen);
+      var tx = 0, ty = 0, tl = 0, s = { x: 0, y: 0, l: 0, vx: 0, vy: 0, vl: 0 }, raf = 0, prev = 0, sp = springOf(50);
+      var TILT = 4, SINK = 14, SHADE = 60;
+      function tick(ts) {
+        var dt = prev ? clamp((ts - prev) / 16.67, 0, 2.5) : 1; prev = ts;
+        var moving = false;
+        [["x", "vx", tx], ["y", "vy", ty], ["l", "vl", tl]].forEach(function (q) {
+          s[q[1]] += (q[2] - s[q[0]]) * sp.k * dt; s[q[1]] *= Math.pow(sp.d, dt); s[q[0]] += s[q[1]] * dt;
+          if (Math.abs(q[2] - s[q[0]]) > 0.001 || Math.abs(s[q[1]]) > 0.001) moving = true; else { s[q[0]] = q[2]; s[q[1]] = 0; }
+        });
+        var rx = -s.y * TILT, ry = s.x * TILT, ppx = (s.x + 1) / 2 * 100, ppy = (s.y + 1) / 2 * 100, dark = SHADE / 100 * 0.55 * s.l, rim = SHADE / 100 * 0.34 * s.l;
+        card.style.transform = "translateZ(" + (-SINK * s.l).toFixed(2) + "px) rotateX(" + rx.toFixed(2) + "deg) rotateY(" + ry.toFixed(2) + "deg)";
+        card.style.boxShadow = "0 " + mix(20, 9, s.l).toFixed(1) + "px " + mix(44, 24, s.l).toFixed(1) + "px -8px oklch(from var(--tilt-dent) l c h / " + mix(0.22, 0.15, s.l).toFixed(3) + ")";
+        sheen.style.backgroundImage = "radial-gradient(42% 34% at " + ppx.toFixed(1) + "% " + ppy.toFixed(1) + "%, oklch(from var(--tilt-dent) l c h / " + dark.toFixed(3) + ") 0%, transparent 100%), radial-gradient(52% 42% at " + (100 - ppx).toFixed(1) + "% " + (100 - ppy).toFixed(1) + "%, oklch(from var(--tilt-rim) l c h / " + rim.toFixed(3) + ") 0%, transparent 100%)";
+        raf = moving ? requestAnimationFrame(tick) : 0; if (!moving) prev = 0;
+      }
+      function go() { if (!raf) raf = requestAnimationFrame(tick); }
+      card.addEventListener("pointermove", function (e) { var b = card.parentNode.getBoundingClientRect(); tx = clamp((e.clientX - b.left) / b.width * 2 - 1, -1, 1); ty = clamp((e.clientY - b.top) / b.height * 2 - 1, -1, 1); tl = 1; go(); });
+      card.addEventListener("pointerleave", function () { tx = 0; ty = 0; tl = 0; go(); });
     }
 
-    // Dock falloff: the three answer cards swell toward the pointer, nearest most.
+    // ---- Magnifying dock falloff (bencho): scale falls off with distance from the pointer, nearest card most.
     function dock(row) {
       if (!row || calm || !fine) return;
       row.addEventListener("pointermove", function (e) {
@@ -936,6 +1026,6 @@
     }
 
     magnetic($("page-title")); tilt($("shot")); dock($("glance"));
-    return { fillAll: fillAll, roll: roll };
+    return { fillAll: fillAll, roll: roll, wake: wake, beam: beam };
   })();
 })();
