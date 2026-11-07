@@ -24,9 +24,7 @@ services:
       - key: AIS_ENABLED
         value: "0"   # AISHub ship counts: also needs AISHUB_USERNAME set in the dashboard, not here
       - key: AIS_LIVE_ENABLED
-        value: "1"   # live ship position by MMSI (aisstream.io): stays off until AISSTREAM_API_KEY is set
-      - key: AISSTREAM_API_KEY
-        sync: false  # secret: paste it in the Render dashboard, never in this file
+        value: "1"   # live ship position by MMSI (aisstream.io): also needs AISSTREAM_API_KEY set in the dashboard, not here
       - key: LANE_PORTS
         value: "Rotterdam,Antwerp,Felixstowe,Dublin,Cork"
     disk:
