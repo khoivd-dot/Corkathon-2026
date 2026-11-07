@@ -55,6 +55,16 @@ class FxTests(unittest.TestCase):
         i = parse_inputs({**GOOD, "fixed_rate_share": "some", "fixed_rate_pct": "25%"})
         self.assertEqual(i.fixed_rate_share, 0.25)
 
+    def test_fx_sentence_names_window(self):
+        from corkathon.exposure import fx_sentence
+        self.assertEqual(fx_sentence("2026-10-07", "2026-11-06", 4.55),
+            "Since 7 Oct, the euro cost of the part you haven't fixed would be about 4.5% higher "
+            "(ECB rate as of 6 Nov). This isn't your bank's rate. Ask for a current quote. Exchange rates say nothing about delays.")
+
+    def test_no_half_default_anywhere(self):
+        from corkathon.inputs import FIXED_SHARE
+        self.assertNotIn(0.5, FIXED_SHARE.values())
+
 
 if __name__ == "__main__":
     unittest.main()
