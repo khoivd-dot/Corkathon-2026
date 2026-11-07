@@ -65,5 +65,17 @@ class NewsPortsTests(unittest.TestCase):
         self.assertIn("busy", res.reason)
 
 
+class OfficialQueryTests(unittest.TestCase):
+    def test_official_query_only_with_confirmation_on(self):
+        with mock.patch.dict(os.environ, {"CONFIRMATION_ENABLED": "0"}):
+            off = gdelt.PortGdeltLoader("Rotterdam")
+        with mock.patch.dict(os.environ, {"CONFIRMATION_ENABLED": "1"}):
+            on = gdelt.PortGdeltLoader("Rotterdam")
+        self.assertEqual(list(off.queries), ["rotterdam"])
+        self.assertEqual(list(on.queries), ["rotterdam", "rotterdam-official"])
+        self.assertIn("domain:portofrotterdam.com", on.queries["rotterdam-official"])
+        self.assertNotEqual(off.cache_key(), on.cache_key())
+
+
 if __name__ == "__main__":
     unittest.main()

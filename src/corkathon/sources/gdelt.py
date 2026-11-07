@@ -172,9 +172,16 @@ class PortGdeltLoader(GdeltLoader):
     so no business's combined route, name, stock or invoice data reaches the cache."""
 
     def __init__(self, port: str, **kw):
-        from ..events import port_query
+        from ..events import confirmation_enabled, official_query, port_query
         self.port = port.strip()
-        super().__init__(queries={_slug(self.port): port_query(self.port)}, **kw)
+        q = {_slug(self.port): port_query(self.port)}
+        # With confirmation on, also ask GDELT for pages on official carrier and
+        # port domains only. A headline from there that names a disruption and a
+        # port on the route is what filter_events treats as confirmed.
+        self.official = confirmation_enabled()
+        if self.official:
+            q[_slug(self.port) + "-official"] = official_query(self.port)
+        super().__init__(queries=q, **kw)
 
     def cache_key(self) -> str:
-        return f"gdelt-port-{_slug(self.port)}"
+        return f"gdelt-port-{_slug(self.port)}" + ("-official" if self.official else "")

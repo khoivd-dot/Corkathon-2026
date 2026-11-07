@@ -30,6 +30,7 @@ CONFIRMING_DOMAINS = frozenset({
     "evergreen-line.com", "cosco.com", "yangming.com", "zim.com",
     "portofcork.ie", "dublinport.ie", "portofrotterdam.com", "portofantwerpbruges.com",
     "hamburg-port-authority.de", "mpa.gov.sg", "suezcanal.gov.eg",
+    "hha.co.uk", "portoffelixstowe.co.uk",
 })
 
 
@@ -99,6 +100,13 @@ def port_query(port: str) -> str:
     """GDELT query for ONE public port. Cache entries are per port, never per route."""
     terms = '("port strike" OR "port closure" OR "port congestion" OR "shipping disruption" OR "vessel diverted" OR "blank sailing")'
     return f'{terms} "{port}"'
+
+
+def official_query(port: str) -> str:
+    """GDELT query restricted to the official carrier and port domains that may
+    confirm an event. Results are still matched and checked by filter_events."""
+    domains = " OR ".join(f"domain:{d}" for d in sorted(CONFIRMING_DOMAINS))
+    return f'{port_query(port)} ({domains})'
 
 
 def lane_query(lane: Lane) -> str:

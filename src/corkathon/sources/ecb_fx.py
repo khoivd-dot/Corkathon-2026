@@ -9,7 +9,10 @@ from typing import Any
 
 from .base import Licence, Loader, http_json, now_iso, DAY
 
-CURRENCIES = ("USD", "GBP", "CNY", "JPY", "CHF")
+MAIN = ("USD", "GBP", "CNY", "JPY", "CHF")
+# More ECB reference currencies (live fetch; the 7 Nov snapshot holds MAIN only).
+EXTRA = ("SEK", "DKK", "NOK", "PLN", "CZK", "HUF", "RON", "CAD", "AUD", "NZD", "INR", "KRW", "SGD", "HKD", "THB", "TRY", "BRL", "MXN", "ZAR")
+CURRENCIES = MAIN + EXTRA
 SERIES = "EXR/D." + "+".join(CURRENCIES) + ".EUR.SP00.A"
 
 

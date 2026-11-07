@@ -9,7 +9,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import date
 
-CURRENCIES = ("EUR", "USD", "GBP", "CNY", "JPY", "CHF")
+from .sources.ecb_fx import CURRENCIES as _ECB
+
+CURRENCIES = ("EUR", *_ECB)
 # Plain-language questions shown on the form (Behavioural Evidence wording).
 QUESTIONS = {
     "importer": "Business name",

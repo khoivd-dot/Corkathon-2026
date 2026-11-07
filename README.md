@@ -151,6 +151,7 @@ CI runs the tests and osv-scanner on every pull request.
 ## Limits
 
 ### What it does well
+- **Several shipments at once.** An accountant can check every client's shipment on one page and re-check them all; nothing is kept after the tab closes.
 - **Checks your route, not the whole world.** Only news naming a port on the route you entered, inside your dates, is shown. We never guess your route.
 - **Separates rumour from confirmation.** A news story is shown as "reported". It only counts as "confirmed" when a carrier or port authority's own notice names the event and a place on your route.
 - **Says when it doesn't know.** It never says "No action needed". When it can't tell, it says so, still flags a stock shortfall, and links to the official notices of the ports it can't check.
@@ -158,22 +159,22 @@ CI runs the tests and osv-scanner on every pull request.
 - **Says where every number came from and how fresh it is.** Every figure carries its source, period and when we checked it.
 - **Keeps your information private.** What you type is never saved, cached or logged.
 - **Doesn't break in a demo.** If a live source is down, it uses the last saved copy and says so.
-- **Tested.** 84 offline tests run on every pull request.
+- **Tested.** 99 offline tests run on every pull request.
 
 ### Where it breaks
-- **We can't see your shipment.** A confirmed port problem on your route may or may not affect your container; we tell you to check with your forwarder.
-- **News is a signal, not proof.** Matching is by keywords, so irrelevant stories can match a port name, and quiet delays may never be reported.
-- **No live alerts yet.** Confirmation is switched off until the reuse terms of carrier and port advisories are recorded, so today every event is "reported" and the app never raises an alert.
-- **Few confirming sources.** Even when switched on, "confirmed" relies on a fixed list of major carriers and ports; smaller ones can only ever show as "reported".
-- **Not your bank's rate.** Currency figures use ECB reference rates, published once a working day, with no exact release time.
-- **Five foreign currencies only:** US dollar, sterling, yuan, yen and Swiss franc (plus euro).
-- **No ship tracking.** Vessel position data was left out because its display rights aren't confirmed.
+- **We can't see your shipment.** A confirmed port problem on your route may or may not affect your container; we tell you to check with your forwarder. The page links your carrier's tracking page from your container number, so that check is one click.
+- **News is a signal, not proof.** A headline must name a port on your route *and* a disruption, and off-topic stories (football, hurling, wine) are dropped, but quiet delays may never be reported.
+- **Confirmation is built but off by default.** With `CONFIRMATION_ENABLED=1`, a headline from an official carrier or port site (found through GDELT's domain filter) that names a disruption and a port on your route counts as "confirmed". It stays off on the public site until the reuse terms of those pages are recorded.
+- **Few confirming sources.** "Confirmed" relies on a fixed list of major carriers and ports (17 domains); smaller ones can only ever show as "reported".
+- **Not your bank's rate.** Currency figures use ECB reference rates, published once a working day. You can type your bank's quote to see its margin against the reference rate.
+- **24 foreign currencies** from the ECB, but our saved copy (used when the ECB is unreachable) holds only the dollar, sterling, yuan, yen and Swiss franc.
+- **Ship positions are counts, not tracks.** With `AIS_ENABLED=1` and an AISHub account, the route answer shows how many ships are at anchor or moving near each port. We never show names or positions; for a single ship we link public trackers.
+- **31 ports known.** News is only searched for ports in our table; we say so when you type another.
+- **Watching needs the page open.** "Check again every 30 minutes" runs in your browser tab, because we never store your shipment.
 - **Trade statistics lag** about 2–3 months, so they're shown as background only.
 
 ### What more time would add
-- Ship-tracking and port-call data, once licensing is clear.
-- More official confirming sources: more ports, carriers and canal authorities.
-- Alerts when something changes on your route, instead of waiting to be asked.
-- Several routes and shipments at once, e.g. for an accountant with many importing clients.
-- A route map: the engine already returns `route_geo` per port, but the map on the page isn't built yet.
+- Confirm the reuse terms of carrier and port pages and of AISHub, then switch both flags on.
+- More confirming sources and ports: canal authorities, smaller carriers, a bigger port table.
+- Alerts that don't need the page open, without storing anyone's shipment (for example, a calendar file the user keeps).
 - Testing with real importers and accountants.

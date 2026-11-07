@@ -21,6 +21,7 @@ from .decision import decide
 from .ports import lookup
 from .inputs import InputError, parse_inputs
 from .sources.base import REPO_ROOT
+from .sources.ais import AisPortLoader, ais_enabled
 from .sources.gdelt import PortGdeltLoader
 from .sources.registry import LOADERS
 
@@ -88,7 +89,32 @@ def answer(form: dict) -> dict:
         sources[sid] = LOADERS[sid]().load()
     out = decide(inp, sources, records)
     out["news_ports"] = {"checked": per_port, "unknown": unknown}
+    if ais_enabled():
+        out["ais"] = ais_counts(known)
+        if out["ais"]["ports"]:
+            out["sources"].append({"name": "AISHub ship counts", "reference_period": "Last 15 minutes",
+                                   "published_at": "\u2014", "retrieved_at": out["ais"]["checked_at"],
+                                   "checked_at": out["ais"]["checked_at"], "source_updated_at": out["ais"]["checked_at"],
+                                   "mode": out["ais"]["mode"], "use": "Context only: counts near each port",
+                                   "status": out["ais"]["status"]})
     return out
+
+
+def ais_counts(ports: list[str]) -> dict:
+    """Aggregate ship counts near each known port. Never names or positions."""
+    rows, checked, mode, status = [], None, "live", "ok"
+    for p in ports:
+        hit = lookup(p)
+        if not hit:
+            continue
+        r = AisPortLoader(p, hit[2], hit[3]).load()
+        if r.records:
+            rows.append({k: r.records[0][k] for k in ("port", "waiting", "moored", "moving")})
+            checked = max(checked or r.checked_at, r.checked_at)
+        if r.mode == "fallback":
+            mode, status = "fallback", r.status
+    return {"ports": rows, "checked_at": checked, "mode": mode, "status": status,
+            "note": "Counts within about 15 nautical miles of each port, from AISHub. A queue at anchor can mean congestion, or just normal waiting."}
 
 
 class Handler(BaseHTTPRequestHandler):

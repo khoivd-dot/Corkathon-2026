@@ -10,7 +10,9 @@ from dataclasses import dataclass
 from datetime import date, timedelta
 
 # ECB series we load, keyed by invoice currency -> record field (foreign per EUR).
-ECB_FIELDS = {c: f"{c.lower()}_per_eur" for c in ("USD", "GBP", "CNY", "JPY", "CHF")}
+from .sources.ecb_fx import CURRENCIES as ECB_CURRENCIES
+
+ECB_FIELDS = {c: f"{c.lower()}_per_eur" for c in ECB_CURRENCIES}
 
 
 @dataclass(frozen=True)

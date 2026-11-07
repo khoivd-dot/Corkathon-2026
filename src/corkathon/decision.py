@@ -130,6 +130,9 @@ def _fx_block(fx: FxExposure) -> dict:
              "action": "Request a current quote from your supplier."}
     if fx.status == "computed":
         block["eur_cost_change_pct"] = fx.eur_cost_change_pct
+        # Units of the invoice currency per EUR, so the page can compare a bank's quote.
+        block.update(rate_then=fx.rate_from, rate_now=fx.rate_to, date_then=fx.date_from, date_now=fx.date_to,
+                     currency=fx.currency)
     return block
 
 
