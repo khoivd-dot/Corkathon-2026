@@ -1,10 +1,10 @@
-/* Hallmark · v2.0.0 · redesign: full · scope: page + app · theme: Soft Pill (morphin-ui shapes, Inter, warm neutrals / pure black) · genre: product · hero: centred question + a fanned stack of real answer cards · landing: section order after useorigin.com (structure only) · posture: Restrained · signature: three answer cards, each with something to try · components: ported by hand from bencho and libraries.dev (both MIT), see docs/third-party.md */
+/* Hallmark · v2.0.0 · redesign: full · scope: page + app · theme: Soft Pill (morphin-ui shapes, Inter, warm neutrals / soft charcoal, blue accents) · genre: product · hero: centred question + a fanned stack of real answer cards · landing: section order after useorigin.com (structure only) · posture: Restrained · signature: three answer cards, each with something to try · components: ported by hand from bencho and libraries.dev (both MIT), see docs/third-party.md */
 /* Pre-emit critique: no eyebrows, no tracked caps, no middle-dot meta, tokens for colour and space, no glow shadows (the border beam is a thin stroke shown only while a check runs), h2 at 40px or more, controls 44 to 52px, hero headline 7 words and one 11-word sentence above the fold at 1280x800. */
 /* Sweep: hallmark's sloplint was not run (this environment does not run code from that repo); gates applied by hand. */
 /* Imports check, theme "Soft Pill" (v4). A clean slate after Night Harbour.
    Shapes and tokens follow the morphin-ui approach (MIT): pill controls with a superellipse
-   corner, soft filled cards, Inter at a tight semibold, warm neutrals in light and pure black
-   with #171717 cards in dark. Interactions borrow ideas from bencho.dev and libraries.dev,
+   corner, soft filled cards, Inter at a tight semibold, warm neutrals in light and a soft blue-tinted charcoal
+   in dark, with brand-blue buttons and accents (Khoa asked for no heavy dark colours, 7 Nov). Interactions borrow ideas from bencho.dev and libraries.dev,
    rebuilt here in plain CSS and JS (no packages, no build step, CSP-safe).
    Amber means "act", never "danger": there is no red status colour. Status always has a word and an icon. */
 
@@ -21,12 +21,12 @@
   --card:oklch(100% 0 0);
   --secondary:oklch(95.6% .004 85);
   --secondary-2:oklch(92.5% .005 85);
-  --foreground:oklch(17% .006 85);
+  --foreground:oklch(24% .02 262);
   --muted-foreground:oklch(45% .01 85);
   --border:oklch(91.5% .005 85);
   --input:oklch(60% .01 85);
-  --primary:var(--foreground);
-  --primary-foreground:oklch(98.5% .002 85);
+  --primary:var(--brand);
+  --primary-foreground:oklch(99% .003 262);
   --brand:oklch(52% .19 262);
   --brand-soft:oklch(93.5% .035 262);
   --brand-ink:oklch(40% .16 262);
@@ -61,17 +61,17 @@
   --dur-1:150ms;--dur-2:250ms;--dur-3:350ms}
 
 @media (prefers-color-scheme:dark){:root{
-  --background:oklch(0% 0 0);
-  --card:oklch(20.5% 0 0);
-  --secondary:oklch(26.9% 0 0);
-  --secondary-2:oklch(31% 0 0);
-  --foreground:oklch(98.5% 0 0);
-  --muted-foreground:oklch(72% 0 0);
-  --border:oklch(29% 0 0);
-  --input:oklch(56% 0 0);
-  --primary-foreground:oklch(14% 0 0);
+  --background:oklch(25% .018 262);
+  --card:oklch(30% .02 262);
+  --secondary:oklch(34% .022 262);
+  --secondary-2:oklch(38% .024 262);
+  --foreground:oklch(97% .006 262);
+  --muted-foreground:oklch(82% .015 262);
+  --border:oklch(40% .02 262);
+  --input:oklch(64% .02 262);
+  --primary-foreground:oklch(20% .03 262);
   --brand:oklch(72% .14 262);
-  --brand-soft:oklch(30% .08 262);
+  --brand-soft:oklch(38% .08 262);
   --brand-ink:oklch(82% .1 262);
   --data:oklch(80% .19 148);
   --data-soft:oklch(80% .19 148 / .16);
@@ -86,7 +86,7 @@
   --ring:oklch(72% .14 262);
   --shadow-1:none;
   --shadow-2:0 0 0 1px oklch(100% 0 0 / .06);
-  --popover-shadow:0 0 0 1px oklch(100% 0 0 / .08),0 24px 48px oklch(0% 0 0 / .6);
+  --popover-shadow:0 0 0 1px oklch(100% 0 0 / .08),0 24px 48px oklch(10% .02 262 / .45);
   --beam-sheen:oklch(100% 0 0 / .75)}}
 
 /* ---------- Base ---------- */
@@ -310,7 +310,7 @@ input[type=date]{max-width:15rem}
 .findings a{color:var(--foreground)}
 .badge{display:inline-flex;align-items:center;height:20px;font:600 var(--text-xs)/1 var(--font-sans);padding:0 var(--s-2);border-radius:var(--pill);margin-right:var(--s-2);vertical-align:1px}
 .badge.rep{color:var(--foreground);background:var(--warn-soft)}
-.badge.conf{color:var(--primary-foreground);background:var(--foreground)}
+.badge.conf{color:var(--primary-foreground);background:var(--primary)}
 .findings .meta{display:block;color:var(--muted-foreground);font-size:var(--text-xs);margin-top:var(--s-1)}
 
 .part-viz{min-width:0;display:flex;flex-direction:column;gap:var(--s-4)}
@@ -343,7 +343,7 @@ input[type=range]:focus-visible{outline:2px solid var(--ring);outline-offset:2px
    input sits on top, transparent, so keyboard, touch and screen readers work as before. */
 .wks{position:relative;display:flex;align-items:center;justify-content:space-between;height:var(--h-md);padding:0 var(--s-1);border-radius:var(--s-2);cursor:ew-resize}
 .wks-bar{flex:none;width:3px;height:20px;border-radius:3px;background:color-mix(in oklch,var(--foreground) 32%,var(--secondary));transform-origin:50% 50%;transition:background-color 160ms ease}
-.wks-bar[data-on]{background:var(--foreground)}
+.wks-bar[data-on]{background:var(--brand)}
 .wks input[type=range]{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:ew-resize}
 .wks:has(input:focus-visible){outline:2px solid var(--ring);outline-offset:4px}
 .rw-ctl .wks{grid-row:2;grid-column:1/-1}
@@ -430,7 +430,7 @@ input[type=range]:focus-visible{outline:2px solid var(--ring);outline-offset:2px
 @media(min-width:1000px){.todo{grid-template-columns:minmax(0,5fr) minmax(0,7fr);column-gap:var(--s-7)}.todo .sub-h{grid-row:span 2}}
 .todo ol{margin:0;padding:0;list-style:none;counter-reset:t;display:grid;gap:var(--s-2)}
 .todo li{counter-increment:t;display:grid;grid-template-columns:var(--s-7) 1fr;align-items:start;font:500 var(--text-lg)/1.4 var(--font-sans);padding:var(--s-4);background:var(--secondary);border-radius:var(--r-inner)}
-.todo li::before{content:counter(t);display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--foreground);color:var(--primary-foreground);font:600 var(--text-sm)/1 var(--font-sans)}
+.todo li::before{content:counter(t);display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--primary);color:var(--primary-foreground);font:600 var(--text-sm)/1 var(--font-sans)}
 .coverage{margin:0;color:var(--muted-foreground);font-size:var(--text-sm)}
 
 .track-grid{display:grid;gap:var(--s-5) var(--s-6)}
@@ -453,7 +453,7 @@ input[type=range]:focus-visible{outline:2px solid var(--ring);outline-offset:2px
 .check{display:inline-flex;align-items:center;gap:var(--s-3);font-weight:500;font-size:var(--text-sm);margin:0;min-height:var(--h-md);cursor:pointer}
 .check input{-webkit-appearance:none;appearance:none;position:relative;flex:none;width:56px;height:32px;min-height:0;padding:0;margin:0;border:0;border-radius:var(--pill);background:var(--card);box-shadow:0 0 0 1px var(--input);cursor:pointer;transition:background 420ms ease}
 .check input::after{content:"";position:absolute;top:var(--s-1);left:var(--s-1);width:24px;height:24px;border-radius:var(--pill);background:color-mix(in oklch,var(--foreground) 40%,var(--card));transition:left 420ms var(--ease-spring),background 420ms ease}
-.check input:checked{background:var(--foreground);box-shadow:none}
+.check input:checked{background:var(--primary);box-shadow:none}
 .check input:checked::after{left:28px;background:var(--card)}
 @media (prefers-reduced-motion:no-preference){.check input::after{animation:drop-off 420ms var(--ease)}.check input:checked::after{animation:drop-on 420ms var(--ease)}}
 @keyframes drop-on{40%{width:34px;margin-left:-10px}}
@@ -620,9 +620,8 @@ h1 em,.section-h em{font-style:normal;color:var(--brand)}
 .sl-name{font-weight:600}
 .sl-when{color:var(--muted-foreground);font-size:var(--text-sm);font-variant-numeric:tabular-nums}
 
-/* Dark panels: near-black in light mode, a lifted card in dark mode */
-.darkpanel,.cta{--dp-bg:var(--foreground);--dp-fg:var(--background);--dp-muted:color-mix(in oklch,var(--background) 74%,var(--foreground));--dp-warn:color-mix(in oklch,var(--warn) 55%,var(--background));--dp-calm:color-mix(in oklch,var(--calm) 55%,var(--background));background:var(--dp-bg);color:var(--dp-fg)}
-@media (prefers-color-scheme:dark){.darkpanel,.cta{--dp-bg:var(--card);--dp-fg:var(--foreground);--dp-muted:var(--muted-foreground);--dp-warn:var(--warn);--dp-calm:var(--calm);box-shadow:0 0 0 1px var(--border)}}
+/* Accent panels: soft brand blue in both modes (Khoa: no heavy dark colours) */
+.darkpanel,.cta{--dp-bg:var(--brand-soft);--dp-fg:var(--foreground);--dp-muted:var(--brand-ink);--dp-warn:var(--warn-ink);--dp-calm:var(--calm);background:var(--dp-bg);color:var(--dp-fg)}
 .darkpanel{padding:var(--s-6);border-radius:var(--r-card);corner-shape:var(--corner-shape)}
 .dp-title{margin:0 0 var(--s-4);font:600 var(--text-xl)/1.2 var(--font-display);letter-spacing:-.02em}
 .dp-list{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-4)}
@@ -634,5 +633,3 @@ h1 em,.section-h em{font-style:normal;color:var(--brand)}
 .dp-foot{margin:var(--s-5) 0 0;font-size:var(--text-sm);color:var(--dp-muted)}
 .cta{display:flex;flex-direction:column;align-items:center;gap:var(--s-4);text-align:center;padding:clamp(var(--s-7),6vw,var(--s-9)) var(--s-5);border-radius:var(--r-card-lg);corner-shape:var(--corner-shape)}
 .cta p{margin:0 0 var(--s-2);color:var(--dp-muted);font-size:var(--text-lg)}
-.btn-invert{background:var(--dp-fg);color:var(--dp-bg)}
-.btn-invert:hover{background:color-mix(in oklch,var(--dp-fg) 88%,var(--dp-bg))}
